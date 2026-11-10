@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Campanhas — Detetiza OS</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button,input,select,textarea{font-family:inherit}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #2F5FE0;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height: 100%; background: #E9EEF5; padding: 24px; box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0F1720">
+<div style="border-radius: 36px; overflow: hidden; border: 6px solid #FFFFFF; background: #F4F7FB; box-shadow: 0 18px 50px rgba(20,40,80,0.14); padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="width: 46px; height: 46px; border-radius: 15px; background: #0F1720; display: flex; align-items: center; justify-content: center">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#9DBBFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"></path><path d="M9 12l2 2 4-4"></path></svg>
+</div>
+<div>
+<div style="font-size: 20px; font-weight: 800; line-height: 1.15">Dedetizadora Impacto</div>
+<div style="font-size: 12px; font-weight: 600; color: #3A4658">Detetiza OS</div>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="display: flex; align-items: center; background: #FFFFFF; border-radius: 999px; padding: 0 18px; height: 48px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 14px rgba(20,40,80,0.08)">09 nov 2026</div>
+<a href="GerenteDigital.dc.html" style="display: flex; align-items: center; gap: 8px; background: #0F1720; color: #FFFFFF; border-radius: 999px; padding: 0 20px; height: 48px; font-size: 14px; font-weight: 700">Gerente Digital</a>
+<div aria-label="Usuário: proprietário" role="img" style="width: 48px; height: 48px; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800">DI</div>
+</div>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+
+<nav aria-label="Navegação principal" style="flex: 0 0 64px; display: flex; flex-direction: column; gap: 4px; padding: 8px; background: #FFFFFF; border-radius: 22px; box-shadow: 0 8px 28px rgba(20,40,80,0.08)">
+<a href="Main.dc.html" aria-label="Dashboard" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg>
+</a>
+<a href="Agenda.dc.html" aria-label="Agenda" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M8 2v4M16 2v4M3 10h18"></path></svg>
+</a>
+<a href="Clientes.dc.html" aria-label="Clientes" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2.2.6 3.5 2.5 3.5 6"></path></svg>
+</a>
+<a href="Campanhas.dc.html" aria-label="Campanhas" aria-current="page" style="width: 48px; height: 48px; border-radius: 15px; background: #2F5FE0; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11v3a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"></path><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"></path></svg>
+</a>
+<a href="Financeiro.dc.html" aria-label="Financeiro" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"></rect><path d="M3 10h18M16 15h2"></path></svg>
+</a>
+<a href="Certificado.dc.html" aria-label="Certificados" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"></path><path d="M9 12l2 2 4-4"></path></svg>
+</a>
+</nav>
+
+<main style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<div>
+<h1 style="margin: 0; font-size: 28px; font-weight: 800">Campanhas</h1>
+<div style="font-size: 14px; font-weight: 600; color: #3A4658; margin-top: 4px">Dias de atendimento em condomínios e prédios com preço especial.</div>
+</div>
+<button onClick="{{openCamp}}" style="min-height: 48px; border: 0; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; padding: 0 24px; font-size: 14px; font-weight: 700">Cadastrar nova campanha</button>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<sc-for list="{{kpis}}" as="k" hint-placeholder-count="3">
+<div style="flex: 1 1 220px; background: #FFFFFF; border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.08); padding: 22px; padding: 18px 20px">
+<div style="font-size: 13px; font-weight: 600; color: #3A4658">{{k.label}}</div>
+<div style="font-size: 26px; font-weight: 800; line-height: 1.15; margin-top: 4px">{{k.value}}</div>
+</div>
+</sc-for>
+</div>
+
+<section style="background: #FFFFFF; border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.08); padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<div role="group" aria-label="Filtrar por status" style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{filters}}" as="f" hint-placeholder-count="4">
+<button onClick="{{f.pick}}" aria-pressed="{{f.on}}" style="min-height: 44px; border-radius: 999px; padding: 0 18px; font-size: 13px; font-weight: 700; {{f.style}}">{{f.label}}</button>
+</sc-for>
+</div>
+<div style="overflow-x: auto">
+<table style="width: 100%; min-width: 860px; border-collapse: collapse; font-size: 14px">
+<thead>
+<tr style="text-align: left; font-size: 12px; font-weight: 700; color: #3A4658">
+<th scope="col" style="padding: 8px 10px">Campanha</th>
+<th scope="col" style="padding: 8px 10px">Período</th>
+<th scope="col" style="padding: 8px 10px">Atendimentos</th>
+<th scope="col" style="padding: 8px 10px">Desconto</th>
+<th scope="col" style="padding: 8px 10px">Receita paga</th>
+<th scope="col" style="padding: 8px 10px">Status</th>
+<th scope="col" style="padding: 8px 10px; text-align: right">Ação</th>
+</tr>
+</thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="6">
+<tr style="border-top: 1px solid #E3E8EF">
+<td style="padding: 14px 10px"><div style="font-weight: 800">{{r.name}}</div><div style="font-size: 12px; font-weight: 500; color: #3A4658">{{r.sub}}</div></td>
+<td style="padding: 14px 10px; font-weight: 600">{{r.period}}</td>
+<td style="padding: 14px 10px; font-weight: 600">{{r.joined}}</td>
+<td style="padding: 14px 10px; font-weight: 600">{{r.disc}}</td>
+<td style="padding: 14px 10px; font-weight: 800">{{r.revenue}}</td>
+<td style="padding: 14px 10px"><span style="display: inline-block; border-radius: 999px; padding: 3px 12px; font-size: 12px; font-weight: 700; {{r.chip}}">{{r.status}}</span></td>
+<td style="padding: 14px 10px; text-align: right">
+<sc-if value="{{r.hasDetail}}" hint-placeholder-val="{{ false }}"><a href="Campanha.dc.html" onClick="{{r.open}}" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 999px; background: #0F1720; color: #FFFFFF; font-size: 13px; font-weight: 700">Abrir</a></sc-if>
+<sc-if value="{{r.noDetail}}" hint-placeholder-val="{{ true }}"><button disabled="" style="min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1.5px solid #C9D3E0; background: #F4F7FB; color: #5B6678; font-size: 13px; font-weight: 700; cursor: default">Detalhe</button></sc-if>
+</td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<sc-if value="{{noRows}}" hint-placeholder-val="{{ false }}">
+<div style="padding: 20px; text-align: center; font-size: 14px; font-weight: 600; color: #3A4658">Nenhuma campanha com esse status.</div>
+</sc-if>
+</section>
+
+<div style="font-size: 12px; font-weight: 600; color: #3A4658">Protótipo v0.1 · dados ilustrativos. As campanhas que você cria ficam salvas neste navegador. As campanhas antigas não têm tela de detalhe.</div>
+</main>
+</div>
+
+<sc-if value="{{cOpen}}" hint-placeholder-val="{{ false }}">
+<div style="position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 50; background: rgba(15,23,32,0.55); display: flex; align-items: flex-start; justify-content: center; padding: 72px 16px 16px; box-sizing: border-box; overflow-y: auto">
+<div role="dialog" aria-modal="true" aria-labelledby="nc-title" style="width: 100%; max-width: 580px; background: #FFFFFF; border-radius: 28px; box-shadow: 0 24px 60px rgba(15,23,32,0.35); padding: 26px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<h2 id="nc-title" style="margin: 0; font-size: 22px; font-weight: 800">Nova campanha</h2>
+<button onClick="{{closeCamp}}" aria-label="Fechar" style="width: 44px; height: 44px; border-radius: 999px; border: 0; background: #E8ECF2; color: #0F1720; font-size: 20px; font-weight: 700">×</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Nome da campanha
+<input value="{{cName}}" onInput="{{onCName}}" placeholder="Ex.: Cond. Recanto Verde" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Data de início
+<input value="{{cStart}}" onInput="{{onCStart}}" placeholder="" type="date" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Data de fim
+<input value="{{cEnd}}" onInput="{{onCEnd}}" placeholder="" type="date" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Horário de início
+<input value="{{cTStart}}" onInput="{{onCTStart}}" placeholder="" type="time" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Horário de fim
+<input value="{{cTEnd}}" onInput="{{onCTEnd}}" placeholder="" type="time" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+</div>
+<div>
+<div style="font-size: 12px; font-weight: 700; color: #3A4658; margin-bottom: 6px">Tipos de serviço disponíveis</div>
+<div role="group" aria-label="Tipos de serviço disponíveis" style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{cSvcChips}}" as="k" hint-placeholder-count="5">
+<button onClick="{{k.pick}}" aria-pressed="{{k.on}}" style="min-height: 44px; border-radius: 999px; padding: 0 16px; font-size: 13px; font-weight: 700; {{k.style}}">{{k.label}}</button>
+</sc-for>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Desconto (0 a 100%)
+<input value="{{cDisc}}" onInput="{{onCDisc}}" placeholder="20" type="number" min="0" max="100" inputmode="numeric" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Nº de casas ou apartamentos
+<input value="{{cUnits}}" onInput="{{onCUnits}}" placeholder="30" type="number" min="1" inputmode="numeric" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Máx. de atendimentos
+<input value="{{cMax}}" onInput="{{onCMax}}" placeholder="24" type="number" min="1" inputmode="numeric" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+</div>
+<div style="background: #F4F7FB; border-radius: 16px; padding: 12px 14px; font-size: 13px; font-weight: 600; line-height: 1.5; color: #2F3A4A">{{cPreview}}</div>
+<sc-if value="{{hasCErr}}" hint-placeholder-val="{{ false }}">
+<div role="alert" style="background: #FDE4E1; color: #8E1B10; border-radius: 14px; padding: 10px 14px; font-size: 13px; font-weight: 700">{{cErr}}</div>
+</sc-if>
+<div style="display: flex; justify-content: flex-end; gap: 8px">
+<button onClick="{{closeCamp}}" style="min-height: 48px; border: 1.5px solid #0F1720; border-radius: 999px; background: #FFFFFF; color: #0F1720; padding: 0 22px; font-size: 14px; font-weight: 700">Cancelar</button>
+<sc-if value="{{canCreate}}" hint-placeholder-val="{{ false }}"><a href="Campanha.dc.html" onClick="{{createCamp}}" style="display: inline-flex; align-items: center; min-height: 48px; border: 0; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; padding: 0 24px; font-size: 14px; font-weight: 700">Criar campanha</a></sc-if>
+<sc-if value="{{cannotCreate}}" hint-placeholder-val="{{ true }}"><button onClick="{{tryCreate}}" style="min-height: 48px; border: 0; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; padding: 0 24px; font-size: 14px; font-weight: 700">Criar campanha</button></sc-if>
+</div>
+</div>
+</div>
+</sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.old = [
+      { name: 'Ed. Aurora', sub: 'Apartamentos · 20 unidades', period: '21/11/2026 · 08:00 a 16:00', joined: 9, max: 16, disc: 25, revenue: 0, status: 'Agendada' },
+      { name: 'Cond. Jardim das Flores', sub: 'Casas · 24 unidades', period: '24/10/2026 · 08:00 a 16:00', joined: 17, max: 20, disc: 20, revenue: 3230, status: 'Finalizada' },
+      { name: 'Ed. Solar', sub: 'Apartamentos · 36 unidades', period: '10/10/2026 · 08:00 a 16:00', joined: 21, max: 30, disc: 25, revenue: 3150, status: 'Finalizada' },
+      { name: 'Cond. Bela Vista', sub: 'Casas · 18 unidades', period: '26/09/2026 · 08:00 a 16:00', joined: 5, max: 14, disc: 20, revenue: 0, status: 'Cancelada' },
+      { name: 'Cond. Portal do Sol', sub: 'Casas · 40 unidades', period: '12/09/2026 · 08:00 a 16:00', joined: 26, max: 30, disc: 20, revenue: 4940, status: 'Finalizada' },
+    ];
+    this.state = { filter: 'Todas', copen: false, c: this.cDefault() };
+  }
+
+  brl(n) {
+    return 'R$ ' + String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+
+  loadCamps() {
+    try { return JSON.parse(localStorage.getItem('detetiza.camps') || '[]'); } catch (e) { return []; }
+  }
+
+  saveCamps(a) {
+    try { localStorage.setItem('detetiza.camps', JSON.stringify(a)); } catch (e) {}
+  }
+
+  setCur(id) {
+    try { localStorage.setItem('detetiza.cur', id); } catch (e) {}
+  }
+
+  cDefault() {
+    return { name: '', start: '', end: '', tStart: '08:00', tEnd: '16:00', svcs: [], disc: '20', units: '', max: '', tried: false };
+  }
+
+  setC(p) {
+    this.setState({ c: Object.assign({}, this.state.c, p) });
+  }
+
+  cCheck(c) {
+    if (!c.name.trim()) return 'Informe o nome da campanha.';
+    if (!c.start || !c.end) return 'Informe as datas de início e fim.';
+    if (c.end < c.start) return 'A data de fim não pode ser antes do início.';
+    if (!c.tStart || !c.tEnd) return 'Informe os horários de início e fim.';
+    if (c.tEnd <= c.tStart) return 'O horário de fim precisa ser depois do início.';
+    if (!c.svcs.length) return 'Escolha pelo menos um tipo de serviço.';
+    const d = Number(c.disc);
+    if (c.disc === '' || !Number.isInteger(d) || d < 0 || d > 100) return 'O desconto deve ser um número inteiro de 0 a 100.';
+    if (!(parseInt(c.units, 10) >= 1)) return 'Informe o número de casas ou apartamentos.';
+    if (!(parseInt(c.max, 10) >= 1)) return 'Informe a quantidade máxima de atendimentos.';
+    if (parseInt(c.max, 10) > parseInt(c.units, 10)) return 'O máximo de atendimentos não pode passar do número de unidades.';
+    return '';
+  }
+
+  createCamp() {
+    const c = this.state.c;
+    const camp = { id: 'c' + Date.now(), name: c.name.trim(), start: c.start, end: c.end, tStart: c.tStart, tEnd: c.tEnd, services: c.svcs, disc: parseInt(c.disc, 10), units: parseInt(c.units, 10), max: parseInt(c.max, 10), status: 'Agendada', rows: [] };
+    const all = this.loadCamps();
+    all.push(camp);
+    this.saveCamps(all);
+    this.setCur(camp.id);
+  }
+
+  campVals() {
+    const s = this.state;
+    const c = s.c;
+    const val = (e) => (e && e.target ? e.target.value : '');
+    const err = this.cCheck(c);
+    const d = Number(c.disc);
+    const okD = c.disc !== '' && d >= 0 && d <= 100;
+    const prices = { 'Baratas e formigas': 240, 'Roedores (desratização)': 320, 'Cupins': 480, 'Pulgas e carrapatos': 260, 'Monitoramento': 150 };
+    const prev = c.svcs.length && okD ? 'Preço na campanha: ' + c.svcs.map((x) => x + ' ' + this.brl(prices[x] * (1 - d / 100))).join(' · ') : 'Escolha os serviços e o desconto para ver o preço da campanha.';
+    return {
+      cOpen: s.copen,
+      openCamp: () => this.setState({ copen: true, c: this.cDefault() }),
+      closeCamp: () => this.setState({ copen: false }),
+      cName: c.name, cStart: c.start, cEnd: c.end, cTStart: c.tStart, cTEnd: c.tEnd, cDisc: c.disc, cUnits: c.units, cMax: c.max,
+      onCName: (e) => this.setC({ name: val(e) }), onCStart: (e) => this.setC({ start: val(e) }), onCEnd: (e) => this.setC({ end: val(e) }),
+      onCTStart: (e) => this.setC({ tStart: val(e) }), onCTEnd: (e) => this.setC({ tEnd: val(e) }),
+      onCDisc: (e) => this.setC({ disc: val(e) }), onCUnits: (e) => this.setC({ units: val(e) }), onCMax: (e) => this.setC({ max: val(e) }),
+      cSvcChips: Object.keys(prices).map((k) => {
+        const on = c.svcs.indexOf(k) !== -1;
+        return { label: k, on: on, style: on ? 'border: 0; background: #0F1720; color: #FFFFFF;' : 'border: 1.5px solid #C9D3E0; background: #F4F7FB; color: #0F1720;', pick: () => this.setC({ svcs: on ? c.svcs.filter((x) => x !== k) : c.svcs.concat([k]) }) };
+      }),
+      cPreview: prev,
+      hasCErr: c.tried && !!err, cErr: err,
+      canCreate: !err, cannotCreate: !!err,
+      tryCreate: () => this.setC({ tried: true }),
+      createCamp: () => this.createCamp(),
+    };
+  }
+
+  fmt(d) {
+    return d ? d.slice(8, 10) + '/' + d.slice(5, 7) + '/' + d.slice(0, 4) : '';
+  }
+
+  renderVals() {
+    const s = this.state;
+    const store = this.loadCamps();
+    const vila = store.find((c) => c.id === 'vilaverde');
+    const vilaRows = vila ? vila.rows : null;
+    const vilaRow = { name: 'Cond. Vila Verde', sub: 'Casas · 30 unidades', period: '14/11/2026 · 08:00 a 16:00', joined: vilaRows ? vilaRows.length : 12, max: 24, disc: 20, revenue: vilaRows ? vilaRows.filter((r) => r.status === 'Pago').reduce((a, r) => a + r.value, 0) : 1536, status: 'Agendada', id: 'vilaverde' };
+    const mine = store.filter((c) => c.id !== 'vilaverde').map((c) => ({
+      name: c.name, sub: c.units + ' unidades · ' + c.services.length + ' serviço(s)',
+      period: (c.start === c.end ? this.fmt(c.start) : this.fmt(c.start).slice(0, 5) + ' a ' + this.fmt(c.end)) + ' · ' + c.tStart + ' a ' + c.tEnd,
+      joined: c.rows.length, max: c.max, disc: c.disc, revenue: c.rows.filter((r) => r.status === 'Pago').reduce((a, r) => a + r.value, 0), status: c.status, id: c.id,
+    })).reverse();
+    const all = mine.concat([vilaRow]).concat(this.old);
+    const statuses = ['Todas', 'Agendada', 'Finalizada', 'Cancelada'];
+    const count = (st) => (st === 'Todas' ? all.length : all.filter((x) => x.status === st).length);
+    const chipOf = { Agendada: 'background: #DCE7FF; color: #1B47B5;', Finalizada: 'background: #DDF3E4; color: #14653A;', Cancelada: 'background: #FDE4E1; color: #8E1B10;' };
+    const shown = all.filter((x) => s.filter === 'Todas' || x.status === s.filter);
+    const fin = all.filter((x) => x.status === 'Finalizada');
+    const finRev = fin.reduce((a, x) => a + x.revenue, 0);
+    const next = all.find((x) => x.status === 'Agendada');
+    return Object.assign(this.campVals(), {
+      kpis: [
+        { label: 'Receita das campanhas finalizadas', value: this.brl(finRev) },
+        { label: 'Campanhas agendadas', value: String(count('Agendada')) },
+        { label: 'Próxima campanha', value: next ? next.name : 'Nenhuma' },
+      ],
+      filters: statuses.map((st) => ({
+        label: st + ' (' + count(st) + ')', on: s.filter === st,
+        style: s.filter === st ? 'border: 0; background: #0F1720; color: #FFFFFF;' : 'border: 1.5px solid #C9D3E0; background: #F4F7FB; color: #0F1720;',
+        pick: () => this.setState({ filter: st }),
+      })),
+      rows: shown.map((x) => ({
+        name: x.name, sub: x.sub, period: x.period, joined: x.joined + ' de ' + x.max, disc: x.disc + '%',
+        revenue: this.brl(x.revenue), status: x.status, chip: chipOf[x.status],
+        hasDetail: !!x.id, noDetail: !x.id, open: () => this.setCur(x.id),
+      })),
+      noRows: shown.length === 0,
+    });
+  }
+}
+</script>
+</body>
+</html>

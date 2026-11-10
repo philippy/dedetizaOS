@@ -1,0 +1,72 @@
+# Detetiza OS
+
+Sistema de gestão da Dedetizadora Impacto (uma única empresa).
+Toda a interface em português do Brasil.
+Produção: https://dedetiza-os.vercel.app (deploy automático a cada push na `main`).
+
+## Escopo (MVP)
+Início, Agenda, Clientes, Serviços, Financeiro (contas a pagar e a receber) e Campanhas.
+Fora do escopo: IA, leitura de comprovante Pix, app offline do técnico, perfis de acesso,
+WhatsApp, Gerente Digital, certificados.
+
+## Protótipo
+As telas de referência estão em `prototipo/`. Leia `prototipo/README.md` antes de criar ou
+mudar qualquer tela. Os `.dc.html` são referência de layout, estilos, textos e regras.
+Não copie o formato: reconstrua em Next.js + Tailwind.
+Desempate: sobre O QUE existe, vale este Escopo. Sobre COMO fica na tela, vale o protótipo.
+Dados dos protótipos são de exemplo e não vão para o banco.
+
+## Stack
+- Next.js 15 (App Router, TypeScript strict)
+- Drizzle ORM + Neon Postgres
+- Better Auth, só e-mail e senha
+- Tailwind (componentes feitos à mão), validação com Zod
+
+## Modelo de dados
+- tecnicos: nome, telefone, cor, ativo
+- clientes: tipo (PF/PJ), nome, documento, whatsapp, email, endereco, observacoes
+- tipos_servico: nome, preco
+- servicos: cliente_id, tipo_servico_id, tecnico_id, data_hora, valor,
+  status (agendado, concluido, cancelado), observacoes
+- lancamentos: tipo (receber, pagar), descricao, cliente_id ou fornecedor, servico_id,
+  inscricao_id, vencimento, valor, status (aberto, pago), pago_em
+- campanhas: nome, local, data_inicio, data_fim, desconto_pct, unidades,
+  status (agendada, finalizada, cancelada)
+- inscricoes: campanha_id, unidade, morador, telefone, valor, pago
+Valores em centavos (integer). Datas em texto ISO (`AAAA-MM-DD`, `AAAA-MM-DDTHH:MM`).
+
+## Segurança (não remover)
+- Toda Server Action em `src/actions` começa com `await requireSession()`. Uma Server
+  Action é um endpoint público: sem isso, qualquer pessoa chama sem login.
+- O cadastro só aceita o primeiro usuário (hook em `src/lib/auth.ts`). `ALLOW_SIGNUP=true`
+  libera de novo.
+- Nada de rotinas que gravam ou apagam dados ao abrir uma página (seed, limpeza,
+  migração). Dados de demonstração só com `npm run seed:demo`, em banco de teste.
+- Nunca enviar ao GitHub `.env*` nem a pasta `dados/`.
+
+## Regras
+- Ler dados em Server Components e gravar com Server Actions. Sem API REST.
+- Não instalar bibliotecas além da stack sem perguntar.
+- Moeda R$ 1.234,56, datas dd/mm/aaaa, fuso America/Sao_Paulo (helpers em `src/lib/utils.ts`).
+- Excluir serviço = mudar status para cancelado. Lançamento pago não pode ser excluído.
+- Ao concluir um serviço, criar o lançamento a receber: vence hoje para PF e em 30 dias para PJ.
+- Cada inscrição de campanha cria um lançamento a receber.
+- Visual: fundo #E9EEF5, cartões brancos, texto #0F1720, primária #2F5FE0, a receber verde
+  #14653A sobre #DDF3E4, a pagar vermelho #8E1B10 sobre #FDE4E1, fonte Plus Jakarta Sans,
+  botões em pílula, áreas de toque de no mínimo 44 px.
+- Menu lateral: Início, Agenda, Clientes, Serviços, Financeiro, Campanhas. No celular vira menu inferior.
+- Toda tela precisa funcionar no celular.
+- O app conecta com DATABASE_URL (pooled). O drizzle-kit usa DATABASE_URL_UNPOOLED.
+- Ao terminar cada etapa, rodar `npm run typecheck` e `npm run build` e corrigir os erros.
+
+## Desenvolvimento local
+- `.env.local` com `DATABASE_URL`. Se apontar para um Postgres em localhost/127.0.0.1,
+  o app usa o driver `pg` em vez do Neon (ver `src/db/index.ts`).
+- Banco novo: `npm run db:push` cria as tabelas; `npm run seed:demo` insere dados de exemplo.
+
+## Comandos
+- npm run dev
+- npm run typecheck
+- npm run build
+- npm run db:push
+- npm run seed:demo

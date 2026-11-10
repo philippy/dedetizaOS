@@ -1,0 +1,669 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Dashboard — Detetiza OS</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font-family:inherit;cursor:pointer}
+input{font-family:inherit}
+a{color:inherit;text-decoration:none}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #2F5FE0;outline-offset:2px}
+.hero-bg{background-color:#E9EEF5;isolation:isolate}
+</style>
+</helmet>
+<div style="min-height: 100%; background: #E9EEF5; padding: 24px; box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0F1720">
+<div class="hero-bg" style="position: relative; border-radius: 36px; overflow: hidden; border: 6px solid #FFFFFF; box-shadow: 0 18px 50px rgba(20,40,80,0.14); padding: 24px; box-sizing: border-box">
+<div style="position: relative; display: flex; flex-direction: column; gap: 20px">
+
+<!-- Barra superior -->
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="width: 46px; height: 46px; border-radius: 15px; background: #0F1720; display: flex; align-items: center; justify-content: center">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#9DBBFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"></path><path d="M9 12l2 2 4-4"></path></svg>
+</div>
+<div>
+<div style="font-size: 20px; font-weight: 800; line-height: 1.15; color: #0F1720">Dedetizadora Impacto</div>
+<div style="font-size: 12px; font-weight: 600; color: #2F3A4A">Detetiza OS</div>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+<label style="display: flex; align-items: center; gap: 10px; background: #FFFFFF; border-radius: 999px; padding: 0 18px; height: 48px; min-width: 240px; box-shadow: 0 4px 14px rgba(20,40,80,0.08)">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3A4658" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+<input type="text" placeholder="Buscar cliente, OS, contrato…" aria-label="Buscar" style="border: 0; outline: 0; background: transparent; font-size: 14px; color: #0F1720; width: 100%">
+</label>
+<div style="display: flex; align-items: center; gap: 8px; background: #FFFFFF; border-radius: 999px; padding: 0 18px; height: 48px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 14px rgba(20,40,80,0.08)">06 nov 2026</div>
+<button onClick="{{openSvc}}" style="display: flex; align-items: center; gap: 8px; background: #2F5FE0; color: #FFFFFF; border: 0; border-radius: 999px; padding: 0 20px; height: 48px; font-size: 14px; font-weight: 700; box-shadow: 0 6px 18px rgba(47,95,224,0.35)">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+Novo serviço
+</button>
+<a href="GerenteDigital.dc.html" style="display: flex; align-items: center; gap: 8px; background: #0F1720; color: #FFFFFF; border-radius: 999px; padding: 0 20px; height: 48px; font-size: 14px; font-weight: 700; box-shadow: 0 6px 18px rgba(15,23,32,0.25)">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9DBBFF" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg>
+Gerente Digital
+</a>
+<button aria-label="Notificações" style="width: 48px; height: 48px; border-radius: 999px; border: 0; background: #FFFFFF; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(20,40,80,0.08)">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7z"></path><path d="M10 20a2 2 0 0 0 4 0"></path></svg>
+</button>
+<div aria-label="Usuário: proprietário" role="img" style="width: 48px; height: 48px; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800">DI</div>
+</div>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+
+<!-- Menu lateral -->
+<nav aria-label="Navegação principal" style="flex: 0 0 64px; display: flex; flex-direction: column; gap: 4px; padding: 8px; background: rgba(255,255,255,0.86); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255,255,255,0.8); border-radius: 22px; box-shadow: 0 8px 28px rgba(20,40,80,0.10)">
+<a href="Main.dc.html" aria-label="Dashboard" aria-current="page" style="width: 48px; height: 48px; border-radius: 15px; background: #2F5FE0; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg>
+</a>
+<a href="Agenda.dc.html" aria-label="Agenda" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M8 2v4M16 2v4M3 10h18"></path></svg>
+</a>
+<a href="Clientes.dc.html" aria-label="Clientes" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2.2.6 3.5 2.5 3.5 6"></path></svg>
+</a>
+<a href="Campanhas.dc.html" aria-label="Campanhas" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11v3a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"></path><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"></path></svg>
+</a>
+<a href="Financeiro.dc.html" aria-label="Financeiro" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"></rect><path d="M3 10h18M16 15h2"></path></svg>
+</a>
+<a href="Certificado.dc.html" aria-label="Certificados" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"></path><path d="M9 12l2 2 4-4"></path></svg>
+</a>
+<div style="height: 1px; background: rgba(15,23,32,0.12); margin: 4px 8px"></div>
+<span role="img" aria-label="Clientes (fora do escopo deste protótipo)" title="Clientes — não prototipado" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; opacity: 0.45">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18.5 14.5c1.9.8 3 2.6 3 5.5"></path></svg>
+</span>
+<span role="img" aria-label="Contratos (fora do escopo deste protótipo)" title="Contratos — não prototipado" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; opacity: 0.45">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5M9 13h6M9 17h6"></path></svg>
+</span>
+<span role="img" aria-label="Financeiro (fora do escopo deste protótipo)" title="Financeiro — não prototipado" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; opacity: 0.45">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h13v4"></path><path d="M3 7v11a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1H5a2 2 0 0 1-2-2z"></path><circle cx="16.5" cy="14.5" r="1.2"></circle></svg>
+</span>
+<span role="img" aria-label="Configurações (fora do escopo deste protótipo)" title="Configurações — não prototipado" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; opacity: 0.45">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"></path><circle cx="16" cy="6" r="2"></circle><circle cx="10" cy="12" r="2"></circle><circle cx="18" cy="18" r="2"></circle></svg>
+</span>
+</nav>
+
+<!-- Conteúdo -->
+<main style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+
+<!-- Hero: KPIs sobre a foto + Precisa de você + gráfico -->
+<section style="display: flex; flex-wrap: wrap; gap: 20px; align-items: stretch; min-height: 430px">
+
+<div style="flex: 1 1 360px; display: flex; flex-direction: column; justify-content: space-between; gap: 20px; min-height: 380px">
+<div style="align-self: flex-start; background: rgba(255,255,255,0.86); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.8); border-radius: 999px; padding: 10px 18px; font-size: 14px; font-weight: 700">Sexta-feira · Bom dia</div>
+<div>
+<div style="font-size: 13px; font-weight: 700; color: #1F2937; margin: 0 0 8px 4px; text-shadow: 0 1px 6px rgba(255,255,255,0.8)">Últimos 30 dias</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<div style="flex: 1 1 160px; background: rgba(255,255,255,0.88); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.8); border-radius: 20px; padding: 14px 16px; box-shadow: 0 8px 24px rgba(20,40,80,0.10)">
+<div style="font-size: 12px; font-weight: 600; color: #3A4658">Faturado</div>
+<div style="font-size: 26px; font-weight: 800; margin-top: 2px">{{kpi.faturado}}</div>
+<div style="font-size: 12px; font-weight: 600; color: #3A4658; margin-top: 2px">48 OS concluídas</div>
+</div>
+<div style="flex: 1 1 160px; background: rgba(255,255,255,0.88); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.8); border-radius: 20px; padding: 14px 16px; box-shadow: 0 8px 24px rgba(20,40,80,0.10)">
+<div style="font-size: 12px; font-weight: 600; color: #3A4658">Recebido</div>
+<div style="font-size: 26px; font-weight: 800; margin-top: 2px">{{kpi.recebido}}</div>
+<div style="font-size: 12px; font-weight: 700; color: #14653A; margin-top: 2px">76% do faturado</div>
+</div>
+<div style="flex: 1 1 160px; background: rgba(255,255,255,0.88); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.8); border-radius: 20px; padding: 14px 16px; box-shadow: 0 8px 24px rgba(20,40,80,0.10)">
+<div style="font-size: 12px; font-weight: 600; color: #3A4658">A receber</div>
+<div style="font-size: 26px; font-weight: 800; margin-top: 2px">{{kpi.areceber}}</div>
+<div style="font-size: 12px; font-weight: 600; color: #3A4658; margin-top: 2px">no prazo e em atraso</div>
+</div>
+<div style="flex: 1 1 160px; background: rgba(255,255,255,0.88); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.8); border-radius: 20px; padding: 14px 16px; box-shadow: 0 8px 24px rgba(20,40,80,0.10)">
+<div style="font-size: 12px; font-weight: 600; color: #3A4658">Em atraso</div>
+<div style="font-size: 26px; font-weight: 800; margin-top: 2px; color: #B42318">{{kpi.atraso}}</div>
+<div style="font-size: 12px; font-weight: 700; color: #B42318; margin-top: 2px">6 clientes</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Precisa de você -->
+<div style="flex: 1 1 360px; max-width: 460px; background: rgba(255,255,255,0.80); backdrop-filter: blur(18px) saturate(1.3); -webkit-backdrop-filter: blur(18px) saturate(1.3); border: 1px solid rgba(255,255,255,0.75); border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.10); padding: 20px; display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px">
+<div style="font-size: 17px; font-weight: 800">Precisa de você</div>
+<div style="background: #0F1720; color: #FFFFFF; font-size: 12px; font-weight: 700; border-radius: 999px; padding: 4px 12px">{{pendingCount}} pendentes</div>
+</div>
+<sc-for list="{{acks}}" as="it" hint-placeholder-count="5">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid rgba(15,23,32,0.08)">
+<div style="min-width: 0">
+<div style="font-size: 14px; font-weight: 700; line-height: 1.3">{{it.title}}</div>
+<div style="font-size: 12px; font-weight: 500; color: #3A4658; margin-top: 2px">{{it.sub}}</div>
+</div>
+<button onClick="{{it.act}}" disabled="{{it.done}}" style="flex: 0 0 auto; min-height: 44px; min-width: 88px; border-radius: 999px; border: 0; box-sizing: border-box; padding: 0 16px; font-size: 13px; font-weight: 700; {{it.btnColors}}">{{it.btnLabel}}</button>
+</div>
+</sc-for>
+</div>
+
+<!-- Faturado × Recebido -->
+<div style="flex: 1 1 340px; max-width: 400px; background: rgba(255,255,255,0.80); backdrop-filter: blur(18px) saturate(1.3); -webkit-backdrop-filter: blur(18px) saturate(1.3); border: 1px solid rgba(255,255,255,0.75); border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.10); padding: 20px; display: flex; flex-direction: column; gap: 12px">
+<div style="font-size: 17px; font-weight: 800">Faturado × Recebido</div>
+<div style="display: flex; gap: 16px; font-size: 12px; font-weight: 600; color: #3A4658">
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #2F5FE0"></span>Faturado</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #0F1720"></span>Recebido</span>
+</div>
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; height: 190px; padding-top: 8px">
+<sc-for list="{{weeks}}" as="w" hint-placeholder-count="4">
+<div style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; min-width: 0">
+<div style="display: flex; align-items: flex-end; gap: 5px; height: 150px">
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 3px">
+<span style="font-size: 12px; font-weight: 700; color: #1B47B5">{{w.fatLabel}}</span>
+<div style="width: 22px; border-radius: 8px 8px 4px 4px; background: #2F5FE0; {{w.fatStyle}}"></div>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 3px">
+<span style="font-size: 12px; font-weight: 700; color: #0F1720">{{w.recLabel}}</span>
+<div style="width: 22px; border-radius: 8px 8px 4px 4px; background: #0F1720; {{w.recStyle}}"></div>
+</div>
+</div>
+<div style="font-size: 12px; font-weight: 600; color: #3A4658; text-align: center; line-height: 1.2">{{w.label}}</div>
+</div>
+</sc-for>
+</div>
+<div style="font-size: 12px; color: #3A4658; font-weight: 500; line-height: 1.4">A diferença entre as duas barras é o que ainda está a receber. Valores em milhares de reais.</div>
+</div>
+
+</section>
+
+<!-- Linha 2: trabalhos, tarefas, ocupação -->
+<section style="display: flex; flex-wrap: wrap; gap: 20px; align-items: stretch">
+
+<div style="flex: 2 1 520px; min-width: 0; background: rgba(255,255,255,0.88); backdrop-filter: blur(18px) saturate(1.3); -webkit-backdrop-filter: blur(18px) saturate(1.3); border: 1px solid rgba(255,255,255,0.75); border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.08); padding: 20px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<div style="display: flex; align-items: center; gap: 10px">
+<div style="font-size: 17px; font-weight: 800">Trabalhos do dia</div>
+<div style="background: #DCE7FF; color: #1B47B5; font-size: 12px; font-weight: 700; border-radius: 999px; padding: 4px 12px">{{day.tag}}</div>
+</div>
+<div style="display: flex; align-items: center; gap: 4px; background: #F1F4F8; border-radius: 999px; padding: 4px">
+<button onClick="{{prevDay}}" disabled="{{prevDisabled}}" aria-label="Dia anterior" style="width: 44px; height: 44px; border-radius: 999px; border: 0; background: #FFFFFF; display: flex; align-items: center; justify-content: center; {{prevStyle}}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+</button>
+<div style="min-width: 118px; text-align: center; font-size: 14px; font-weight: 700">{{day.label}}</div>
+<button onClick="{{nextDay}}" disabled="{{nextDisabled}}" aria-label="Próximo dia" style="width: 44px; height: 44px; border-radius: 999px; border: 0; background: #FFFFFF; display: flex; align-items: center; justify-content: center; {{nextStyle}}">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+</button>
+</div>
+</div>
+<div style="font-size: 13px; font-weight: 600; color: #3A4658">{{day.summary}}</div>
+<sc-for list="{{jobs}}" as="job" hint-placeholder-count="6">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid rgba(15,23,32,0.08)">
+<div style="flex: 0 0 52px; font-size: 14px; font-weight: 800">{{job.time}}</div>
+<div style="flex: 1 1 200px; min-width: 0">
+<div style="font-size: 14px; font-weight: 700">{{job.client}}</div>
+<div style="font-size: 13px; font-weight: 500; color: #3A4658">{{job.service}}</div>
+</div>
+<div style="flex: 0 0 auto; display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; min-width: 92px">
+<div style="width: 30px; height: 30px; border-radius: 999px; color: #FFFFFF; font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; {{job.techColors}}">{{job.ini}}</div>
+{{job.tech}}
+</div>
+<div style="flex: 0 0 auto; min-width: 104px; text-align: center; font-size: 12px; font-weight: 700; border-radius: 999px; padding: 6px 12px; {{job.chipColors}}">{{job.status}}</div>
+</div>
+</sc-for>
+<a href="Agenda.dc.html" style="margin-top: 4px; align-self: flex-start; font-size: 14px; font-weight: 700; color: #1B47B5; min-height: 44px; display: flex; align-items: center">Abrir agenda dos técnicos →</a>
+</div>
+
+<div style="flex: 1 1 340px; min-width: 0; background: rgba(255,255,255,0.88); backdrop-filter: blur(18px) saturate(1.3); -webkit-backdrop-filter: blur(18px) saturate(1.3); border: 1px solid rgba(255,255,255,0.75); border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.08); padding: 20px; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 4px">
+<div style="font-size: 17px; font-weight: 800">Tarefas do dia</div>
+<div style="font-size: 12px; font-weight: 700; color: #3A4658">{{tasksDone}} de {{tasksTotal}}</div>
+</div>
+<sc-for list="{{tasks}}" as="t" hint-placeholder-count="5">
+<button onClick="{{t.toggle}}" aria-pressed="{{t.done}}" style="display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; text-align: left; border: 0; border-top: 1px solid rgba(15,23,32,0.08); background: transparent; padding: 8px 0; color: #0F1720">
+<span style="flex: 0 0 24px; height: 24px; border-radius: 8px; display: flex; align-items: center; justify-content: center; {{t.boxColors}}">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="{{t.checkStyle}}"><path d="M5 12l4 4 10-10"></path></svg>
+</span>
+<span style="flex: 1; min-width: 0; font-size: 14px; font-weight: 600; line-height: 1.35; {{t.textStyle}}">{{t.text}}</span>
+<span style="flex: 0 0 auto; font-size: 12px; font-weight: 700; border-radius: 999px; padding: 4px 10px; {{t.originColors}}">{{t.origin}}</span>
+</button>
+</sc-for>
+</div>
+
+<div style="flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+<div style="background: rgba(255,255,255,0.88); backdrop-filter: blur(18px) saturate(1.3); -webkit-backdrop-filter: blur(18px) saturate(1.3); border: 1px solid rgba(255,255,255,0.75); border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.08); padding: 20px; display: flex; flex-direction: column; gap: 12px">
+<div style="font-size: 17px; font-weight: 800">Ocupação · próximos 7 dias</div>
+<div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 6px; height: 124px">
+<sc-for list="{{occupancy}}" as="o" hint-placeholder-count="7">
+<div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; min-width: 0">
+<span style="font-size: 12px; font-weight: 700">{{o.pct}}</span>
+<div style="width: 100%; max-width: 30px; border-radius: 8px 8px 4px 4px; {{o.style}}"></div>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; justify-content: space-between; gap: 6px">
+<sc-for list="{{occupancy}}" as="o" hint-placeholder-count="7">
+<div style="flex: 1; text-align: center; font-size: 12px; font-weight: 600; color: #3A4658">{{o.day}}</div>
+</sc-for>
+</div>
+</div>
+<div style="background: rgba(255,255,255,0.88); backdrop-filter: blur(18px) saturate(1.3); -webkit-backdrop-filter: blur(18px) saturate(1.3); border: 1px solid rgba(255,255,255,0.75); border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.08); padding: 20px; display: flex; flex-direction: column; gap: 4px">
+<div style="font-size: 17px; font-weight: 800; margin-bottom: 4px">Contratos a vencer</div>
+<sc-for list="{{contracts}}" as="c" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid rgba(15,23,32,0.08)">
+<div style="min-width: 0">
+<div style="font-size: 14px; font-weight: 700">{{c.name}}</div>
+<div style="font-size: 12px; font-weight: 500; color: #3A4658">{{c.kind}}</div>
+</div>
+<div style="flex: 0 0 auto; font-size: 12px; font-weight: 700; border-radius: 999px; padding: 5px 12px; {{c.colors}}">{{c.when}}</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+</section>
+
+<!-- Linha 3: campanhas, consumo, clientes -->
+<section style="display: flex; flex-wrap: wrap; gap: 20px; align-items: stretch">
+
+<div style="flex: 1 1 340px; min-width: 0; background: rgba(255,255,255,0.88); backdrop-filter: blur(18px) saturate(1.3); -webkit-backdrop-filter: blur(18px) saturate(1.3); border: 1px solid rgba(255,255,255,0.75); border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.08); padding: 20px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<div style="font-size: 17px; font-weight: 800">Campanhas ativas</div>
+<a href="Campanhas.dc.html" style="font-size: 13px; font-weight: 700; color: #1B47B5; min-height: 44px; display: flex; align-items: center">Ver campanhas →</a>
+</div>
+<sc-for list="{{campaigns}}" as="cp" hint-placeholder-count="2">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; gap: 12px; align-items: baseline">
+<div style="font-size: 14px; font-weight: 700">{{cp.name}}</div>
+<div style="font-size: 12px; font-weight: 700; color: #3A4658">{{cp.date}}</div>
+</div>
+<div style="height: 10px; border-radius: 999px; background: #E3E8EF; overflow: hidden"><div style="height: 10px; border-radius: 999px; background: #2F5FE0; {{cp.barStyle}}"></div></div>
+<div style="display: flex; justify-content: space-between; gap: 12px; font-size: 12px; font-weight: 600; color: #3A4658"><span>{{cp.adesoes}}</span><span>Receita prevista {{cp.receita}}</span></div>
+</div>
+</sc-for>
+</div>
+
+<div style="flex: 1 1 340px; min-width: 0; background: rgba(255,255,255,0.88); backdrop-filter: blur(18px) saturate(1.3); -webkit-backdrop-filter: blur(18px) saturate(1.3); border: 1px solid rgba(255,255,255,0.75); border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.08); padding: 20px; display: flex; flex-direction: column; gap: 14px">
+<div style="font-size: 17px; font-weight: 800">Consumo do plano</div>
+<sc-for list="{{usage}}" as="u" hint-placeholder-count="2">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; gap: 12px; align-items: baseline">
+<div style="font-size: 14px; font-weight: 700">{{u.name}}</div>
+<div style="font-size: 13px; font-weight: 700">{{u.value}}</div>
+</div>
+<div style="height: 10px; border-radius: 999px; background: #E3E8EF; overflow: hidden"><div style="height: 10px; border-radius: 999px; background: #0F1720; {{u.barStyle}}"></div></div>
+</div>
+</sc-for>
+<div style="font-size: 12px; color: #3A4658; font-weight: 500; line-height: 1.4">Franquias do plano são ilustrativas. Acima do limite, o excedente é cobrado por conversa e o cliente é avisado antes.</div>
+</div>
+
+<div style="flex: 1 1 340px; min-width: 0; background: rgba(255,255,255,0.88); backdrop-filter: blur(18px) saturate(1.3); -webkit-backdrop-filter: blur(18px) saturate(1.3); border: 1px solid rgba(255,255,255,0.75); border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.08); padding: 20px; display: flex; flex-direction: column; gap: 14px">
+<div style="font-size: 17px; font-weight: 800">Carteira e equipe</div>
+<div style="display: flex; align-items: baseline; gap: 10px">
+<div style="font-size: 40px; font-weight: 800; line-height: 1">271</div>
+<div style="font-size: 14px; font-weight: 600; color: #3A4658">clientes ativos</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<span style="font-size: 12px; font-weight: 700; border-radius: 999px; padding: 6px 12px; background: #DCE7FF; color: #1B47B5">71 empresas</span>
+<span style="font-size: 12px; font-weight: 700; border-radius: 999px; padding: 6px 12px; background: #E8ECF2; color: #2F3A4A">200 residenciais</span>
+</div>
+<div style="height: 1px; background: rgba(15,23,32,0.08)"></div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<div style="font-size: 14px; font-weight: 700">3 técnicos em campo</div>
+<div style="display: flex">
+<div role="img" aria-label="Marcos" style="width: 34px; height: 34px; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; border: 2px solid #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800">M</div>
+<div role="img" aria-label="Ana" style="width: 34px; height: 34px; border-radius: 999px; background: #0F1720; color: #FFFFFF; border: 2px solid #FFFFFF; margin-left: -8px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800">A</div>
+<div role="img" aria-label="Paulo" style="width: 34px; height: 34px; border-radius: 999px; background: #4A5B78; color: #FFFFFF; border: 2px solid #FFFFFF; margin-left: -8px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800">P</div>
+</div>
+</div>
+</div>
+
+</section>
+
+<div style="font-size: 12px; font-weight: 600; color: #3A4658; padding: 0 4px 4px">Protótipo v0.1 · números e nomes de clientes ilustrativos, exceto a carteira (71 empresas, 200 residenciais) e a equipe (3 técnicos).</div>
+
+</main>
+</div>
+</div>
+</div>
+<sc-if value="{{svcOpen}}" hint-placeholder-val="{{ false }}">
+<div style="position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 50; background: rgba(15,23,32,0.55); display: flex; align-items: flex-start; justify-content: center; padding: 72px 16px 16px; box-sizing: border-box; overflow-y: auto">
+<div role="dialog" aria-modal="true" aria-labelledby="svc-title" style="width: 100%; max-width: 580px; background: #FFFFFF; border-radius: 28px; box-shadow: 0 24px 60px rgba(15,23,32,0.35); padding: 26px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px; color: #0F1720; font-family: 'Plus Jakarta Sans', system-ui, sans-serif">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<h2 id="svc-title" style="margin: 0; font-size: 22px; font-weight: 800">{{svcTitle}}</h2>
+<button onClick="{{closeSvc}}" aria-label="Fechar" style="width: 44px; height: 44px; border-radius: 999px; border: 0; background: #E8ECF2; color: #0F1720; font-size: 20px; font-weight: 700">×</button>
+</div>
+
+<sc-if value="{{svcIsForm}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; align-items: flex-end; gap: 8px">
+<label style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Cliente
+<select value="{{svcClient}}" onChange="{{onClient}}" style="height: 48px; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 12px; font-size: 14px; font-family: inherit; background: #FFFFFF; color: #0F1720">
+<sc-for list="{{clientOpts}}" as="o" hint-placeholder-count="4"><option value="{{o.v}}" selected="{{o.sel}}">{{o.l}}</option></sc-for>
+</select>
+</label>
+<button onClick="{{openNewClient}}" style="flex: 0 0 auto; min-height: 48px; border: 1.5px solid #0F1720; border-radius: 999px; background: #FFFFFF; color: #0F1720; padding: 0 16px; font-size: 13px; font-weight: 700">+ Cadastrar novo</button>
+</div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Tipo de serviço
+<select value="{{svcType}}" onChange="{{onType}}" style="height: 48px; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 12px; font-size: 14px; font-family: inherit; background: #FFFFFF; color: #0F1720">
+<sc-for list="{{typeOpts}}" as="o" hint-placeholder-count="5"><option value="{{o.v}}" selected="{{o.sel}}">{{o.l}}</option></sc-for>
+</select>
+</label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Técnico
+<select value="{{svcTech}}" onChange="{{onTech}}" style="height: 48px; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 12px; font-size: 14px; font-family: inherit; background: #FFFFFF; color: #0F1720">
+<sc-for list="{{techOpts}}" as="o" hint-placeholder-count="4"><option value="{{o.v}}" selected="{{o.sel}}">{{o.l}}</option></sc-for>
+</select>
+</label>
+<div style="display: flex; gap: 8px">
+<label style="flex: 1 1 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Dia
+<select value="{{svcDay}}" onChange="{{onDay}}" style="height: 48px; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 12px; font-size: 14px; font-family: inherit; background: #FFFFFF; color: #0F1720">
+<sc-for list="{{dayOpts}}" as="o" hint-placeholder-count="4"><option value="{{o.v}}" selected="{{o.sel}}">{{o.l}}</option></sc-for>
+</select>
+</label>
+<label style="flex: 1 1 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Horário
+<select value="{{svcTime}}" onChange="{{onTime}}" style="height: 48px; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 12px; font-size: 14px; font-family: inherit; background: #FFFFFF; color: #0F1720">
+<sc-for list="{{timeOpts}}" as="o" hint-placeholder-count="10"><option value="{{o.v}}" selected="{{o.sel}}">{{o.l}}</option></sc-for>
+</select>
+</label>
+</div>
+<div style="background: #F4F7FB; border-radius: 16px; padding: 12px 14px; font-size: 13px; font-weight: 500; line-height: 1.5; color: #2F3A4A">
+<div style="font-weight: 800; color: #0F1720">{{svcPriceText}}</div>
+<div>{{svcPolicy}}</div>
+</div>
+<sc-if value="{{svcHasError}}" hint-placeholder-val="{{ false }}">
+<div role="alert" style="background: #FDE4E1; color: #8E1B10; border-radius: 14px; padding: 10px 14px; font-size: 13px; font-weight: 700">{{svcError}}</div>
+</sc-if>
+<div style="display: flex; justify-content: flex-end; gap: 8px">
+<button onClick="{{closeSvc}}" style="min-height: 48px; border: 1.5px solid #0F1720; border-radius: 999px; background: #FFFFFF; color: #0F1720; padding: 0 22px; font-size: 14px; font-weight: 700">Cancelar</button>
+<button onClick="{{saveSvc}}" style="min-height: 48px; border: 0; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; padding: 0 24px; font-size: 14px; font-weight: 700">Salvar serviço</button>
+</div>
+</sc-if>
+
+<sc-if value="{{svcIsNew}}" hint-placeholder-val="{{ false }}">
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Nome ou razão social
+<input value="{{nName}}" onInput="{{onNName}}" placeholder="Ex.: Pet Shop Au Au" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; font-family: inherit; color: #0F1720">
+</label>
+<div role="group" aria-label="Tipo de cliente" style="display: flex; gap: 8px">
+<sc-for list="{{kindBtns}}" as="k" hint-placeholder-count="2">
+<button onClick="{{k.pick}}" aria-pressed="{{k.on}}" style="min-height: 44px; border-radius: 999px; padding: 0 20px; font-size: 13px; font-weight: 700; {{k.style}}">{{k.label}}</button>
+</sc-for>
+</div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">WhatsApp
+<input value="{{nPhone}}" onInput="{{onNPhone}}" placeholder="(11) 90000-0000" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; font-family: inherit; color: #0F1720">
+</label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Endereço do serviço
+<input value="{{nAddr}}" onInput="{{onNAddr}}" placeholder="Rua, número, bairro" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; font-family: inherit; color: #0F1720">
+</label>
+<sc-if value="{{svcHasError}}" hint-placeholder-val="{{ false }}">
+<div role="alert" style="background: #FDE4E1; color: #8E1B10; border-radius: 14px; padding: 10px 14px; font-size: 13px; font-weight: 700">{{svcError}}</div>
+</sc-if>
+<div style="display: flex; justify-content: flex-end; gap: 8px">
+<button onClick="{{backToList}}" style="min-height: 48px; border: 1.5px solid #0F1720; border-radius: 999px; background: #FFFFFF; color: #0F1720; padding: 0 22px; font-size: 14px; font-weight: 700">Voltar à lista</button>
+<button onClick="{{saveClient}}" style="min-height: 48px; border: 0; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; padding: 0 24px; font-size: 14px; font-weight: 700">Salvar cliente</button>
+</div>
+</sc-if>
+
+<sc-if value="{{svcIsDone}}" hint-placeholder-val="{{ false }}">
+<div style="background: #DDF3E4; color: #14653A; border-radius: 16px; padding: 14px 16px; font-size: 14px; font-weight: 700; line-height: 1.5">{{svcDoneText}}</div>
+<div style="display: flex; justify-content: flex-end; gap: 8px">
+<button onClick="{{anotherSvc}}" style="min-height: 48px; border: 1.5px solid #0F1720; border-radius: 999px; background: #FFFFFF; color: #0F1720; padding: 0 22px; font-size: 14px; font-weight: 700">Cadastrar outro</button>
+<button onClick="{{closeSvc}}" style="min-height: 48px; border: 0; border-radius: 999px; background: #0F1720; color: #FFFFFF; padding: 0 24px; font-size: 14px; font-weight: 700">Fechar</button>
+</div>
+</sc-if>
+</div>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1500}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { day: 1, tasks: {}, acks: {} };
+  }
+
+  renderBase() {
+    const st = this.state;
+    const fmt = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+    const T = {
+      M: { name: 'Marcos', ini: 'M', colors: 'background: #2F5FE0;' },
+      A: { name: 'Ana', ini: 'A', colors: 'background: #0F1720;' },
+      P: { name: 'Paulo', ini: 'P', colors: 'background: #4A5B78;' },
+    };
+    const S = {
+      done: { label: 'Concluído', colors: 'background: #DDF3E4; color: #14653A;' },
+      run: { label: 'Em execução', colors: 'background: #DCE7FF; color: #1B47B5;' },
+      sched: { label: 'Agendado', colors: 'background: #E8ECF2; color: #2F3A4A;' },
+    };
+    const days = [
+      { label: 'Qui, 05 nov', tag: 'Ontem', jobs: [
+        ['08:30', 'Restaurante Sabor & Cia', 'Desinsetização preventiva', 'M', 'done'],
+        ['10:00', 'Residência · R. das Acácias', 'Baratas', 'A', 'done'],
+        ['14:00', 'Escola Pequeno Mundo', 'Contrato mensal · monitoramento', 'P', 'done'],
+        ['15:30', 'Apto 31 · Ed. Aurora', 'Formigas', 'A', 'done'],
+      ] },
+      { label: 'Sex, 06 nov', tag: 'Hoje', jobs: [
+        ['08:00', 'Padaria Sol', 'Desinsetização + roedores', 'M', 'done'],
+        ['09:30', 'Residência · R. Silva', 'Baratas', 'A', 'done'],
+        ['10:30', 'Clínica Vida', 'Contrato mensal · monitoramento', 'P', 'run'],
+        ['13:00', 'Cond. Vila Verde', 'Campanha · casas 1 a 8', 'M', 'sched'],
+        ['14:30', 'Mercado Bom Preço', 'Desratização', 'A', 'sched'],
+        ['16:00', 'Apto 52 · Ed. Aurora', 'Cupins', 'P', 'sched'],
+      ] },
+      { label: 'Sáb, 07 nov', tag: 'Amanhã', jobs: [
+        ['09:00', 'Residência · Av. Central', 'Pulgas', 'A', 'sched'],
+        ['10:30', 'Cond. Vila Verde', 'Campanha · casas 9 a 16', 'M', 'sched'],
+        ['13:00', 'Salão Bela Forma', 'Baratas', 'P', 'sched'],
+      ] },
+    ];
+    const day = days[st.day];
+    const counts = { done: 0, run: 0, sched: 0 };
+    day.jobs.forEach((j) => { counts[j[4]] += 1; });
+    const parts = [day.jobs.length + ' serviços'];
+    if (counts.done) parts.push(counts.done + (counts.done > 1 ? ' concluídos' : ' concluído'));
+    if (counts.run) parts.push(counts.run + ' em execução');
+    if (counts.sched) parts.push(counts.sched + (counts.sched > 1 ? ' agendados' : ' agendado'));
+    const jobs = day.jobs.map((j) => ({
+      time: j[0], client: j[1], service: j[2],
+      tech: T[j[3]].name, ini: T[j[3]].ini, techColors: T[j[3]].colors,
+      status: S[j[4]].label, chipColors: S[j[4]].colors,
+    }));
+
+    const taskDefs = [
+      { id: 't1', text: 'Ligar para Mercado Bom Preço: contrato vence em 15 dias', origin: 'Sistema' },
+      { id: 't2', text: 'Confirmar presença do síndico na campanha Vila Verde', origin: 'Sistema' },
+      { id: 't3', text: 'Reenviar boleto à Clínica Vida (venceu há 9 dias)', origin: 'IA' },
+      { id: 't4', text: 'Conferir estoque de isca gel no carro do Paulo', origin: 'Manual' },
+      { id: 't5', text: 'Responder orçamento do Ed. Aurora (cupins)', origin: 'Manual' },
+    ];
+    const originColors = {
+      Sistema: 'background: #E8ECF2; color: #2F3A4A;',
+      IA: 'background: #DCE7FF; color: #1B47B5;',
+      Manual: 'background: #F1F4F8; color: #2F3A4A; border: 1px solid #D3DAE4;',
+    };
+    const tasks = taskDefs.map((t) => {
+      const done = !!st.tasks[t.id];
+      return {
+        text: t.text, origin: t.origin, done: done,
+        originColors: originColors[t.origin],
+        boxColors: done ? 'background: #2F5FE0; border: 2px solid #2F5FE0;' : 'background: #FFFFFF; border: 2px solid #8793A6;',
+        checkStyle: done ? 'opacity: 1' : 'opacity: 0',
+        textStyle: done ? 'color: #4B5666; text-decoration: line-through;' : 'color: #0F1720;',
+        toggle: () => this.setState({ tasks: { ...st.tasks, [t.id]: !done } }),
+      };
+    });
+    const tasksDone = tasks.filter((t) => t.done).length;
+
+    const ackDefs = [
+      { id: 'a1', title: 'Enviar cobrança Pix · Padaria Sol · R$ 380', sub: 'Preparada pela IA. Falta sua aprovação para enviar.', btn: 'Aprovar', done: 'Enviada' },
+      { id: 'a2', title: 'Cadastro extraído de foto · Cond. Vila Verde', sub: 'CNPJ e endereço lidos da imagem. Confira os dados.', btn: 'Revisar', done: 'Revisado' },
+      { id: 'a3', title: 'Conversa passada para humano', sub: 'Cliente perguntou sobre gestante em casa.', btn: 'Assumir', done: 'Assumida' },
+      { id: 'a4', title: '4 certificados aguardando o RT', sub: 'Só são enviados ao cliente depois da validação.', btn: 'Validar', done: 'Validados' },
+      { id: 'a5', title: '6 pagamentos atrasados há mais de 7 dias', sub: 'A IA sugere uma régua de lembrete por WhatsApp.', btn: 'Cobrar', done: 'Régua criada' },
+    ];
+    const acks = ackDefs.map((a) => {
+      const done = !!st.acks[a.id];
+      return {
+        title: a.title, sub: a.sub, done: done,
+        btnLabel: done ? a.done : a.btn,
+        btnColors: done ? 'background: #DDF3E4; color: #14653A; cursor: default;' : 'background: #FFFFFF; color: #0F1720; border: 1.5px solid #0F1720;',
+        act: () => this.setState({ acks: { ...st.acks, [a.id]: true } }),
+      };
+    });
+    const pendingCount = acks.filter((a) => !a.done).length;
+
+    const max = 5100;
+    const weekDefs = [
+      ['10–16 out', 3900, 3700], ['17–23 out', 4700, 4300], ['24–30 out', 5100, 3900], ['31 out–06 nov', 4940, 2310],
+    ];
+    const k = (n) => (n / 1000).toFixed(1).replace('.', ',') + 'k';
+    const weeks = weekDefs.map((w) => ({
+      label: w[0], fatLabel: k(w[1]), recLabel: k(w[2]),
+      fatStyle: 'height: ' + Math.round((w[1] / max) * 112) + 'px;',
+      recStyle: 'height: ' + Math.round((w[2] / max) * 112) + 'px;',
+    }));
+
+    const occDefs = [['Sex', 85], ['Sáb', 40], ['Dom', 5], ['Seg', 90], ['Ter', 70], ['Qua', 60], ['Qui', 55]];
+    const occupancy = occDefs.map((o) => ({
+      day: o[0], pct: o[1] + '%',
+      style: 'height: ' + Math.max(6, Math.round(o[1] * 0.9)) + 'px; background: ' + (o[1] >= 85 ? '#0F1720' : '#2F5FE0') + ';',
+    }));
+
+    const contracts = [
+      { name: 'Mercado Bom Preço', kind: 'Contrato mensal · empresa', when: 'em 15 dias', colors: 'background: #FFF0D1; color: #7A4B00;' },
+      { name: 'Clínica Vida', kind: 'Contrato mensal · empresa', when: 'em 28 dias', colors: 'background: #E8ECF2; color: #2F3A4A;' },
+      { name: 'Ed. Aurora', kind: 'Contrato trimestral · condomínio', when: 'em 41 dias', colors: 'background: #E8ECF2; color: #2F3A4A;' },
+    ];
+
+    const campaigns = [
+      { name: 'Cond. Vila Verde · casas 1 a 24', date: 'qui, 12 nov', adesoes: '14 de 30 adesões', receita: 'R$ 2.660', barStyle: 'width: 47%;' },
+      { name: 'Ed. Aurora · apartamentos', date: 'qua, 18 nov', adesoes: '9 de 20 adesões', receita: 'R$ 1.350', barStyle: 'width: 45%;' },
+    ];
+
+    const usage = [
+      { name: 'Conversas com a IA', value: '412 de 1.000', barStyle: 'width: 41%;' },
+      { name: 'Mensagens enviadas (templates)', value: '238 de 500', barStyle: 'width: 48%;' },
+    ];
+
+    return {
+      kpi: { faturado: 'R$ ' + fmt(18640), recebido: 'R$ ' + fmt(14210), areceber: 'R$ ' + fmt(4430), atraso: 'R$ ' + fmt(2180) },
+      acks: acks, pendingCount: pendingCount,
+      weeks: weeks,
+      day: { label: day.label, tag: day.tag, summary: parts.join(' · ') },
+      jobs: jobs,
+      prevDay: () => this.setState({ day: Math.max(0, st.day - 1) }),
+      nextDay: () => this.setState({ day: Math.min(2, st.day + 1) }),
+      prevDisabled: st.day === 0, nextDisabled: st.day === 2,
+      prevStyle: st.day === 0 ? 'opacity: 0.4; cursor: default;' : '',
+      nextStyle: st.day === 2 ? 'opacity: 0.4; cursor: default;' : '',
+      tasks: tasks, tasksDone: tasksDone, tasksTotal: tasks.length,
+      occupancy: occupancy, contracts: contracts, campaigns: campaigns, usage: usage,
+    };
+  }
+  svcDefaults() {
+    return { open: false, step: 'form', client: '', type: '', tech: '', day: 'Seg 09 nov', time: '08:00', error: '', created: [], nName: '', nKind: 'Empresa', nPhone: '', nAddr: '', doneText: '' };
+  }
+
+  svcGet() {
+    return Object.assign(this.svcDefaults(), this.state.svc || {});
+  }
+
+  svcSet(p) {
+    this.setState({ svc: Object.assign(this.svcGet(), p) });
+  }
+
+  svcClients() {
+    const base = [
+      { v: 'Academia Fit', kind: 'Empresa' }, { v: 'Padaria Sol', kind: 'Empresa' }, { v: 'Clínica Vida', kind: 'Empresa' },
+      { v: 'Escritório Alfa', kind: 'Empresa' }, { v: 'Loja Moda Viva', kind: 'Empresa' }, { v: 'Mercado Bom Preço', kind: 'Empresa' },
+      { v: 'Restaurante Sabor & Cia', kind: 'Empresa' }, { v: 'Cond. Vila Verde', kind: 'Empresa' },
+      { v: 'Residência R. Silva', kind: 'Residencial' }, { v: 'Casa R. do Ipê', kind: 'Residencial' },
+    ];
+    return base.concat(this.svcGet().created);
+  }
+
+  svcTypes() {
+    return [
+      { v: 'Baratas e formigas', price: 240 }, { v: 'Roedores (desratização)', price: 320 }, { v: 'Cupins', price: 450 },
+      { v: 'Pulgas e carrapatos', price: 220 }, { v: 'Monitoramento mensal (contrato)', price: 0 },
+    ];
+  }
+
+  svcTechs() {
+    return [{ v: 'Marcos', l: 'Marcos' }, { v: 'Ana', l: 'Ana' }, { v: 'Paulo', l: 'Paulo' }];
+  }
+
+  svcOpts(list, cur, ph) {
+    const out = [{ v: '', l: ph, sel: cur === '' }];
+    list.forEach((x) => out.push({ v: x.v, l: x.l || x.v, sel: cur === x.v }));
+    return out;
+  }
+
+  renderVals() {
+    return Object.assign(this.renderBase(), this.renderSvc());
+  }
+
+  renderSvc() {
+    const g = this.svcGet();
+    const val = (e) => (e && e.target ? e.target.value : '');
+    const clients = this.svcClients();
+    const types = this.svcTypes();
+    const cl = clients.find((c) => c.v === g.client);
+    const ty = types.find((t) => t.v === g.type);
+    const days = ['Seg 09 nov', 'Ter 10 nov', 'Qua 11 nov', 'Qui 12 nov', 'Sex 13 nov'].map((d) => ({ v: d }));
+    const times = [];
+    for (let h = 8; h < 18; h++) times.push({ v: (h < 10 ? '0' : '') + h + ':00' });
+    const techList = this.svcTechs().concat([{ v: 'none', l: 'Sem técnico (agendar depois)' }]);
+    const title = { form: 'Novo serviço', new: 'Novo cliente', done: 'Serviço cadastrado' }[g.step];
+    let priceText = 'Escolha o cliente e o tipo de serviço para ver o valor da tabela.';
+    if (ty) priceText = ty.price > 0 ? 'Valor da tabela: R$ ' + ty.price : 'Valor conforme o contrato do cliente.';
+    let policy = '';
+    if (cl) policy = cl.kind === 'Residencial' ? 'Residencial: a ordem de serviço é liberada depois do Pix, e o horário fica reservado por 30 minutos.' : 'Empresa: pós-pago. A ordem de serviço é liberada na hora e a cobrança sai depois da execução.';
+    return {
+      svcOpen: g.open, svcTitle: title,
+      svcIsForm: g.step === 'form', svcIsNew: g.step === 'new', svcIsDone: g.step === 'done',
+      svcClient: g.client, svcType: g.type, svcTech: g.tech, svcDay: g.day, svcTime: g.time,
+      clientOpts: this.svcOpts(clients, g.client, 'Selecione o cliente'),
+      typeOpts: this.svcOpts(types, g.type, 'Selecione o serviço'),
+      techOpts: this.svcOpts(techList, g.tech, 'Selecione o técnico'),
+      dayOpts: this.svcOpts(days, g.day, 'Dia'),
+      timeOpts: this.svcOpts(times, g.time, 'Horário'),
+      onClient: (e) => this.svcSet({ client: val(e), error: '' }),
+      onType: (e) => this.svcSet({ type: val(e), error: '' }),
+      onTech: (e) => this.svcSet({ tech: val(e), error: '' }),
+      onDay: (e) => this.svcSet({ day: val(e) }),
+      onTime: (e) => this.svcSet({ time: val(e) }),
+      svcPriceText: priceText, svcPolicy: policy,
+      svcHasError: !!g.error, svcError: g.error,
+      openSvc: () => this.svcSet({ open: true, step: 'form', client: '', type: '', tech: '', error: '', doneText: '' }),
+      closeSvc: () => this.svcSet({ open: false, step: 'form', error: '' }),
+      anotherSvc: () => this.svcSet({ step: 'form', client: '', type: '', tech: '', error: '', doneText: '' }),
+      openNewClient: () => this.svcSet({ step: 'new', error: '', nName: '', nPhone: '', nAddr: '', nKind: 'Empresa' }),
+      backToList: () => this.svcSet({ step: 'form', error: '' }),
+      nName: g.nName, nPhone: g.nPhone, nAddr: g.nAddr,
+      onNName: (e) => this.svcSet({ nName: val(e) }),
+      onNPhone: (e) => this.svcSet({ nPhone: val(e) }),
+      onNAddr: (e) => this.svcSet({ nAddr: val(e) }),
+      kindBtns: ['Empresa', 'Residencial'].map((k) => ({
+        label: k, on: g.nKind === k,
+        style: g.nKind === k ? 'border: 0; background: #0F1720; color: #FFFFFF;' : 'border: 1.5px solid #C9D3E0; background: #FFFFFF; color: #0F1720;',
+        pick: () => this.svcSet({ nKind: k }),
+      })),
+      saveClient: () => {
+        if (!g.nName.trim()) { this.svcSet({ error: 'Informe o nome do cliente.' }); return; }
+        this.svcSet({ created: g.created.concat([{ v: g.nName.trim(), kind: g.nKind }]), client: g.nName.trim(), step: 'form', error: '' });
+      },
+      saveSvc: () => {
+        if (!g.client) { this.svcSet({ error: 'Selecione o cliente ou cadastre um novo.' }); return; }
+        if (!g.type) { this.svcSet({ error: 'Selecione o tipo de serviço.' }); return; }
+        if (!g.tech) { this.svcSet({ error: 'Selecione o técnico, ou escolha "Sem técnico".' }); return; }
+        const data = { client: g.client, type: g.type, tech: g.tech, day: g.day, time: g.time, kind: cl ? cl.kind : 'Empresa' };
+        const res = this.svcOnSave ? this.svcOnSave(data) : null;
+        if (res && res.error) { this.svcSet({ error: res.error }); return; }
+        const when = g.tech === 'none' ? 'sem horário definido' : g.day + ' às ' + g.time + ' com ' + g.tech;
+        const pay = data.kind === 'Residencial' ? ' O Pix foi enviado ao cliente e o horário fica reservado por 30 minutos.' : ' A ordem de serviço foi criada.';
+        this.svcSet({ step: 'done', error: '', doneText: g.client + ' · ' + g.type + ' · ' + when + '.' + pay });
+      },
+      svcDoneText: g.doneText,
+    };
+  }
+
+}
+</script>
+</body>
+</html>

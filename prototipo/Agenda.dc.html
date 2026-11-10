@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Agenda dos técnicos — Detetiza OS</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button{font-family:inherit;cursor:pointer}
+a{color:inherit;text-decoration:none}
+button:focus-visible,a:focus-visible{outline:3px solid #2F5FE0;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height: 100%; background: #E9EEF5; padding: 24px; box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0F1720">
+<div style="position: relative; border-radius: 36px; overflow: hidden; border: 6px solid #FFFFFF; background: #F4F7FB; box-shadow: 0 18px 50px rgba(20,40,80,0.14); padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="width: 46px; height: 46px; border-radius: 15px; background: #0F1720; display: flex; align-items: center; justify-content: center">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#9DBBFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"></path><path d="M9 12l2 2 4-4"></path></svg>
+</div>
+<div>
+<div style="font-size: 20px; font-weight: 800; line-height: 1.15">Dedetizadora Impacto</div>
+<div style="font-size: 12px; font-weight: 600; color: #3A4658">Detetiza OS</div>
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+<div style="display: flex; align-items: center; background: #FFFFFF; border-radius: 999px; padding: 0 18px; height: 48px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 14px rgba(20,40,80,0.08)">06 nov 2026</div>
+<a href="GerenteDigital.dc.html" style="display: flex; align-items: center; gap: 8px; background: #0F1720; color: #FFFFFF; border-radius: 999px; padding: 0 20px; height: 48px; font-size: 14px; font-weight: 700">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9DBBFF" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg>
+Gerente Digital
+</a>
+<div aria-label="Usuário: proprietário" role="img" style="width: 48px; height: 48px; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800">DI</div>
+</div>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+
+<nav aria-label="Navegação principal" style="flex: 0 0 64px; display: flex; flex-direction: column; gap: 4px; padding: 8px; background: #FFFFFF; border-radius: 22px; box-shadow: 0 8px 28px rgba(20,40,80,0.08)">
+<a href="Main.dc.html" aria-label="Dashboard" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg>
+</a>
+<a href="Agenda.dc.html" aria-label="Agenda" aria-current="page" style="width: 48px; height: 48px; border-radius: 15px; background: #2F5FE0; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M8 2v4M16 2v4M3 10h18"></path></svg>
+</a>
+<a href="Clientes.dc.html" aria-label="Clientes" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2.2.6 3.5 2.5 3.5 6"></path></svg>
+</a>
+<a href="Campanhas.dc.html" aria-label="Campanhas" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11v3a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"></path><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"></path></svg>
+</a>
+<a href="Financeiro.dc.html" aria-label="Financeiro" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"></rect><path d="M3 10h18M16 15h2"></path></svg>
+</a>
+<a href="Certificado.dc.html" aria-label="Certificados" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"></path><path d="M9 12l2 2 4-4"></path></svg>
+</a>
+</nav>
+
+<main style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+<div>
+<h1 style="margin: 0; font-size: 28px; font-weight: 800">Agenda dos técnicos</h1>
+<div style="font-size: 14px; font-weight: 600; color: #3A4658; margin-top: 4px">Sexta-feira, 06 de novembro · {{summary}}</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center">
+<button onClick="{{openSvc}}" style="min-height: 48px; display: flex; align-items: center; gap: 8px; border: 0; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; padding: 0 20px; font-size: 14px; font-weight: 700"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>Novo serviço</button>
+<button onClick="{{openNewTech}}" style="min-height: 48px; border: 1.5px solid #0F1720; border-radius: 999px; background: #FFFFFF; color: #0F1720; padding: 0 18px; font-size: 14px; font-weight: 700">Novo técnico</button>
+<button onClick="{{openManage}}" style="min-height: 48px; border: 1.5px solid #0F1720; border-radius: 999px; background: #FFFFFF; color: #0F1720; padding: 0 18px; font-size: 14px; font-weight: 700">Gerenciar técnicos</button>
+<div role="group" aria-label="Modo de visualização" style="display: flex; background: #E3E8EF; border-radius: 999px; padding: 4px; gap: 4px">
+<button onClick="{{showTimeline}}" aria-pressed="{{isTimeline}}" style="min-height: 44px; border: 0; border-radius: 999px; padding: 0 20px; font-size: 14px; font-weight: 700; {{timelineBtn}}">Linha do tempo</button>
+<button onClick="{{showKanban}}" aria-pressed="{{isKanban}}" style="min-height: 44px; border: 0; border-radius: 999px; padding: 0 20px; font-size: 14px; font-weight: 700; {{kanbanBtn}}">Kanban por status</button>
+</div>
+</div>
+</div>
+
+<sc-if value="{{hasNotice}}" hint-placeholder-val="{{ false }}">
+<div role="status" style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; border-radius: 18px; padding: 14px 18px; {{notice.colors}}">
+<div style="font-size: 14px; font-weight: 700; line-height: 1.4">{{notice.text}}</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-if value="{{notice.askNotify}}" hint-placeholder-val="{{ false }}">
+<button onClick="{{notify}}" style="min-height: 44px; border: 0; border-radius: 999px; background: #0F1720; color: #FFFFFF; padding: 0 18px; font-size: 13px; font-weight: 700">Avisar cliente por WhatsApp</button>
+</sc-if>
+<button onClick="{{dismiss}}" style="min-height: 44px; border: 1px solid rgba(15,23,32,0.25); border-radius: 999px; background: transparent; color: inherit; padding: 0 18px; font-size: 13px; font-weight: 700">{{notice.dismissLabel}}</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isTimeline}}" hint-placeholder-val="{{ true }}">
+<div style="background: #FFFFFF; border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.08); padding: 18px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<div style="font-size: 13px; font-weight: 600; color: #3A4658; line-height: 1.45; max-width: 640px">{{helpText}}</div>
+<div style="display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; font-weight: 700; color: #2F3A4A">
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 14px; height: 14px; border-radius: 4px; background: #FFFFFF; border: 2px solid #8793A6"></span>Agendado · arrastável</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 14px; height: 14px; border-radius: 4px; background: #DCE7FF; border: 2px solid #7FA0F0"></span>Em execução</span>
+<span style="display: flex; align-items: center; gap: 6px"><span style="width: 14px; height: 14px; border-radius: 4px; background: #DDF3E4; border: 2px solid #7CC59B"></span>Concluído</span>
+</div>
+</div>
+<div style="overflow-x: auto">
+<div style="min-width: {{gridMin}}; display: flex; gap: 12px">
+<div style="flex: 0 0 52px; padding-top: 64px">
+<sc-for list="{{hours}}" as="h" hint-placeholder-count="10">
+<div style="height: 64px; font-size: 12px; font-weight: 700; color: #3A4658; padding-top: 2px">{{h.label}}</div>
+</sc-for>
+</div>
+<sc-for list="{{columns}}" as="col" hint-placeholder-count="3">
+<div style="flex: 1 1 0; min-width: 220px">
+<div style="height: 56px; margin-bottom: 8px; background: #F1F4F8; border-radius: 16px; padding: 0 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px">
+<div style="display: flex; align-items: center; gap: 10px">
+<div style="width: 32px; height: 32px; border-radius: 999px; color: #FFFFFF; font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center; {{col.colors}}">{{col.ini}}</div>
+<div style="font-size: 15px; font-weight: 800">{{col.name}}</div>
+</div>
+<div style="font-size: 12px; font-weight: 700; color: #3A4658">{{col.load}}</div>
+</div>
+<div style="position: relative; height: 640px; border-radius: 16px; background: #FAFBFD; border: 1px solid #E3E8EF">
+<sc-for list="{{col.slots}}" as="slot" hint-placeholder-count="10">
+<div onClick="{{slot.onClick}}" onDragOver="{{slot.onOver}}" onDrop="{{slot.onDrop}}" aria-hidden="true" style="position: absolute; left: 0; right: 0; height: 64px; box-sizing: border-box; border-top: 1px dashed #D3DAE4; {{slot.style}}"></div>
+</sc-for>
+<sc-for list="{{col.cards}}" as="card" hint-placeholder-count="2">
+<div role="button" tabindex="0" aria-label="{{card.aria}}" draggable="{{card.draggable}}" onClick="{{card.onClick}}" onDragStart="{{card.onDragStart}}" onDragEnd="{{card.onDragEnd}}" style="position: absolute; left: 6px; right: 6px; box-sizing: border-box; border-radius: 14px; padding: 8px 10px; overflow: hidden; {{card.style}}">
+<div style="font-size: 12px; font-weight: 700; color: #2F3A4A">{{card.range}}</div>
+<div style="font-size: 13px; font-weight: 800; line-height: 1.25; margin-top: 1px">{{card.client}}</div>
+<div style="font-size: 12px; font-weight: 500; color: #3A4658; line-height: 1.25; margin-top: 1px">{{card.service}}</div>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isKanban}}" hint-placeholder-val="{{ false }}">
+<div style="overflow-x: auto">
+<div style="min-width: 1000px; display: flex; gap: 14px; align-items: flex-start">
+<sc-for list="{{lanes}}" as="lane" hint-placeholder-count="5">
+<div style="flex: 1 1 0; min-width: 190px; background: #FFFFFF; border-radius: 22px; box-shadow: 0 8px 28px rgba(20,40,80,0.08); padding: 14px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+<div style="font-size: 14px; font-weight: 800">{{lane.label}}</div>
+<div style="font-size: 12px; font-weight: 700; border-radius: 999px; padding: 3px 10px; background: #E8ECF2; color: #2F3A4A">{{lane.count}}</div>
+</div>
+<sc-for list="{{lane.cards}}" as="kc" hint-placeholder-count="2">
+<div style="background: #F4F7FB; border: 1px solid #E3E8EF; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 6px">
+<div style="font-size: 13px; font-weight: 800; line-height: 1.25">{{kc.client}}</div>
+<div style="font-size: 12px; font-weight: 500; color: #3A4658">{{kc.service}}</div>
+<div style="font-size: 12px; font-weight: 700; color: #2F3A4A">{{kc.when}}</div>
+<button onClick="{{kc.act}}" disabled="{{kc.noAction}}" style="min-height: 44px; border: 0; border-radius: 999px; padding: 0 14px; font-size: 13px; font-weight: 700; margin-top: 4px; {{kc.btnColors}}">{{kc.btnLabel}}</button>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<div style="font-size: 12px; font-weight: 600; color: #3A4658">Protótipo v0.1 · dados ilustrativos. Concluir um serviço gera a cobrança Pix; o certificado só sai depois da validação do responsável técnico.</div>
+
+</main>
+</div>
+</div>
+<sc-if value="{{svcOpen}}" hint-placeholder-val="{{ false }}">
+<div style="position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 50; background: rgba(15,23,32,0.55); display: flex; align-items: flex-start; justify-content: center; padding: 72px 16px 16px; box-sizing: border-box; overflow-y: auto">
+<div role="dialog" aria-modal="true" aria-labelledby="svc-title" style="width: 100%; max-width: 580px; background: #FFFFFF; border-radius: 28px; box-shadow: 0 24px 60px rgba(15,23,32,0.35); padding: 26px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px; color: #0F1720; font-family: 'Plus Jakarta Sans', system-ui, sans-serif">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<h2 id="svc-title" style="margin: 0; font-size: 22px; font-weight: 800">{{svcTitle}}</h2>
+<button onClick="{{closeSvc}}" aria-label="Fechar" style="width: 44px; height: 44px; border-radius: 999px; border: 0; background: #E8ECF2; color: #0F1720; font-size: 20px; font-weight: 700">×</button>
+</div>
+
+<sc-if value="{{svcIsForm}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; align-items: flex-end; gap: 8px">
+<label style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Cliente
+<select value="{{svcClient}}" onChange="{{onClient}}" style="height: 48px; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 12px; font-size: 14px; font-family: inherit; background: #FFFFFF; color: #0F1720">
+<sc-for list="{{clientOpts}}" as="o" hint-placeholder-count="4"><option value="{{o.v}}" selected="{{o.sel}}">{{o.l}}</option></sc-for>
+</select>
+</label>
+<button onClick="{{openNewClient}}" style="flex: 0 0 auto; min-height: 48px; border: 1.5px solid #0F1720; border-radius: 999px; background: #FFFFFF; color: #0F1720; padding: 0 16px; font-size: 13px; font-weight: 700">+ Cadastrar novo</button>
+</div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Tipo de serviço
+<select value="{{svcType}}" onChange="{{onType}}" style="height: 48px; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 12px; font-size: 14px; font-family: inherit; background: #FFFFFF; color: #0F1720">
+<sc-for list="{{typeOpts}}" as="o" hint-placeholder-count="5"><option value="{{o.v}}" selected="{{o.sel}}">{{o.l}}</option></sc-for>
+</select>
+</label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Técnico
+<select value="{{svcTech}}" onChange="{{onTech}}" style="height: 48px; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 12px; font-size: 14px; font-family: inherit; background: #FFFFFF; color: #0F1720">
+<sc-for list="{{techOpts}}" as="o" hint-placeholder-count="4"><option value="{{o.v}}" selected="{{o.sel}}">{{o.l}}</option></sc-for>
+</select>
+</label>
+<div style="display: flex; gap: 8px">
+<label style="flex: 1 1 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Dia
+<select value="{{svcDay}}" onChange="{{onDay}}" style="height: 48px; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 12px; font-size: 14px; font-family: inherit; background: #FFFFFF; color: #0F1720">
+<sc-for list="{{dayOpts}}" as="o" hint-placeholder-count="4"><option value="{{o.v}}" selected="{{o.sel}}">{{o.l}}</option></sc-for>
+</select>
+</label>
+<label style="flex: 1 1 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Horário
+<select value="{{svcTime}}" onChange="{{onTime}}" style="height: 48px; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 12px; font-size: 14px; font-family: inherit; background: #FFFFFF; color: #0F1720">
+<sc-for list="{{timeOpts}}" as="o" hint-placeholder-count="10"><option value="{{o.v}}" selected="{{o.sel}}">{{o.l}}</option></sc-for>
+</select>
+</label>
+</div>
+<div style="background: #F4F7FB; border-radius: 16px; padding: 12px 14px; font-size: 13px; font-weight: 500; line-height: 1.5; color: #2F3A4A">
+<div style="font-weight: 800; color: #0F1720">{{svcPriceText}}</div>
+<div>{{svcPolicy}}</div>
+</div>
+<sc-if value="{{svcHasError}}" hint-placeholder-val="{{ false }}">
+<div role="alert" style="background: #FDE4E1; color: #8E1B10; border-radius: 14px; padding: 10px 14px; font-size: 13px; font-weight: 700">{{svcError}}</div>
+</sc-if>
+<div style="display: flex; justify-content: flex-end; gap: 8px">
+<button onClick="{{closeSvc}}" style="min-height: 48px; border: 1.5px solid #0F1720; border-radius: 999px; background: #FFFFFF; color: #0F1720; padding: 0 22px; font-size: 14px; font-weight: 700">Cancelar</button>
+<button onClick="{{saveSvc}}" style="min-height: 48px; border: 0; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; padding: 0 24px; font-size: 14px; font-weight: 700">Salvar serviço</button>
+</div>
+</sc-if>
+
+<sc-if value="{{svcIsNew}}" hint-placeholder-val="{{ false }}">
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Nome ou razão social
+<input value="{{nName}}" onInput="{{onNName}}" placeholder="Ex.: Pet Shop Au Au" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; font-family: inherit; color: #0F1720">
+</label>
+<div role="group" aria-label="Tipo de cliente" style="display: flex; gap: 8px">
+<sc-for list="{{kindBtns}}" as="k" hint-placeholder-count="2">
+<button onClick="{{k.pick}}" aria-pressed="{{k.on}}" style="min-height: 44px; border-radius: 999px; padding: 0 20px; font-size: 13px; font-weight: 700; {{k.style}}">{{k.label}}</button>
+</sc-for>
+</div>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">WhatsApp
+<input value="{{nPhone}}" onInput="{{onNPhone}}" placeholder="(11) 90000-0000" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; font-family: inherit; color: #0F1720">
+</label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Endereço do serviço
+<input value="{{nAddr}}" onInput="{{onNAddr}}" placeholder="Rua, número, bairro" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; font-family: inherit; color: #0F1720">
+</label>
+<sc-if value="{{svcHasError}}" hint-placeholder-val="{{ false }}">
+<div role="alert" style="background: #FDE4E1; color: #8E1B10; border-radius: 14px; padding: 10px 14px; font-size: 13px; font-weight: 700">{{svcError}}</div>
+</sc-if>
+<div style="display: flex; justify-content: flex-end; gap: 8px">
+<button onClick="{{backToList}}" style="min-height: 48px; border: 1.5px solid #0F1720; border-radius: 999px; background: #FFFFFF; color: #0F1720; padding: 0 22px; font-size: 14px; font-weight: 700">Voltar à lista</button>
+<button onClick="{{saveClient}}" style="min-height: 48px; border: 0; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; padding: 0 24px; font-size: 14px; font-weight: 700">Salvar cliente</button>
+</div>
+</sc-if>
+
+<sc-if value="{{svcIsDone}}" hint-placeholder-val="{{ false }}">
+<div style="background: #DDF3E4; color: #14653A; border-radius: 16px; padding: 14px 16px; font-size: 14px; font-weight: 700; line-height: 1.5">{{svcDoneText}}</div>
+<div style="display: flex; justify-content: flex-end; gap: 8px">
+<button onClick="{{anotherSvc}}" style="min-height: 48px; border: 1.5px solid #0F1720; border-radius: 999px; background: #FFFFFF; color: #0F1720; padding: 0 22px; font-size: 14px; font-weight: 700">Cadastrar outro</button>
+<button onClick="{{closeSvc}}" style="min-height: 48px; border: 0; border-radius: 999px; background: #0F1720; color: #FFFFFF; padding: 0 24px; font-size: 14px; font-weight: 700">Fechar</button>
+</div>
+</sc-if>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{tmOpen}}" hint-placeholder-val="{{ false }}">
+<div style="position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 50; background: rgba(15,23,32,0.55); display: flex; align-items: flex-start; justify-content: center; padding: 72px 16px 16px; box-sizing: border-box; overflow-y: auto">
+<div role="dialog" aria-modal="true" aria-labelledby="tm-title" style="width: 100%; max-width: 580px; background: #FFFFFF; border-radius: 28px; box-shadow: 0 24px 60px rgba(15,23,32,0.35); padding: 26px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px; color: #0F1720; font-family: 'Plus Jakarta Sans', system-ui, sans-serif">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<h2 id="tm-title" style="margin: 0; font-size: 22px; font-weight: 800">{{tmTitle}}</h2>
+<button onClick="{{closeTm}}" aria-label="Fechar" style="width: 44px; height: 44px; border-radius: 999px; border: 0; background: #E8ECF2; color: #0F1720; font-size: 20px; font-weight: 700">×</button>
+</div>
+
+<sc-if value="{{tmIsNew}}" hint-placeholder-val="{{ true }}">
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Nome do técnico
+<input value="{{tName}}" onInput="{{onTName}}" placeholder="Ex.: Carlos" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; font-family: inherit; color: #0F1720">
+</label>
+<label style="display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">WhatsApp
+<input value="{{tPhone}}" onInput="{{onTPhone}}" placeholder="(11) 90000-0000" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; font-family: inherit; color: #0F1720">
+</label>
+<div>
+<div style="font-size: 12px; font-weight: 700; color: #3A4658; margin-bottom: 8px">Cor na agenda</div>
+<div role="group" aria-label="Cor na agenda" style="display: flex; gap: 10px">
+<sc-for list="{{swatches}}" as="sw" hint-placeholder-count="5">
+<button onClick="{{sw.pick}}" aria-pressed="{{sw.on}}" aria-label="{{sw.aria}}" style="width: 44px; height: 44px; border-radius: 999px; {{sw.style}}"></button>
+</sc-for>
+</div>
+</div>
+<div style="font-size: 12px; font-weight: 500; color: #3A4658; line-height: 1.45">O técnico recebe um PIN para entrar no app. Ele só vê os próprios serviços.</div>
+<sc-if value="{{tmHasError}}" hint-placeholder-val="{{ false }}">
+<div role="alert" style="background: #FDE4E1; color: #8E1B10; border-radius: 14px; padding: 10px 14px; font-size: 13px; font-weight: 700">{{tmError}}</div>
+</sc-if>
+<div style="display: flex; justify-content: flex-end; gap: 8px">
+<button onClick="{{openManage}}" style="min-height: 48px; border: 1.5px solid #0F1720; border-radius: 999px; background: #FFFFFF; color: #0F1720; padding: 0 22px; font-size: 14px; font-weight: 700">Cancelar</button>
+<button onClick="{{saveTech}}" style="min-height: 48px; border: 0; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; padding: 0 24px; font-size: 14px; font-weight: 700">Salvar técnico</button>
+</div>
+</sc-if>
+
+<sc-if value="{{tmIsManage}}" hint-placeholder-val="{{ false }}">
+<sc-if value="{{tmHasInfo}}" hint-placeholder-val="{{ false }}">
+<div role="status" style="{{tmInfoStyle}} border-radius: 14px; padding: 10px 14px; font-size: 13px; font-weight: 700; line-height: 1.4">{{tmInfo}}</div>
+</sc-if>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<sc-for list="{{techRows}}" as="t" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 12px; background: #F4F7FB; border-radius: 18px; padding: 12px 14px">
+<div style="width: 40px; height: 40px; border-radius: 999px; color: #FFFFFF; font-size: 15px; font-weight: 800; display: flex; align-items: center; justify-content: center; {{t.avatar}}">{{t.ini}}</div>
+<div style="flex: 1 1 0; min-width: 0">
+<div style="font-size: 15px; font-weight: 800">{{t.name}}</div>
+<div style="font-size: 12px; font-weight: 500; color: #3A4658">{{t.phone}} · {{t.jobs}}</div>
+</div>
+<span style="border-radius: 999px; padding: 3px 12px; font-size: 12px; font-weight: 700; {{t.statusStyle}}">{{t.status}}</span>
+<button onClick="{{t.toggle}}" style="min-height: 44px; border: 1.5px solid #0F1720; border-radius: 999px; background: #FFFFFF; color: #0F1720; padding: 0 14px; font-size: 13px; font-weight: 700">{{t.toggleLabel}}</button>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap">
+<button onClick="{{openNewTech}}" style="min-height: 48px; border: 0; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; padding: 0 22px; font-size: 14px; font-weight: 700">+ Novo técnico</button>
+<button onClick="{{closeTm}}" style="min-height: 48px; border: 1.5px solid #0F1720; border-radius: 999px; background: #FFFFFF; color: #0F1720; padding: 0 22px; font-size: 14px; font-weight: 700">Fechar</button>
+</div>
+</sc-if>
+</div>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1060}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      techs: [
+        { k: 'M', name: 'Marcos', phone: '(11) 90000-0001', color: '#2F5FE0', active: true },
+        { k: 'A', name: 'Ana', phone: '(11) 90000-0002', color: '#0F1720', active: true },
+        { k: 'P', name: 'Paulo', phone: '(11) 90000-0003', color: '#4A5B78', active: true },
+      ],
+      view: 'timeline',
+      sel: null,
+      dragging: null,
+      notice: null,
+      os: [
+        { id: 1, client: 'Padaria Sol', service: 'Desinsetização + roedores', tech: 'M', start: 8, dur: 1.5, status: 'done' },
+        { id: 2, client: 'Residência · R. Silva', service: 'Baratas', tech: 'A', start: 9.5, dur: 1, status: 'done' },
+        { id: 3, client: 'Clínica Vida', service: 'Contrato mensal · monitoramento', tech: 'P', start: 10.5, dur: 2, status: 'run' },
+        { id: 4, client: 'Cond. Vila Verde', service: 'Campanha · casas 1 a 8', tech: 'M', start: 13, dur: 2.5, status: 'sched' },
+        { id: 5, client: 'Mercado Bom Preço', service: 'Desratização', tech: 'A', start: 14.5, dur: 1.5, status: 'sched' },
+        { id: 6, client: 'Apto 52 · Ed. Aurora', service: 'Cupins', tech: 'P', start: 16, dur: 1.5, status: 'sched' },
+        { id: 7, client: 'Academia Fit', service: 'Baratas e formigas', tech: 'M', start: 10, dur: 1.5, status: 'sched' },
+        { id: 8, client: 'Escritório Alfa', service: 'Desinsetização preventiva', tech: 'A', start: 11.5, dur: 1, status: 'sched' },
+        { id: 9, client: 'Casa · R. do Ipê', service: 'Pulgas', tech: 'P', start: 14, dur: 1, status: 'sched' },
+        { id: 10, client: 'Residência · R. das Flores', service: 'Pulgas', tech: null, start: null, dur: 1, status: 'todo' },
+        { id: 11, client: 'Loja Moda Viva', service: 'Baratas', tech: null, start: null, dur: 1, status: 'todo' },
+        { id: 12, client: 'Restaurante Sabor & Cia', service: 'Desinsetização preventiva', tech: 'M', start: null, dur: 1.5, status: 'pay' },
+      ],
+    };
+  }
+
+  pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+  fmtH(x) {
+    const hh = Math.floor(x);
+    const mm = Math.round((x - hh) * 60);
+    return this.pad(hh) + ':' + this.pad(mm);
+  }
+
+  clashWith(os, id, tech, start, dur) {
+    return os.find((x) => x.id !== id && x.tech === tech && x.start != null && ['sched', 'run', 'done'].indexOf(x.status) >= 0 && start < x.start + x.dur && x.start < start + dur);
+  }
+
+  moveTo(tech, h) {
+    const s = this.state;
+    const id = s.sel || s.dragging;
+    if (!id) return;
+    const it = s.os.find((x) => x.id === id);
+    if (!it || it.status !== 'sched') return;
+    if (h + it.dur > 18) {
+      this.setState({ sel: null, dragging: null, notice: { type: 'conflict', text: 'Fora do horário de atendimento (até 18:00). O serviço continua onde estava.' } });
+      return;
+    }
+    const clash = this.clashWith(s.os, id, tech, h, it.dur);
+    if (clash) {
+      this.setState({ sel: null, dragging: null, notice: { type: 'conflict', text: 'Conflito: ' + this.namesMap()[tech] + ' já tem ' + clash.client + ' nesse horário. O serviço continua onde estava.' } });
+      return;
+    }
+    const moved = s.os.map((x) => (x.id === id ? { ...x, tech: tech, start: h } : x));
+    this.setState({ os: moved, sel: null, dragging: null, notice: { type: 'moved', text: it.client + ' reagendado para ' + this.namesMap()[tech] + ' às ' + this.fmtH(h) + '. Avisar o cliente?' } });
+  }
+
+  advance(id) {
+    const s = this.state;
+    const it = s.os.find((x) => x.id === id);
+    if (!it) return;
+    if (it.status === 'todo') {
+      const keys = this.activeKeys();
+      for (let h = 8; h + it.dur <= 18; h += 1) {
+        for (let i = 0; i < keys.length; i++) {
+          if (!this.clashWith(s.os, id, keys[i], h, it.dur)) {
+            const next = s.os.map((x) => (x.id === id ? { ...x, tech: keys[i], start: h, status: 'sched' } : x));
+            this.setState({ os: next, notice: { type: 'moved', text: 'Primeiro horário livre: ' + this.namesMap()[keys[i]] + ' às ' + this.fmtH(h) + '. Enviar a confirmação ao cliente?' } });
+            return;
+          }
+        }
+      }
+      return;
+    }
+    const nextStatus = { sched: 'run', run: 'done', done: 'pay' }[it.status];
+    if (!nextStatus) return;
+    const next = s.os.map((x) => (x.id === id ? { ...x, status: nextStatus } : x));
+    const notice = nextStatus === 'pay' ? { type: 'sent', text: 'Cobrança Pix gerada para ' + it.client + '. Aguardando pagamento.' } : s.notice;
+    this.setState({ os: next, notice: notice });
+  }
+
+  renderBase() {
+    const s = this.state;
+    const names = this.namesMap();
+    const avatar = {};
+    this.state.techs.forEach((t) => { avatar[t.k] = 'background: ' + t.color + ';'; });
+    const inTimeline = (x) => x.start != null && ['sched', 'run', 'done'].indexOf(x.status) >= 0;
+    const summary = (() => {
+      const c = { done: 0, run: 0, sched: 0 };
+      s.os.filter(inTimeline).forEach((x) => { c[x.status] += 1; });
+      return (c.done + c.run + c.sched) + ' serviços · ' + c.done + ' concluídos · ' + c.run + ' em execução · ' + c.sched + ' agendados';
+    })();
+
+    const hours = [];
+    for (let h = 8; h < 18; h++) hours.push({ label: this.pad(h) + ':00' });
+
+    const columns = this.activeKeys().map((k) => {
+      const mine = s.os.filter((x) => inTimeline(x) && x.tech === k);
+      const hrs = mine.reduce((a, x) => a + x.dur, 0);
+      const slots = hours.map((_, i) => {
+        const h = 8 + i;
+        return {
+          style: 'top: ' + (i * 64) + 'px;' + (s.sel || s.dragging ? ' cursor: pointer; background: rgba(47,95,224,0.05);' : ''),
+          onClick: () => this.moveTo(k, h),
+          onOver: (e) => { if (e && e.preventDefault) e.preventDefault(); },
+          onDrop: (e) => { if (e && e.preventDefault) e.preventDefault(); this.moveTo(k, h); },
+        };
+      });
+      const cards = mine.map((x) => {
+        const movable = x.status === 'sched';
+        const selected = s.sel === x.id;
+        let skin = 'background: #FFFFFF; border: 2px solid #8793A6; box-shadow: 0 2px 8px rgba(20,40,80,0.10);';
+        if (x.status === 'run') skin = 'background: #DCE7FF; border: 2px solid #7FA0F0;';
+        if (x.status === 'done') skin = 'background: #DDF3E4; border: 2px solid #7CC59B;';
+        if (selected) skin = 'background: #FFFFFF; border: 3px solid #0F1720; box-shadow: 0 8px 20px rgba(15,23,32,0.25);';
+        const dragActive = !!s.dragging && s.dragging !== x.id;
+        return {
+          client: x.client, service: x.service,
+          range: this.fmtH(x.start) + ' – ' + this.fmtH(x.start + x.dur),
+          aria: x.client + ', ' + this.fmtH(x.start) + (movable ? '. Selecione e depois escolha um horário livre.' : '. Em andamento ou concluído, não pode ser movido.'),
+          draggable: movable,
+          style: 'top: ' + ((x.start - 8) * 64 + 2) + 'px; height: ' + (x.dur * 64 - 4) + 'px; ' + skin + (movable ? ' cursor: grab;' : ' cursor: default;') + (dragActive ? ' pointer-events: none;' : ''),
+          onClick: () => { if (movable) this.setState({ sel: selected ? null : x.id, notice: null }); },
+          onDragStart: (e) => { try { if (e && e.dataTransfer) { e.dataTransfer.setData('text/plain', String(x.id)); e.dataTransfer.effectAllowed = 'move'; } } catch (err) {} this.setState({ dragging: x.id, sel: x.id, notice: null }); },
+          onDragEnd: () => this.setState({ dragging: null }),
+        };
+      });
+      return { name: names[k], ini: names[k].charAt(0), colors: avatar[k], load: hrs + ' h de 10 h', slots: slots, cards: cards };
+    });
+
+    const laneDefs = [
+      { key: 'todo', label: 'A agendar' },
+      { key: 'sched', label: 'Agendado' },
+      { key: 'run', label: 'Em execução' },
+      { key: 'done', label: 'Concluído' },
+      { key: 'pay', label: 'Pendente de pagamento' },
+    ];
+    const btn = {
+      todo: ['Sugerir horário', 'background: #2F5FE0; color: #FFFFFF;'],
+      sched: ['Iniciar serviço', 'background: #0F1720; color: #FFFFFF;'],
+      run: ['Concluir serviço', 'background: #0F1720; color: #FFFFFF;'],
+      done: ['Gerar cobrança Pix', 'background: #2F5FE0; color: #FFFFFF;'],
+      pay: ['Aguardando Pix', 'background: #E8ECF2; color: #2F3A4A; cursor: default;'],
+    };
+    const lanes = laneDefs.map((l) => {
+      const items = s.os.filter((x) => x.status === l.key);
+      return {
+        label: l.label, count: items.length,
+        cards: items.map((x) => ({
+          client: x.client, service: x.service,
+          when: x.tech && x.start != null ? names[x.tech] + ' · ' + this.fmtH(x.start) : (x.tech ? names[x.tech] + ' · serviço de ontem' : 'Sem técnico nem horário'),
+          btnLabel: btn[l.key][0], btnColors: btn[l.key][1], noAction: l.key === 'pay',
+          act: () => this.advance(x.id),
+        })),
+      };
+    });
+
+    const n = s.notice;
+    const noticeColors = { moved: 'background: #FFFFFF; border: 1px solid #C9D3E0; color: #0F1720;', conflict: 'background: #FDE4E1; color: #8E1B10;', sent: 'background: #DDF3E4; color: #14653A;' };
+
+    return {
+      summary: summary,
+      isTimeline: s.view === 'timeline', isKanban: s.view === 'kanban',
+      timelineBtn: s.view === 'timeline' ? 'background: #0F1720; color: #FFFFFF;' : 'background: transparent; color: #2F3A4A;',
+      kanbanBtn: s.view === 'kanban' ? 'background: #0F1720; color: #FFFFFF;' : 'background: transparent; color: #2F3A4A;',
+      showTimeline: () => this.setState({ view: 'timeline' }),
+      showKanban: () => this.setState({ view: 'kanban', sel: null }),
+      helpText: s.sel || s.dragging ? 'Serviço selecionado. Solte ou clique em um horário livre de qualquer técnico. Se houver conflito, o sistema avisa e não move.' : 'Arraste um serviço agendado para outro técnico ou horário. Também funciona clicando no serviço e depois no horário desejado.',
+      hours: hours, columns: columns, lanes: lanes,
+      hasNotice: !!n,
+      notice: n ? { text: n.text, colors: noticeColors[n.type], askNotify: n.type === 'moved', dismissLabel: n.type === 'moved' ? 'Não avisar' : 'Fechar' } : { text: '', colors: '', askNotify: false, dismissLabel: '' },
+      notify: () => this.setState({ notice: { type: 'sent', text: 'Aviso enviado por WhatsApp (template aprovado de reagendamento).' } }),
+      dismiss: () => this.setState({ notice: null }),
+    };
+  }
+  svcDefaults() {
+    return { open: false, step: 'form', client: '', type: '', tech: '', day: this.svcDayList()[0], time: '08:00', error: '', created: [], nName: '', nKind: 'Empresa', nPhone: '', nAddr: '', doneText: '' };
+  }
+
+  svcGet() {
+    return Object.assign(this.svcDefaults(), this.state.svc || {});
+  }
+
+  svcSet(p) {
+    this.setState({ svc: Object.assign(this.svcGet(), p) });
+  }
+
+  svcClients() {
+    const base = [
+      { v: 'Academia Fit', kind: 'Empresa' }, { v: 'Padaria Sol', kind: 'Empresa' }, { v: 'Clínica Vida', kind: 'Empresa' },
+      { v: 'Escritório Alfa', kind: 'Empresa' }, { v: 'Loja Moda Viva', kind: 'Empresa' }, { v: 'Mercado Bom Preço', kind: 'Empresa' },
+      { v: 'Restaurante Sabor & Cia', kind: 'Empresa' }, { v: 'Cond. Vila Verde', kind: 'Empresa' },
+      { v: 'Residência R. Silva', kind: 'Residencial' }, { v: 'Casa R. do Ipê', kind: 'Residencial' },
+    ];
+    return base.concat(this.svcGet().created);
+  }
+
+  svcTypes() {
+    return [
+      { v: 'Baratas e formigas', price: 240 }, { v: 'Roedores (desratização)', price: 320 }, { v: 'Cupins', price: 450 },
+      { v: 'Pulgas e carrapatos', price: 220 }, { v: 'Monitoramento mensal (contrato)', price: 0 },
+    ];
+  }
+
+
+  svcOpts(list, cur, ph) {
+    const out = [{ v: '', l: ph, sel: cur === '' }];
+    list.forEach((x) => out.push({ v: x.v, l: x.l || x.v, sel: cur === x.v }));
+    return out;
+  }
+
+  renderSvc() {
+    const g = this.svcGet();
+    const val = (e) => (e && e.target ? e.target.value : '');
+    const clients = this.svcClients();
+    const types = this.svcTypes();
+    const cl = clients.find((c) => c.v === g.client);
+    const ty = types.find((t) => t.v === g.type);
+    const days = this.svcDayList().map((d) => ({ v: d }));
+    const times = [];
+    for (let h = 8; h < 18; h++) times.push({ v: (h < 10 ? '0' : '') + h + ':00' });
+    const techList = this.svcTechs().concat([{ v: 'none', l: 'Sem técnico (agendar depois)' }]);
+    const title = { form: 'Novo serviço', new: 'Novo cliente', done: 'Serviço cadastrado' }[g.step];
+    let priceText = 'Escolha o cliente e o tipo de serviço para ver o valor da tabela.';
+    if (ty) priceText = ty.price > 0 ? 'Valor da tabela: R$ ' + ty.price : 'Valor conforme o contrato do cliente.';
+    let policy = '';
+    if (cl) policy = cl.kind === 'Residencial' ? 'Residencial: a ordem de serviço é liberada depois do Pix, e o horário fica reservado por 30 minutos.' : 'Empresa: pós-pago. A ordem de serviço é liberada na hora e a cobrança sai depois da execução.';
+    return {
+      svcOpen: g.open, svcTitle: title,
+      svcIsForm: g.step === 'form', svcIsNew: g.step === 'new', svcIsDone: g.step === 'done',
+      svcClient: g.client, svcType: g.type, svcTech: g.tech, svcDay: g.day, svcTime: g.time,
+      clientOpts: this.svcOpts(clients, g.client, 'Selecione o cliente'),
+      typeOpts: this.svcOpts(types, g.type, 'Selecione o serviço'),
+      techOpts: this.svcOpts(techList, g.tech, 'Selecione o técnico'),
+      dayOpts: this.svcOpts(days, g.day, 'Dia'),
+      timeOpts: this.svcOpts(times, g.time, 'Horário'),
+      onClient: (e) => this.svcSet({ client: val(e), error: '' }),
+      onType: (e) => this.svcSet({ type: val(e), error: '' }),
+      onTech: (e) => this.svcSet({ tech: val(e), error: '' }),
+      onDay: (e) => this.svcSet({ day: val(e) }),
+      onTime: (e) => this.svcSet({ time: val(e) }),
+      svcPriceText: priceText, svcPolicy: policy,
+      svcHasError: !!g.error, svcError: g.error,
+      openSvc: () => this.svcSet({ open: true, step: 'form', client: '', type: '', tech: '', error: '', doneText: '' }),
+      closeSvc: () => this.svcSet({ open: false, step: 'form', error: '' }),
+      anotherSvc: () => this.svcSet({ step: 'form', client: '', type: '', tech: '', error: '', doneText: '' }),
+      openNewClient: () => this.svcSet({ step: 'new', error: '', nName: '', nPhone: '', nAddr: '', nKind: 'Empresa' }),
+      backToList: () => this.svcSet({ step: 'form', error: '' }),
+      nName: g.nName, nPhone: g.nPhone, nAddr: g.nAddr,
+      onNName: (e) => this.svcSet({ nName: val(e) }),
+      onNPhone: (e) => this.svcSet({ nPhone: val(e) }),
+      onNAddr: (e) => this.svcSet({ nAddr: val(e) }),
+      kindBtns: ['Empresa', 'Residencial'].map((k) => ({
+        label: k, on: g.nKind === k,
+        style: g.nKind === k ? 'border: 0; background: #0F1720; color: #FFFFFF;' : 'border: 1.5px solid #C9D3E0; background: #FFFFFF; color: #0F1720;',
+        pick: () => this.svcSet({ nKind: k }),
+      })),
+      saveClient: () => {
+        if (!g.nName.trim()) { this.svcSet({ error: 'Informe o nome do cliente.' }); return; }
+        this.svcSet({ created: g.created.concat([{ v: g.nName.trim(), kind: g.nKind }]), client: g.nName.trim(), step: 'form', error: '' });
+      },
+      saveSvc: () => {
+        if (!g.client) { this.svcSet({ error: 'Selecione o cliente ou cadastre um novo.' }); return; }
+        if (!g.type) { this.svcSet({ error: 'Selecione o tipo de serviço.' }); return; }
+        if (!g.tech) { this.svcSet({ error: 'Selecione o técnico, ou escolha "Sem técnico".' }); return; }
+        const data = { client: g.client, type: g.type, tech: g.tech, day: g.day, time: g.time, kind: cl ? cl.kind : 'Empresa' };
+        const res = this.svcOnSave ? this.svcOnSave(data) : null;
+        if (res && res.error) { this.svcSet({ error: res.error }); return; }
+        const when = g.tech === 'none' ? 'sem horário definido' : g.day + ' às ' + g.time + ' com ' + g.tech;
+        const pay = data.kind === 'Residencial' ? ' O Pix foi enviado ao cliente e o horário fica reservado por 30 minutos.' : ' A ordem de serviço foi criada.';
+        this.svcSet({ step: 'done', error: '', doneText: g.client + ' · ' + g.type + ' · ' + when + '.' + pay });
+      },
+      svcDoneText: g.doneText,
+    };
+  }
+
+  namesMap() {
+    const m = {};
+    (this.state.techs || []).forEach((t) => { m[t.k] = t.name; });
+    return m;
+  }
+
+  activeKeys() {
+    return this.state.techs.filter((t) => t.active).map((t) => t.k);
+  }
+
+  svcDayList() {
+    return ['Sex 06 nov', 'Seg 09 nov', 'Ter 10 nov', 'Qua 11 nov', 'Qui 12 nov'];
+  }
+
+  svcTechs() {
+    return this.state.techs.filter((t) => t.active).map((t) => ({ v: t.name, l: t.name }));
+  }
+
+  svcOnSave(data) {
+    const s = this.state;
+    const tech = data.tech === 'none' ? null : s.techs.find((t) => t.name === data.tech);
+    const id = Math.max.apply(null, s.os.map((x) => x.id)) + 1;
+    const dur = data.type.indexOf('Cupins') === 0 ? 2 : 1.5;
+    if (!tech) {
+      this.setState({ os: s.os.concat([{ id: id, client: data.client, service: data.type, tech: null, start: null, dur: dur, status: 'todo' }]) });
+      return null;
+    }
+    if (data.day !== 'Sex 06 nov') {
+      this.setState({ notice: { type: 'sent', text: data.client + ' agendado para ' + data.day + ' às ' + data.time + ' com ' + tech.name + '. Esta tela mostra só o dia de hoje.' } });
+      return null;
+    }
+    const start = parseInt(data.time, 10);
+    if (start + dur > 18) return { error: 'Fora do horário de atendimento (até 18:00). Escolha um horário mais cedo.' };
+    const clash = this.clashWith(s.os, id, tech.k, start, dur);
+    if (clash) return { error: 'Conflito: ' + tech.name + ' já tem ' + clash.client + ' nesse horário. Escolha outro horário ou outro técnico.' };
+    this.setState({ os: s.os.concat([{ id: id, client: data.client, service: data.type, tech: tech.k, start: start, dur: dur, status: 'sched' }]) });
+    return null;
+  }
+
+  tmGet() {
+    return Object.assign({ open: false, mode: 'manage', name: '', phone: '', color: '#2F5FE0', error: '', info: '', infoOk: true }, this.state.tm || {});
+  }
+
+  tmSet(p) {
+    this.setState({ tm: Object.assign(this.tmGet(), p) });
+  }
+
+  renderVals() {
+    return Object.assign(this.renderBase(), this.renderSvc(), this.renderTech());
+  }
+
+  renderTech() {
+    const g = this.tmGet();
+    const s = this.state;
+    const val = (e) => (e && e.target ? e.target.value : '');
+    const colors = ['#2F5FE0', '#0F1720', '#4A5B78', '#14653A', '#7A4B00'];
+    const jobsOf = (k) => s.os.filter((x) => x.tech === k && (x.status === 'sched' || x.status === 'run')).length;
+    return {
+      gridMin: (52 + this.activeKeys().length * 232) + 'px',
+      tmOpen: g.open, tmIsNew: g.mode === 'new', tmIsManage: g.mode === 'manage',
+      tmTitle: g.mode === 'new' ? 'Novo técnico' : 'Gerenciar técnicos',
+      tName: g.name, tPhone: g.phone,
+      onTName: (e) => this.tmSet({ name: val(e), error: '' }),
+      onTPhone: (e) => this.tmSet({ phone: val(e) }),
+      swatches: colors.map((c) => ({
+        on: g.color === c, aria: 'Cor ' + c,
+        style: 'background: ' + c + '; border: ' + (g.color === c ? '4px solid #9DBBFF; box-shadow: 0 0 0 2px #0F1720;' : '2px solid #FFFFFF; box-shadow: 0 0 0 1px #C9D3E0;'),
+        pick: () => this.tmSet({ color: c }),
+      })),
+      tmHasError: !!g.error, tmError: g.error,
+      tmHasInfo: !!g.info, tmInfo: g.info,
+      tmInfoStyle: g.infoOk ? 'background: #DDF3E4; color: #14653A;' : 'background: #FFF0D1; color: #7A4B00;',
+      openNewTech: () => this.tmSet({ open: true, mode: 'new', name: '', phone: '', color: '#2F5FE0', error: '', info: '' }),
+      openManage: () => this.tmSet({ open: true, mode: 'manage', error: '' }),
+      closeTm: () => this.tmSet({ open: false, info: '', error: '' }),
+      saveTech: () => {
+        const nm = g.name.trim();
+        if (!nm) { this.tmSet({ error: 'Informe o nome do técnico.' }); return; }
+        if (s.techs.some((t) => t.name.toLowerCase() === nm.toLowerCase())) { this.tmSet({ error: 'Já existe um técnico com esse nome.' }); return; }
+        const k = 'T' + (s.techs.length + 1);
+        this.setState({ techs: s.techs.concat([{ k: k, name: nm, phone: g.phone || 'sem telefone', color: g.color, active: true }]) });
+        this.tmSet({ mode: 'manage', info: nm + ' cadastrado. A coluna dele já aparece na agenda.', infoOk: true, error: '' });
+      },
+      techRows: s.techs.map((t) => {
+        const n = jobsOf(t.k);
+        return {
+          name: t.name, ini: t.name.charAt(0), phone: t.phone,
+          avatar: 'background: ' + t.color + ';',
+          jobs: n + (n === 1 ? ' serviço pendente' : ' serviços pendentes'),
+          status: t.active ? 'Ativo' : 'Inativo',
+          statusStyle: t.active ? 'background: #DDF3E4; color: #14653A;' : 'background: #E8ECF2; color: #2F3A4A;',
+          toggleLabel: t.active ? 'Desativar' : 'Ativar',
+          toggle: () => {
+            if (t.active && n > 0) {
+              this.tmSet({ info: t.name + ' tem ' + n + (n === 1 ? ' serviço' : ' serviços') + ' pendente' + (n === 1 ? '' : 's') + ' hoje. Reagende antes de desativar.', infoOk: false });
+              return;
+            }
+            this.setState({ techs: s.techs.map((x) => (x.k === t.k ? { ...x, active: !x.active } : x)) });
+            this.tmSet({ info: t.name + (t.active ? ' desativado. A coluna saiu da agenda.' : ' ativado. A coluna voltou para a agenda.'), infoOk: true });
+          },
+        };
+      }),
+    };
+  }
+
+}
+</script>
+</body>
+</html>

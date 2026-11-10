@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Clientes — Detetiza OS</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button,input,select,textarea{font-family:inherit}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #2F5FE0;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height: 100%; background: #E9EEF5; padding: 24px; box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0F1720">
+<div style="border-radius: 36px; overflow: hidden; border: 6px solid #FFFFFF; background: #F4F7FB; box-shadow: 0 18px 50px rgba(20,40,80,0.14); padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="width: 46px; height: 46px; border-radius: 15px; background: #0F1720; display: flex; align-items: center; justify-content: center">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#9DBBFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"></path><path d="M9 12l2 2 4-4"></path></svg>
+</div>
+<div>
+<div style="font-size: 20px; font-weight: 800; line-height: 1.15">Dedetizadora Impacto</div>
+<div style="font-size: 12px; font-weight: 600; color: #3A4658">Detetiza OS</div>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="display: flex; align-items: center; background: #FFFFFF; border-radius: 999px; padding: 0 18px; height: 48px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 14px rgba(20,40,80,0.08)">09 nov 2026</div>
+<a href="GerenteDigital.dc.html" style="display: flex; align-items: center; gap: 8px; background: #0F1720; color: #FFFFFF; border-radius: 999px; padding: 0 20px; height: 48px; font-size: 14px; font-weight: 700">Gerente Digital</a>
+<div aria-label="Usuário: proprietário" role="img" style="width: 48px; height: 48px; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800">DI</div>
+</div>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+
+<nav aria-label="Navegação principal" style="flex: 0 0 64px; display: flex; flex-direction: column; gap: 4px; padding: 8px; background: #FFFFFF; border-radius: 22px; box-shadow: 0 8px 28px rgba(20,40,80,0.08)">
+<a href="Main.dc.html" aria-label="Dashboard" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg>
+</a>
+<a href="Agenda.dc.html" aria-label="Agenda" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M8 2v4M16 2v4M3 10h18"></path></svg>
+</a>
+<a href="Clientes.dc.html" aria-label="Clientes" aria-current="page" style="width: 48px; height: 48px; border-radius: 15px; background: #2F5FE0; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2.2.6 3.5 2.5 3.5 6"></path></svg>
+</a>
+<a href="Campanhas.dc.html" aria-label="Campanhas" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11v3a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"></path><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"></path></svg>
+</a>
+<a href="Financeiro.dc.html" aria-label="Financeiro" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"></rect><path d="M3 10h18M16 15h2"></path></svg>
+</a>
+<a href="Certificado.dc.html" aria-label="Certificados" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"></path><path d="M9 12l2 2 4-4"></path></svg>
+</a>
+</nav>
+
+<main style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<div>
+<h1 style="margin: 0; font-size: 28px; font-weight: 800">Clientes</h1>
+<div style="font-size: 14px; font-weight: 600; color: #3A4658; margin-top: 4px">Empresas e residências atendidas, com histórico e retorno.</div>
+</div>
+<button onClick="{{openNew}}" style="min-height: 48px; border: 0; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; padding: 0 24px; font-size: 14px; font-weight: 700">Cadastrar cliente</button>
+</div>
+
+<sc-if value="{{hasMsg}}" hint-placeholder-val="{{ false }}">
+<div role="status" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #DDF3E4; color: #14653A; border-radius: 16px; padding: 6px 8px 6px 16px; font-size: 14px; font-weight: 700">
+<span>{{msg}}</span>
+<button onClick="{{dismissMsg}}" aria-label="Fechar aviso" style="width: 44px; height: 44px; border: 0; border-radius: 999px; background: transparent; color: #14653A; font-size: 20px; font-weight: 700">×</button>
+</div>
+</sc-if>
+
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<sc-for list="{{kpis}}" as="k" hint-placeholder-count="4">
+<div style="flex: 1 1 200px; background: #FFFFFF; border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.08); padding: 22px; padding: 18px 20px">
+<div style="font-size: 13px; font-weight: 600; color: #3A4658">{{k.label}}</div>
+<div style="font-size: 28px; font-weight: 800; line-height: 1.15; margin-top: 4px">{{k.value}}</div>
+</div>
+</sc-for>
+</div>
+
+<section style="background: #FFFFFF; border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.08); padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end">
+<label style="flex: 2 1 260px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Buscar cliente
+<input value="{{q}}" onInput="{{onQ}}" placeholder="Nome do cliente" type="search" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+<div style="flex: 0 0 auto; display: flex; flex-direction: column; gap: 6px">
+<div style="font-size: 12px; font-weight: 700; color: #3A4658">Tipo</div>
+<div role="group" aria-label="Filtrar por tipo" style="display: flex; gap: 8px">
+<sc-for list="{{tipos}}" as="t" hint-placeholder-count="3">
+<button onClick="{{t.pick}}" aria-pressed="{{t.on}}" style="min-height: 48px; border-radius: 999px; padding: 0 18px; font-size: 13px; font-weight: 700; {{t.style}}">{{t.label}}</button>
+</sc-for>
+</div>
+</div>
+<label style="flex: 1 1 180px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Situação
+<select value="{{sit}}" onChange="{{onSit}}" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+<sc-for list="{{sitOpts}}" as="o" hint-placeholder-count="5"><option value="{{o.v}}" selected="{{o.sel}}">{{o.v}}</option></sc-for>
+</select>
+</label>
+</div>
+
+<div style="overflow-x: auto">
+<table style="width: 100%; min-width: 860px; border-collapse: collapse; font-size: 14px">
+<thead>
+<tr style="text-align: left; font-size: 12px; font-weight: 700; color: #3A4658">
+<th scope="col" style="padding: 8px 10px">Cliente</th>
+<th scope="col" style="padding: 8px 10px">Contato</th>
+<th scope="col" style="padding: 8px 10px">Último serviço</th>
+<th scope="col" style="padding: 8px 10px">Total pago</th>
+<th scope="col" style="padding: 8px 10px">Situação</th>
+<th scope="col" style="padding: 8px 10px; text-align: right">Ação</th>
+</tr>
+</thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+<tr style="border-top: 1px solid #E3E8EF">
+<td style="padding: 14px 10px"><div style="font-weight: 800">{{r.name}}</div><span style="display: inline-block; margin-top: 4px; border-radius: 999px; padding: 2px 10px; font-size: 12px; font-weight: 700; {{r.kindChip}}">{{r.kind}}</span></td>
+<td style="padding: 14px 10px; font-weight: 600">{{r.phone}}</td>
+<td style="padding: 14px 10px; font-weight: 600">{{r.last}}</td>
+<td style="padding: 14px 10px; font-weight: 800">{{r.paid}}</td>
+<td style="padding: 14px 10px"><span style="display: inline-block; border-radius: 999px; padding: 3px 12px; font-size: 12px; font-weight: 700; {{r.sitChip}}">{{r.sit}}</span></td>
+<td style="padding: 14px 10px; text-align: right">
+<sc-if value="{{r.hasDetail}}" hint-placeholder-val="{{ false }}"><a href="Cliente.dc.html" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1.5px solid #0F1720; background: #FFFFFF; color: #0F1720; font-size: 13px; font-weight: 700">Gerenciar</a></sc-if>
+<sc-if value="{{r.noDetail}}" hint-placeholder-val="{{ true }}"><button disabled="" style="min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1.5px solid #C9D3E0; background: #F4F7FB; color: #5B6678; font-size: 13px; font-weight: 700; cursor: default">Gerenciar</button></sc-if>
+</td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<sc-if value="{{noRows}}" hint-placeholder-val="{{ false }}">
+<div style="padding: 20px; text-align: center; font-size: 14px; font-weight: 600; color: #3A4658">Nenhum cliente com esses filtros.</div>
+</sc-if>
+<div style="font-size: 12px; font-weight: 600; color: #3A4658">Mostrando {{shown}} de {{total}} clientes (amostra do protótipo).</div>
+</section>
+
+<div style="font-size: 12px; font-weight: 600; color: #3A4658">Protótipo v0.1 · dados ilustrativos. Só o Padaria Sol tem tela de gerenciamento no protótipo; as demais linhas ficam desabilitadas.</div>
+</main>
+</div>
+
+<sc-if value="{{newOpen}}" hint-placeholder-val="{{ false }}">
+<div style="position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 50; background: rgba(15,23,32,0.55); display: flex; align-items: flex-start; justify-content: center; padding: 72px 16px 16px; box-sizing: border-box; overflow-y: auto">
+<div role="dialog" aria-modal="true" aria-labelledby="nc-title" style="width: 100%; max-width: 580px; background: #FFFFFF; border-radius: 28px; box-shadow: 0 24px 60px rgba(15,23,32,0.35); padding: 26px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<h2 id="nc-title" style="margin: 0; font-size: 22px; font-weight: 800">Cadastrar cliente</h2>
+<button onClick="{{closeNew}}" aria-label="Fechar" style="width: 44px; height: 44px; border-radius: 999px; border: 0; background: #E8ECF2; color: #0F1720; font-size: 20px; font-weight: 700">×</button>
+</div>
+<div style="display: flex; gap: 8px" role="group" aria-label="Tipo de cliente">
+<sc-for list="{{kindBtns}}" as="k" hint-placeholder-count="2">
+<button onClick="{{k.pick}}" aria-pressed="{{k.on}}" style="flex: 1 1 0; min-height: 48px; border-radius: 999px; font-size: 14px; font-weight: 700; {{k.style}}">{{k.label}}</button>
+</sc-for>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Nome ou razão social
+<input value="{{fName}}" onInput="{{onFName}}" placeholder="Ex.: Pet Shop Au Au" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">{{docLabel}}
+<input value="{{fDoc}}" onInput="{{onFDoc}}" placeholder="" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">WhatsApp
+<input value="{{fPhone}}" onInput="{{onFPhone}}" placeholder="(11) 90000-0000" inputmode="tel" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">E-mail
+<input value="{{fMail}}" onInput="{{onFMail}}" placeholder="contato@empresa.com.br" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Endereço do serviço
+<input value="{{fAddr}}" onInput="{{onFAddr}}" placeholder="Rua, número, bairro" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+</div>
+<div style="background: #F4F7FB; border-radius: 16px; padding: 12px 14px; font-size: 13px; font-weight: 500; line-height: 1.5; color: #2F3A4A">{{billingNote}}</div>
+<sc-if value="{{hasError}}" hint-placeholder-val="{{ false }}">
+<div role="alert" style="background: #FDE4E1; color: #8E1B10; border-radius: 14px; padding: 10px 14px; font-size: 13px; font-weight: 700">{{error}}</div>
+</sc-if>
+<div style="display: flex; justify-content: flex-end; gap: 8px">
+<button onClick="{{closeNew}}" style="min-height: 48px; border: 1.5px solid #0F1720; border-radius: 999px; background: #FFFFFF; color: #0F1720; padding: 0 22px; font-size: 14px; font-weight: 700">Cancelar</button>
+<button onClick="{{saveNew}}" style="min-height: 48px; border: 0; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; padding: 0 24px; font-size: 14px; font-weight: 700">Salvar cliente</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1200}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.base = [
+      { name: 'Padaria Sol', kind: 'Empresa', phone: '(11) 98888-1200', last: '08 mai 2026', paid: 2000, sit: 'Retorno a vencer', detail: true },
+      { name: 'Academia Fit', kind: 'Empresa', phone: '(11) 97777-3040', last: '18 out 2026', paid: 2880, sit: 'Em dia' },
+      { name: 'Clínica Vida', kind: 'Empresa', phone: '(11) 96666-2210', last: '02 set 2026', paid: 4200, sit: 'Retorno a vencer' },
+      { name: 'Escritório Alfa', kind: 'Empresa', phone: '(11) 95555-8120', last: '30 set 2026', paid: 1900, sit: 'Em dia' },
+      { name: 'Loja Moda Viva', kind: 'Empresa', phone: '(11) 94444-7001', last: '12 ago 2026', paid: 960, sit: 'Inadimplente' },
+      { name: 'Mercado Bom Preço', kind: 'Empresa', phone: '(11) 93333-5510', last: '27 out 2026', paid: 5400, sit: 'Em dia' },
+      { name: 'Restaurante Sabor & Cia', kind: 'Empresa', phone: '(11) 92222-6405', last: '15 ago 2026', paid: 4680, sit: 'Retorno a vencer' },
+      { name: 'Cond. Vila Verde', kind: 'Empresa', phone: '(11) 91111-9090', last: '04 out 2026', paid: 7200, sit: 'Em dia' },
+      { name: 'Residência R. Silva', kind: 'Residencial', phone: '(11) 98123-4455', last: '09 out 2026', paid: 240, sit: 'Em dia' },
+      { name: 'Casa R. do Ipê', kind: 'Residencial', phone: '(11) 98234-5566', last: '14 ago 2026', paid: 480, sit: 'Retorno a vencer' },
+      { name: 'Ana Paula Ribeiro', kind: 'Residencial', phone: '(11) 98345-6677', last: '21 out 2026', paid: 240, sit: 'Em dia' },
+      { name: 'Carlos Menezes', kind: 'Residencial', phone: '(11) 98456-7788', last: '12 mar 2026', paid: 240, sit: 'Inativo' },
+    ];
+    this.state = { q: '', tipo: 'Todos', sit: 'Todas', open: false, added: [], msg: '', f: { kind: 'Empresa', name: '', doc: '', phone: '', mail: '', addr: '', error: '' } };
+  }
+
+  brl(n) {
+    return 'R$ ' + String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+
+  setF(p) {
+    this.setState({ f: Object.assign({}, this.state.f, p) });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const f = s.f;
+    const val = (e) => (e && e.target ? e.target.value : '');
+    const all = s.added.concat(this.base);
+    const q = s.q.trim().toLowerCase();
+    const list = all.filter((c) => (s.tipo === 'Todos' || c.kind === s.tipo) && (s.sit === 'Todas' || c.sit === s.sit) && (!q || c.name.toLowerCase().indexOf(q) !== -1));
+    const kindChip = (k) => (k === 'Empresa' ? 'background: #DCE7FF; color: #1B47B5;' : 'background: #E8ECF2; color: #2F3A4A;');
+    const sitChip = (x) => ({ 'Em dia': 'background: #DDF3E4; color: #14653A;', 'Retorno a vencer': 'background: #FFF0D1; color: #7A4B00;', 'Inadimplente': 'background: #FDE4E1; color: #8E1B10;', 'Inativo': 'background: #E8ECF2; color: #2F3A4A;' }[x]);
+    const rows = list.map((c) => ({
+      name: c.name, kind: c.kind, kindChip: kindChip(c.kind), phone: c.phone, last: c.last,
+      paid: this.brl(c.paid), sit: c.sit, sitChip: sitChip(c.sit), hasDetail: !!c.detail, noDetail: !c.detail,
+    }));
+    const baseTotal = 271;
+    const count = (k) => all.filter((c) => c.kind === k).length;
+    const kpis = [
+      { label: 'Clientes ativos', value: String(baseTotal + s.added.length) },
+      { label: 'Empresas', value: String(71 + count('Empresa') - this.base.filter((c) => c.kind === 'Empresa').length + this.base.filter((c) => c.kind === 'Empresa').length - 0 - 0) },
+      { label: 'Residenciais', value: String(200 + s.added.filter((c) => c.kind === 'Residencial').length) },
+      { label: 'Retorno a vencer (30 dias)', value: String(12 + 0) },
+    ];
+    kpis[1].value = String(71 + s.added.filter((c) => c.kind === 'Empresa').length);
+    const tipos = ['Todos', 'Empresa', 'Residencial'].map((t) => ({
+      label: t, on: s.tipo === t,
+      style: s.tipo === t ? 'border: 0; background: #0F1720; color: #FFFFFF;' : 'border: 1.5px solid #C9D3E0; background: #F4F7FB; color: #0F1720;',
+      pick: () => this.setState({ tipo: t }),
+    }));
+    const sits = ['Todas', 'Em dia', 'Retorno a vencer', 'Inadimplente', 'Inativo'];
+    const isEmp = f.kind === 'Empresa';
+    return {
+      kpis: kpis, rows: rows, tipos: tipos, noRows: list.length === 0, shown: list.length, total: baseTotal + s.added.length,
+      q: s.q, onQ: (e) => this.setState({ q: val(e) }),
+      sit: s.sit, onSit: (e) => this.setState({ sit: val(e) }),
+      sitOpts: sits.map((x) => ({ v: x, sel: s.sit === x })),
+      hasMsg: !!s.msg, msg: s.msg, dismissMsg: () => this.setState({ msg: '' }),
+      openNew: () => this.setState({ open: true, f: { kind: 'Empresa', name: '', doc: '', phone: '', mail: '', addr: '', error: '' } }),
+      closeNew: () => this.setState({ open: false }),
+      newOpen: s.open,
+      kindBtns: ['Empresa', 'Residencial'].map((k) => ({
+        label: k, on: f.kind === k,
+        style: f.kind === k ? 'border: 0; background: #0F1720; color: #FFFFFF;' : 'border: 1.5px solid #C9D3E0; background: #F4F7FB; color: #0F1720;',
+        pick: () => this.setF({ kind: k }),
+      })),
+      docLabel: isEmp ? 'CNPJ' : 'CPF',
+      billingNote: isEmp ? 'Empresa: cobrança pós-pago. A ordem de serviço sai na hora e a cobrança é gerada depois da execução.' : 'Residencial: cobrança pré-paga. O horário fica reservado por 30 minutos e a ordem de serviço sai depois do Pix.',
+      fName: f.name, fDoc: f.doc, fPhone: f.phone, fMail: f.mail, fAddr: f.addr,
+      onFName: (e) => this.setF({ name: val(e), error: '' }),
+      onFDoc: (e) => this.setF({ doc: val(e) }),
+      onFPhone: (e) => this.setF({ phone: val(e), error: '' }),
+      onFMail: (e) => this.setF({ mail: val(e) }),
+      onFAddr: (e) => this.setF({ addr: val(e) }),
+      hasError: !!f.error, error: f.error,
+      saveNew: () => {
+        if (!f.name.trim()) { this.setF({ error: 'Informe o nome do cliente.' }); return; }
+        if (!f.phone.trim()) { this.setF({ error: 'Informe o WhatsApp para enviar lembretes e comprovantes.' }); return; }
+        const c = { name: f.name.trim(), kind: f.kind, phone: f.phone.trim(), last: 'Sem serviço', paid: 0, sit: 'Em dia' };
+        this.setState({ open: false, added: [c].concat(s.added), msg: c.name + ' cadastrado. Agora é só cadastrar o primeiro serviço.' });
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>

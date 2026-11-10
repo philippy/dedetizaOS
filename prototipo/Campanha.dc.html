@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Campanha — Detetiza OS</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button,input,select,textarea{font-family:inherit}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #2F5FE0;outline-offset:2px}
+</style>
+</helmet>
+<div style="min-height: 100%; background: #E9EEF5; padding: 24px; box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0F1720">
+<div style="border-radius: 36px; overflow: hidden; border: 6px solid #FFFFFF; background: #F4F7FB; box-shadow: 0 18px 50px rgba(20,40,80,0.14); padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="width: 46px; height: 46px; border-radius: 15px; background: #0F1720; display: flex; align-items: center; justify-content: center">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#9DBBFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"></path><path d="M9 12l2 2 4-4"></path></svg>
+</div>
+<div>
+<div style="font-size: 20px; font-weight: 800; line-height: 1.15">Dedetizadora Impacto</div>
+<div style="font-size: 12px; font-weight: 600; color: #3A4658">Detetiza OS</div>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="display: flex; align-items: center; background: #FFFFFF; border-radius: 999px; padding: 0 18px; height: 48px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 14px rgba(20,40,80,0.08)">09 nov 2026</div>
+<a href="GerenteDigital.dc.html" style="display: flex; align-items: center; gap: 8px; background: #0F1720; color: #FFFFFF; border-radius: 999px; padding: 0 20px; height: 48px; font-size: 14px; font-weight: 700">Gerente Digital</a>
+<div aria-label="Usuário: proprietário" role="img" style="width: 48px; height: 48px; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800">DI</div>
+</div>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+
+<nav aria-label="Navegação principal" style="flex: 0 0 64px; display: flex; flex-direction: column; gap: 4px; padding: 8px; background: #FFFFFF; border-radius: 22px; box-shadow: 0 8px 28px rgba(20,40,80,0.08)">
+<a href="Main.dc.html" aria-label="Dashboard" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg>
+</a>
+<a href="Agenda.dc.html" aria-label="Agenda" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M8 2v4M16 2v4M3 10h18"></path></svg>
+</a>
+<a href="Clientes.dc.html" aria-label="Clientes" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2.2.6 3.5 2.5 3.5 6"></path></svg>
+</a>
+<a href="Campanhas.dc.html" aria-label="Campanhas" aria-current="page" style="width: 48px; height: 48px; border-radius: 15px; background: #2F5FE0; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11v3a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"></path><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"></path></svg>
+</a>
+<a href="Financeiro.dc.html" aria-label="Financeiro" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"></rect><path d="M3 10h18M16 15h2"></path></svg>
+</a>
+<a href="Certificado.dc.html" aria-label="Certificados" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"></path><path d="M9 12l2 2 4-4"></path></svg>
+</a>
+</nav>
+
+<main style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px">
+<div>
+<a href="Campanhas.dc.html" style="display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-size: 13px; font-weight: 700; color: #1B47B5">← Todas as campanhas</a>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+<h1 style="margin: 0; font-size: 28px; font-weight: 800">Campanha · {{name}}</h1>
+<span style="border-radius: 999px; padding: 3px 14px; font-size: 13px; font-weight: 700; background: #DCE7FF; color: #1B47B5">Agendada</span>
+</div>
+<div style="font-size: 14px; font-weight: 600; color: #3A4658; margin-top: 4px">{{period}}</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+<button onClick="{{useSample}}" style="min-height: 48px; border: 1.5px solid #0F1720; border-radius: 999px; background: #FFFFFF; color: #0F1720; padding: 0 22px; font-size: 14px; font-weight: 700">Enviar comprovante Pix</button>
+<button onClick="{{openSvc}}" style="min-height: 48px; border: 0; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; padding: 0 24px; font-size: 14px; font-weight: 700">Contratar serviço</button>
+</div>
+</div>
+
+<sc-if value="{{hasMsg}}" hint-placeholder-val="{{ false }}">
+<div role="status" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #DDF3E4; color: #14653A; border-radius: 16px; padding: 6px 8px 6px 16px; font-size: 14px; font-weight: 700">
+<span>{{msg}}</span>
+<button onClick="{{dismissMsg}}" aria-label="Fechar aviso" style="width: 44px; height: 44px; border: 0; border-radius: 999px; background: transparent; color: #14653A; font-size: 20px; font-weight: 700">×</button>
+</div>
+</sc-if>
+
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<sc-for list="{{kpis}}" as="k" hint-placeholder-count="4">
+<div style="flex: 1 1 200px; background: #FFFFFF; border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.08); padding: 22px; padding: 18px 20px">
+<div style="font-size: 13px; font-weight: 600; color: #3A4658">{{k.label}}</div>
+<div style="font-size: 26px; font-weight: 800; line-height: 1.15; margin-top: 4px">{{k.value}}</div>
+<div style="font-size: 12px; font-weight: 600; color: #3A4658; margin-top: 4px">{{k.sub}}</div>
+</div>
+</sc-for>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+
+<section style="flex: 2 1 520px; min-width: 0; background: #FFFFFF; border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.08); padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px">
+<h2 style="margin: 0; font-size: 17px; font-weight: 800">Casas e apartamentos</h2>
+<div role="group" aria-label="Filtrar lista" style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{filters}}" as="f" hint-placeholder-count="3">
+<button onClick="{{f.pick}}" aria-pressed="{{f.on}}" style="min-height: 44px; border-radius: 999px; padding: 0 16px; font-size: 13px; font-weight: 700; {{f.style}}">{{f.label}}</button>
+</sc-for>
+</div>
+</div>
+<div style="overflow-x: auto">
+<table style="width: 100%; min-width: 640px; border-collapse: collapse; font-size: 14px">
+<thead>
+<tr style="text-align: left; font-size: 12px; font-weight: 700; color: #3A4658">
+<th scope="col" style="padding: 8px 10px">Unidade</th>
+<th scope="col" style="padding: 8px 10px">Morador</th>
+<th scope="col" style="padding: 8px 10px">Serviço</th>
+<th scope="col" style="padding: 8px 10px">Horário</th>
+<th scope="col" style="padding: 8px 10px">Valor</th>
+<th scope="col" style="padding: 8px 10px">Pix</th>
+</tr>
+</thead>
+<tbody>
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+<tr style="border-top: 1px solid #E3E8EF">
+<td style="padding: 12px 10px; font-weight: 800; white-space: nowrap">{{r.unit}}</td>
+<td style="padding: 12px 10px"><div style="font-weight: 700">{{r.person}}</div><div style="font-size: 12px; font-weight: 500; color: #3A4658">CPF {{r.cpf}}</div></td>
+<td style="padding: 12px 10px; font-weight: 600">{{r.service}}</td>
+<td style="padding: 12px 10px; font-weight: 600; white-space: nowrap">{{r.when}}</td>
+<td style="padding: 12px 10px; font-weight: 800">{{r.value}}</td>
+<td style="padding: 12px 10px"><span style="display: inline-block; border-radius: 999px; padding: 3px 12px; font-size: 12px; font-weight: 700; white-space: nowrap; {{r.chip}}">{{r.status}}</span></td>
+</tr>
+</sc-for>
+</tbody>
+</table>
+</div>
+<sc-if value="{{noRows}}" hint-placeholder-val="{{ false }}">
+<div style="padding: 20px; text-align: center; font-size: 14px; font-weight: 600; color: #3A4658; line-height: 1.5">{{emptyText}}</div>
+</sc-if>
+</section>
+
+<div style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+
+<section style="background: #FFFFFF; border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.08); padding: 22px; display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 17px; font-weight: 800">Comprovantes Pix</h2>
+<div style="font-size: 13px; font-weight: 500; color: #3A4658; line-height: 1.45">Envie a foto ou o PDF do comprovante. A IA lê o valor e o nome do pagador e marca a casa ou o apartamento como pago.</div>
+<label style="position: relative; display: inline-flex; align-items: center; justify-content: center; min-height: 48px; border: 1.5px solid #0F1720; border-radius: 999px; background: #FFFFFF; color: #0F1720; padding: 0 22px; font-size: 14px; font-weight: 700; cursor: pointer">Enviar comprovante
+<input type="file" accept="image/*,application/pdf" onChange="{{onFile}}" aria-label="Enviar comprovante Pix" style="position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden">
+</label>
+<button onClick="{{useSample}}" style="min-height: 44px; border: 0; background: transparent; color: #1B47B5; font-size: 13px; font-weight: 700; text-align: left; padding: 0">Usar comprovante de exemplo</button>
+<sc-if value="{{aiReading}}" hint-placeholder-val="{{ false }}">
+<div role="status" style="background: #FFF0D1; color: #7A4B00; border-radius: 14px; padding: 12px 14px; font-size: 13px; font-weight: 700">Lendo {{aiFile}} com IA...</div>
+</sc-if>
+<sc-if value="{{aiNone}}" hint-placeholder-val="{{ false }}">
+<div role="status" style="background: #FFF0D1; color: #7A4B00; border-radius: 14px; padding: 12px 14px; font-size: 13px; font-weight: 700; line-height: 1.45">Li o comprovante, mas não há nenhuma unidade aguardando Pix para vincular. Contrate um serviço primeiro.</div>
+</sc-if>
+<sc-if value="{{aiDone}}" hint-placeholder-val="{{ false }}">
+<div role="status" style="background: #F4F7FB; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 6px">
+<div style="font-size: 12px; font-weight: 700; color: #3A4658">Lido por IA · {{aiFile}}</div>
+<div style="display: flex; justify-content: space-between; gap: 8px; font-size: 13px"><span style="color: #3A4658; font-weight: 600">Pagador</span><span style="font-weight: 800; text-align: right">{{aiPayer}}</span></div>
+<div style="display: flex; justify-content: space-between; gap: 8px; font-size: 13px"><span style="color: #3A4658; font-weight: 600">Valor</span><span style="font-weight: 800">{{aiValue}}</span></div>
+<div style="display: flex; justify-content: space-between; gap: 8px; font-size: 13px"><span style="color: #3A4658; font-weight: 600">Data e hora</span><span style="font-weight: 800">{{aiWhen}}</span></div>
+<div style="display: flex; justify-content: space-between; gap: 8px; font-size: 13px"><span style="color: #3A4658; font-weight: 600">ID da transação</span><span style="font-weight: 800; word-break: break-all; text-align: right">{{aiTx}}</span></div>
+<div style="background: #DDF3E4; color: #14653A; border-radius: 12px; padding: 10px 12px; font-size: 13px; font-weight: 700; line-height: 1.45">{{aiMatch}}</div>
+</div>
+</sc-if>
+<div style="font-size: 12px; font-weight: 600; color: #3A4658; line-height: 1.4">Simulação: no sistema real a IA confere valor, nome e horário antes de marcar como pago, e manda para revisão o que não bater.</div>
+</section>
+
+<section style="background: #FFFFFF; border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.08); padding: 22px">
+<h2 style="margin: 0 0 10px; font-size: 17px; font-weight: 800">Resumo da campanha</h2>
+<dl style="margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; font-size: 13px">
+<dt style="font-weight: 600; color: #3A4658">Período</dt><dd style="margin: 0; font-weight: 700; text-align: right">{{period}}</dd>
+<dt style="font-weight: 600; color: #3A4658">Desconto</dt><dd style="margin: 0; font-weight: 700; text-align: right">{{disc}}</dd>
+<dt style="font-weight: 600; color: #3A4658">Unidades</dt><dd style="margin: 0; font-weight: 700; text-align: right">{{units}}</dd>
+<dt style="font-weight: 600; color: #3A4658">Máx. de atendimentos</dt><dd style="margin: 0; font-weight: 700; text-align: right">{{max}}</dd>
+</dl>
+<div style="font-size: 12px; font-weight: 700; color: #3A4658; margin: 14px 0 6px">Serviços e preço na campanha</div>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; font-size: 13px">
+<sc-for list="{{svcList}}" as="x" hint-placeholder-count="2">
+<li style="display: flex; justify-content: space-between; gap: 8px"><span style="font-weight: 600">{{x.name}}</span><span style="font-weight: 800; color: #1B47B5">{{x.price}}</span></li>
+</sc-for>
+</ul>
+</section>
+
+</div>
+</div>
+
+<div style="font-size: 12px; font-weight: 600; color: #3A4658">Protótipo v0.1 · dados ilustrativos e CPFs fictícios (exibidos mascarados). A campanha fica salva neste navegador.</div>
+</main>
+</div>
+
+<sc-if value="{{svcOpen}}" hint-placeholder-val="{{ false }}">
+<div style="position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 50; background: rgba(15,23,32,0.55); display: flex; align-items: flex-start; justify-content: center; padding: 72px 16px 16px; box-sizing: border-box; overflow-y: auto">
+<div role="dialog" aria-modal="true" aria-labelledby="sv-title" style="width: 100%; max-width: 580px; background: #FFFFFF; border-radius: 28px; box-shadow: 0 24px 60px rgba(15,23,32,0.35); padding: 26px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<h2 id="sv-title" style="margin: 0; font-size: 22px; font-weight: 800">Contratar serviço</h2>
+<button onClick="{{closeSvc}}" aria-label="Fechar" style="width: 44px; height: 44px; border-radius: 999px; border: 0; background: #E8ECF2; color: #0F1720; font-size: 20px; font-weight: 700">×</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Nome
+<input value="{{sFirst}}" onInput="{{onSFirst}}" placeholder="" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Sobrenome
+<input value="{{sLast}}" onInput="{{onSLast}}" placeholder="" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">CPF
+<input value="{{sCpf}}" onInput="{{onSCpf}}" placeholder="000.000.000-00" inputmode="numeric" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Casa ou apartamento
+<select value="{{sUnit}}" onChange="{{onSUnit}}" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+<sc-for list="{{unitOpts}}" as="o" hint-placeholder-count="6"><option value="{{o.v}}" selected="{{o.sel}}">{{o.v}}</option></sc-for>
+</select>
+</label>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Serviço
+<select value="{{sService}}" onChange="{{onSService}}" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+<sc-for list="{{svcOpts}}" as="o" hint-placeholder-count="2"><option value="{{o.v}}" selected="{{o.sel}}">{{o.v}}</option></sc-for>
+</select>
+</label>
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Valor (R$)
+<input value="{{sValue}}" onInput="{{onSValue}}" placeholder="" inputmode="numeric" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Data
+<input value="{{sDate}}" onInput="{{onSDate}}" placeholder="" type="date" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Hora
+<input value="{{sTime}}" onInput="{{onSTime}}" placeholder="" type="time" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+</div>
+<div style="background: #F4F7FB; border-radius: 16px; padding: 12px 14px; font-size: 13px; font-weight: 600; line-height: 1.5; color: #2F3A4A">O valor já vem com o desconto da campanha e pode ser editado. O horário fica reservado até o Pix ser confirmado.</div>
+<sc-if value="{{hasError}}" hint-placeholder-val="{{ false }}">
+<div role="alert" style="background: #FDE4E1; color: #8E1B10; border-radius: 14px; padding: 10px 14px; font-size: 13px; font-weight: 700">{{error}}</div>
+</sc-if>
+<div style="display: flex; justify-content: flex-end; gap: 8px">
+<button onClick="{{closeSvc}}" style="min-height: 48px; border: 1.5px solid #0F1720; border-radius: 999px; background: #FFFFFF; color: #0F1720; padding: 0 22px; font-size: 14px; font-weight: 700">Cancelar</button>
+<button onClick="{{confirmSvc}}" style="min-height: 48px; border: 0; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; padding: 0 24px; font-size: 14px; font-weight: 700">Confirmar</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.prices = { 'Baratas e formigas': 240, 'Roedores (desratização)': 320, 'Cupins': 480, 'Pulgas e carrapatos': 260, 'Monitoramento': 150 };
+    this.state = { camp: this.loadCamp(), filter: 'Todos', msg: '', svcOpen: false, f: null, ai: { st: 'idle', file: '', res: null } };
+  }
+
+  brl(n) {
+    return 'R$ ' + String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+
+  vila() {
+    const names = [['Marina', 'Souza'], ['Paulo', 'Andrade'], ['Luciana', 'Prado'], ['Rogério', 'Lima'], ['Fernanda', 'Alves'], ['Tiago', 'Nogueira'], ['Camila', 'Duarte'], ['Rafael', 'Borges'], ['Helena', 'Castro'], ['Bruno', 'Teixeira'], ['Patrícia', 'Moura'], ['André', 'Ferraz']];
+    const units = [1, 2, 3, 5, 6, 8, 9, 11, 12, 14, 15, 18];
+    const times = ['08:00', '08:40', '09:20', '10:00', '10:40', '11:20', '13:00', '13:40', '14:20', '15:00', '15:30', '16:00'];
+    const rows = names.map((n, i) => {
+      const svc = i % 3 === 2 ? 'Pulgas e carrapatos' : 'Baratas e formigas';
+      return { unit: units[i], first: n[0], last: n[1], cpf: '1234' + String(10000000 + i * 7919).slice(0, 7), service: svc, date: '2026-11-14', time: times[i], value: Math.round(this.prices[svc] * 0.8), status: i < 8 ? 'Pago' : 'Aguardando Pix' };
+    });
+    return { id: 'vilaverde', name: 'Cond. Vila Verde', start: '2026-11-14', end: '2026-11-14', tStart: '08:00', tEnd: '16:00', services: ['Baratas e formigas', 'Pulgas e carrapatos'], disc: 20, units: 30, max: 24, status: 'Agendada', rows: rows };
+  }
+
+  loadCamp() {
+    let cur = '';
+    try { cur = localStorage.getItem('detetiza.cur') || ''; } catch (e) {}
+    let all = [];
+    try { all = JSON.parse(localStorage.getItem('detetiza.camps') || '[]'); } catch (e) {}
+    const found = all.find((c) => c.id === cur);
+    if (found) return found;
+    const v = all.find((c) => c.id === 'vilaverde');
+    return v || this.vila();
+  }
+
+  persist(camp) {
+    let all = [];
+    try { all = JSON.parse(localStorage.getItem('detetiza.camps') || '[]'); } catch (e) {}
+    const i = all.findIndex((c) => c.id === camp.id);
+    if (i === -1) all.push(camp); else all[i] = camp;
+    try { localStorage.setItem('detetiza.camps', JSON.stringify(all)); } catch (e) {}
+  }
+
+  setCamp(camp, extra) {
+    this.persist(camp);
+    this.setState(Object.assign({ camp: camp }, extra || {}));
+  }
+
+  setF(p) {
+    this.setState({ f: Object.assign({}, this.state.f, p) });
+  }
+
+  fmt(d) {
+    return d ? d.slice(8, 10) + '/' + d.slice(5, 7) + '/' + d.slice(0, 4) : '';
+  }
+
+  freeSlot(camp) {
+    const taken = camp.rows.map((r) => r.date + r.time);
+    let h = parseInt(camp.tStart.slice(0, 2), 10);
+    let m = parseInt(camp.tStart.slice(3, 5), 10);
+    for (let i = 0; i < 60; i++) {
+      const t = (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+      if (t > camp.tEnd) break;
+      if (taken.indexOf(camp.start + t) === -1) return t;
+      m += 30;
+      if (m >= 60) { m -= 60; h += 1; }
+    }
+    return camp.tStart;
+  }
+
+  readProof(name) {
+    this.setState({ ai: { st: 'reading', file: name, res: null } });
+    setTimeout(() => {
+      const camp = this.state.camp;
+      const idx = camp.rows.findIndex((r) => r.status === 'Aguardando Pix');
+      if (idx === -1) { this.setState({ ai: { st: 'none', file: name, res: null } }); return; }
+      const r = camp.rows[idx];
+      const rows = camp.rows.map((x, i) => (i === idx ? Object.assign({}, x, { status: 'Pago', proof: name }) : x));
+      const res = { payer: (r.first + ' ' + r.last).toUpperCase(), value: this.brl(r.value), when: '09/11/2026 14:32', tx: 'E18236120202611091732' + String(r.unit).padStart(3, '0'), match: 'Unidade ' + r.unit + ' (' + r.first + ' ' + r.last + '): valor e nome do pagador conferem. Marquei como paga.' };
+      this.setCamp(Object.assign({}, camp, { rows: rows }), { ai: { st: 'done', file: name, res: res } });
+    }, 1400);
+  }
+
+  renderVals() {
+    const s = this.state;
+    const camp = s.camp;
+    const f = s.f;
+    const val = (e) => (e && e.target ? e.target.value : '');
+    const rows = camp.rows;
+    const paid = rows.filter((r) => r.status === 'Pago');
+    const pend = rows.filter((r) => r.status !== 'Pago');
+    const sum = (a) => a.reduce((t, r) => t + r.value, 0);
+    const price = (name) => Math.round(this.prices[name] * (1 - camp.disc / 100));
+    const filters = [['Todos', rows.length], ['Pagos', paid.length], ['Aguardando Pix', pend.length]].map((x) => ({
+      label: x[0] + ' (' + x[1] + ')', on: s.filter === x[0],
+      style: s.filter === x[0] ? 'border: 0; background: #0F1720; color: #FFFFFF;' : 'border: 1.5px solid #C9D3E0; background: #F4F7FB; color: #0F1720;',
+      pick: () => this.setState({ filter: x[0] }),
+    }));
+    const shown = rows.filter((r) => s.filter === 'Todos' || (s.filter === 'Pagos' ? r.status === 'Pago' : r.status !== 'Pago'));
+    const used = rows.map((r) => r.unit);
+    const free = [];
+    for (let i = 1; i <= camp.units; i++) if (used.indexOf(i) === -1) free.push(i);
+    const ai = s.ai;
+    const opts = (list, cur) => list.map((x) => ({ v: String(x), sel: String(cur) === String(x) }));
+    const period = (camp.start === camp.end ? this.fmt(camp.start) : this.fmt(camp.start).slice(0, 5) + ' a ' + this.fmt(camp.end)) + ' · ' + camp.tStart + ' às ' + camp.tEnd;
+    return Object.assign({
+      name: camp.name, period: period, disc: camp.disc + '%', units: String(camp.units), max: String(camp.max),
+      svcList: camp.services.map((x) => ({ name: x, price: this.brl(price(x)) + ' (de ' + this.brl(this.prices[x]) + ')' })),
+      hasMsg: !!s.msg, msg: s.msg, dismissMsg: () => this.setState({ msg: '' }),
+      kpis: [
+        { label: 'Atendimentos contratados', value: rows.length + ' de ' + camp.max, sub: free.length + ' unidades ainda sem contratação' },
+        { label: 'Pagos', value: String(paid.length), sub: pend.length + ' aguardando Pix' },
+        { label: 'Receita confirmada', value: this.brl(sum(paid)), sub: 'Pix lido e conferido' },
+        { label: 'A confirmar', value: this.brl(sum(pend)), sub: 'contratados, ainda sem Pix' },
+      ],
+      filters: filters,
+      rows: shown.map((r) => ({
+        unit: 'Unid. ' + r.unit, person: r.first + ' ' + r.last, cpf: '•••.' + String(r.cpf).slice(3, 6) + '.' + String(r.cpf).slice(6, 9) + '-••',
+        service: r.service, when: this.fmt(r.date).slice(0, 5) + ' · ' + r.time, value: this.brl(r.value), status: r.status,
+        chip: r.status === 'Pago' ? 'background: #DDF3E4; color: #14653A;' : 'background: #FFF0D1; color: #7A4B00;',
+      })),
+      noRows: shown.length === 0,
+      emptyText: rows.length === 0 ? 'Nenhum atendimento contratado ainda. Use "Contratar serviço" para cadastrar o primeiro morador.' : 'Nenhuma unidade nesse filtro.',
+      onFile: (e) => { const fl = e && e.target && e.target.files && e.target.files[0]; this.readProof(fl ? fl.name : 'comprovante.pdf'); },
+      useSample: () => this.readProof('comprovante-exemplo.pdf'),
+      aiReading: ai.st === 'reading', aiNone: ai.st === 'none', aiDone: ai.st === 'done', aiFile: ai.file,
+      aiPayer: ai.res ? ai.res.payer : '', aiValue: ai.res ? ai.res.value : '', aiWhen: ai.res ? ai.res.when : '', aiTx: ai.res ? ai.res.tx : '', aiMatch: ai.res ? ai.res.match : '',
+      svcOpen: s.svcOpen,
+      openSvc: () => {
+        const svc = camp.services[0];
+        this.setState({ svcOpen: true, f: { first: '', last: '', cpf: '', unit: free[0] ? String(free[0]) : '', service: svc, value: String(price(svc)), date: camp.start, time: this.freeSlot(camp), error: '' } });
+      },
+      closeSvc: () => this.setState({ svcOpen: false }),
+    }, f ? {
+      sFirst: f.first, sLast: f.last, sCpf: f.cpf, sUnit: f.unit, sService: f.service, sValue: f.value, sDate: f.date, sTime: f.time,
+      unitOpts: opts(free, f.unit), svcOpts: opts(camp.services, f.service),
+      onSFirst: (e) => this.setF({ first: val(e), error: '' }), onSLast: (e) => this.setF({ last: val(e), error: '' }), onSCpf: (e) => this.setF({ cpf: val(e), error: '' }),
+      onSUnit: (e) => this.setF({ unit: val(e) }), onSService: (e) => this.setF({ service: val(e), value: String(price(val(e))) }),
+      onSValue: (e) => this.setF({ value: val(e), error: '' }), onSDate: (e) => this.setF({ date: val(e), error: '' }), onSTime: (e) => this.setF({ time: val(e), error: '' }),
+      hasError: !!f.error, error: f.error,
+      confirmSvc: () => {
+        const digits = f.cpf.replace(/\D/g, '');
+        const v = parseInt(String(f.value).replace(/\D/g, ''), 10);
+        let e = '';
+        if (!f.first.trim() || !f.last.trim()) e = 'Informe nome e sobrenome.';
+        else if (digits.length !== 11) e = 'O CPF precisa ter 11 números.';
+        else if (!f.unit) e = 'Não há mais casas ou apartamentos livres nesta campanha.';
+        else if (rows.length >= camp.max) e = 'A campanha já chegou ao máximo de ' + camp.max + ' atendimentos.';
+        else if (!f.date || f.date < camp.start || f.date > camp.end) e = 'Escolha uma data dentro do período da campanha.';
+        else if (!f.time || f.time < camp.tStart || f.time > camp.tEnd) e = 'Escolha um horário entre ' + camp.tStart + ' e ' + camp.tEnd + '.';
+        else if (!(v > 0)) e = 'Informe um valor maior que zero.';
+        else if (rows.some((r) => r.date === f.date && r.time === f.time)) e = 'Esse horário já está reservado para outro morador.';
+        if (e) { this.setF({ error: e }); return; }
+        const row = { unit: parseInt(f.unit, 10), first: f.first.trim(), last: f.last.trim(), cpf: digits, service: f.service, date: f.date, time: f.time, value: v, status: 'Aguardando Pix' };
+        const list = rows.concat([row]).sort((a, b) => a.unit - b.unit);
+        this.setCamp(Object.assign({}, camp, { rows: list }), { svcOpen: false, filter: 'Todos', msg: 'Unidade ' + row.unit + ' contratada para ' + row.first + ' ' + row.last + '. Pix de ' + this.brl(v) + ' enviado para o morador (simulado); a unidade fica Aguardando Pix.' });
+      },
+    } : { sFirst: '', sLast: '', sCpf: '', sUnit: '', sService: '', sValue: '', sDate: '', sTime: '', unitOpts: [], svcOpts: [], onSFirst: null, onSLast: null, onSCpf: null, onSUnit: null, onSService: null, onSValue: null, onSDate: null, onSTime: null, hasError: false, error: '', confirmSvc: null });
+  }
+}
+</script>
+</body>
+</html>

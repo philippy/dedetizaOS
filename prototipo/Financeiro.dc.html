@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Financeiro — Detetiza OS</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+button,input,select,textarea{font-family:inherit}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #2F5FE0;outline-offset:2px}
+.shimmer{background:linear-gradient(90deg,#E3E8EF 0%,#F4F7FB 50%,#E3E8EF 100%);background-size:200% 100%;animation:shim 1.4s linear infinite}
+.scan{position:absolute;left:0;right:0;height:46px;background:linear-gradient(to bottom,rgba(47,95,224,0),rgba(47,95,224,.28),rgba(47,95,224,0));animation:scan 1.8s ease-in-out infinite}
+.spin{animation:spin .8s linear infinite}
+.ai-title{background:linear-gradient(90deg,#1B47B5,#6B8CF0,#1B47B5);background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shim 2.4s linear infinite}
+@keyframes shim{from{background-position:200% 0}to{background-position:-200% 0}}
+@keyframes scan{0%{top:-46px}100%{top:190px}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.shimmer,.scan,.spin,.ai-title{animation:none}.ai-title{color:#1B47B5}}
+</style>
+</helmet>
+<div style="min-height: 100%; background: #E9EEF5; padding: 24px; box-sizing: border-box; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; color: #0F1720">
+<div style="border-radius: 36px; overflow: hidden; border: 6px solid #FFFFFF; background: #F4F7FB; box-shadow: 0 18px 50px rgba(20,40,80,0.14); padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 20px">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="width: 46px; height: 46px; border-radius: 15px; background: #0F1720; display: flex; align-items: center; justify-content: center">
+<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#9DBBFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"></path><path d="M9 12l2 2 4-4"></path></svg>
+</div>
+<div>
+<div style="font-size: 20px; font-weight: 800; line-height: 1.15">Dedetizadora Impacto</div>
+<div style="font-size: 12px; font-weight: 600; color: #3A4658">Detetiza OS</div>
+</div>
+</div>
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="display: flex; align-items: center; background: #FFFFFF; border-radius: 999px; padding: 0 18px; height: 48px; font-size: 14px; font-weight: 600; box-shadow: 0 4px 14px rgba(20,40,80,0.08)">09 nov 2026</div>
+<a href="GerenteDigital.dc.html" style="display: flex; align-items: center; gap: 8px; background: #0F1720; color: #FFFFFF; border-radius: 999px; padding: 0 20px; height: 48px; font-size: 14px; font-weight: 700">Gerente Digital</a>
+<div aria-label="Usuário: proprietário" role="img" style="width: 48px; height: 48px; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800">DI</div>
+</div>
+</header>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start">
+
+<nav aria-label="Navegação principal" style="flex: 0 0 64px; display: flex; flex-direction: column; gap: 4px; padding: 8px; background: #FFFFFF; border-radius: 22px; box-shadow: 0 8px 28px rgba(20,40,80,0.08)">
+<a href="Main.dc.html" aria-label="Dashboard" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect></svg>
+</a>
+<a href="Agenda.dc.html" aria-label="Agenda" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M8 2v4M16 2v4M3 10h18"></path></svg>
+</a>
+<a href="Clientes.dc.html" aria-label="Clientes" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"></circle><path d="M2.5 20c0-3.5 3-6 6.5-6s6.5 2.5 6.5 6"></path><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2.2.6 3.5 2.5 3.5 6"></path></svg>
+</a>
+<a href="Campanhas.dc.html" aria-label="Campanhas" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11v3a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"></path><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"></path></svg>
+</a>
+<a href="Financeiro.dc.html" aria-label="Financeiro" aria-current="page" style="width: 48px; height: 48px; border-radius: 15px; background: #2F5FE0; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"></rect><path d="M3 10h18M16 15h2"></path></svg>
+</a>
+<a href="Certificado.dc.html" aria-label="Certificados" style="width: 48px; height: 48px; border-radius: 15px; display: flex; align-items: center; justify-content: center">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F1720" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6z"></path><path d="M9 12l2 2 4-4"></path></svg>
+</a>
+</nav>
+
+<main style="flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<div>
+<h1 style="margin: 0; font-size: 28px; font-weight: 800">Financeiro</h1>
+<div style="font-size: 14px; font-weight: 600; color: #3A4658; margin-top: 4px">Contas a receber e a pagar da Dedetizadora Impacto.</div>
+</div>
+<button onClick="{{openUp}}" style="min-height: 48px; border: 0; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; padding: 0 24px; font-size: 14px; font-weight: 700">Dar baixa com comprovante Pix</button>
+</div>
+
+<sc-if value="{{hasMsg}}" hint-placeholder-val="{{ false }}">
+<div role="status" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #DDF3E4; color: #14653A; border-radius: 16px; padding: 6px 8px 6px 16px; font-size: 14px; font-weight: 700">
+<span>{{msg}}</span>
+<button onClick="{{dismissMsg}}" aria-label="Fechar aviso" style="width: 44px; height: 44px; border: 0; border-radius: 999px; background: transparent; color: #14653A; font-size: 20px; font-weight: 700">×</button>
+</div>
+</sc-if>
+
+<section style="background: #FFFFFF; border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.08); padding: 22px; padding: 0; overflow: hidden">
+<button onClick="{{toggleDay}}" aria-expanded="{{dayOpen}}" aria-controls="day-panel" style="width: 100%; box-sizing: border-box; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 22px; border: 0; background: #FFFFFF; color: #0F1720; text-align: left">
+<span style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 17px; font-weight: 800">Contas do dia · segunda, 09 nov 2026</span>
+<span style="font-size: 13px; font-weight: 600; color: #3A4658">{{daySummary}}</span>
+</span>
+<span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; color: #1B47B5">{{dayToggleLabel}}
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1B47B5" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="{{chevStyle}}"><path d="M6 9l6 6 6-6"></path></svg>
+</span>
+</button>
+<sc-if value="{{dayOpen}}" hint-placeholder-val="{{ true }}">
+<div id="day-panel" style="display: flex; flex-wrap: wrap; gap: 16px; padding: 4px 22px 22px">
+<div style="flex: 1 1 340px; min-width: 0">
+<div style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 800; color: #14653A; background: #DDF3E4; border-radius: 12px; padding: 8px 12px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 7L7 17M7 9v8h8"></path></svg> Entradas de hoje · {{dayR.total}}</div>
+<sc-for list="{{dayRList}}" as="r" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 4px; border-bottom: 1px solid #E3E8EF">
+<div style="min-width: 0"><div style="font-size: 14px; font-weight: 800">{{r.who}}</div><div style="font-size: 12px; font-weight: 500; color: #3A4658">{{r.what}}</div></div>
+<div style="flex: 0 0 auto; text-align: right"><div style="font-size: 14px; font-weight: 800; color: #14653A">{{r.value}}</div><span style="display: inline-block; margin-top: 2px; border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 700; {{r.chip}}">{{r.status}}</span></div>
+</div>
+</sc-for>
+<sc-if value="{{dayR.empty}}" hint-placeholder-val="{{ false }}"><div style="padding: 14px 4px; font-size: 13px; font-weight: 600; color: #3A4658">Nada a receber hoje.</div></sc-if>
+</div>
+<div style="flex: 1 1 340px; min-width: 0">
+<div style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 800; color: #8E1B10; background: #FDE4E1; border-radius: 12px; padding: 8px 12px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"></path></svg> Saídas de hoje · {{dayP.total}}</div>
+<sc-for list="{{dayPList}}" as="r" hint-placeholder-count="2">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 4px; border-bottom: 1px solid #E3E8EF">
+<div style="min-width: 0"><div style="font-size: 14px; font-weight: 800">{{r.who}}</div><div style="font-size: 12px; font-weight: 500; color: #3A4658">{{r.what}}</div></div>
+<div style="flex: 0 0 auto; text-align: right"><div style="font-size: 14px; font-weight: 800; color: #8E1B10">{{r.value}}</div><span style="display: inline-block; margin-top: 2px; border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 700; {{r.chip}}">{{r.status}}</span></div>
+</div>
+</sc-for>
+<sc-if value="{{dayP.empty}}" hint-placeholder-val="{{ false }}"><div style="padding: 14px 4px; font-size: 13px; font-weight: 600; color: #3A4658">Nada a pagar hoje.</div></sc-if>
+</div>
+</div>
+</sc-if>
+</section>
+
+<section style="background: #FFFFFF; border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.08); padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px">
+<div style="flex: 0 0 auto; display: flex; flex-direction: column; gap: 6px">
+<div style="font-size: 12px; font-weight: 700; color: #3A4658">Período</div>
+<div role="group" aria-label="Atalhos de período" style="display: flex; flex-wrap: wrap; gap: 8px">
+<sc-for list="{{periods}}" as="p" hint-placeholder-count="5">
+<button onClick="{{p.pick}}" aria-pressed="{{p.on}}" style="min-height: 44px; border-radius: 999px; padding: 0 16px; font-size: 13px; font-weight: 700; {{p.style}}">{{p.label}}</button>
+</sc-for>
+</div>
+</div>
+<div style="flex: 0 0 auto; display: flex; align-items: center; gap: 4px" role="group" aria-label="Trocar de mês">
+<button onClick="{{prevMonth}}" aria-label="Mês anterior" style="width: 44px; height: 44px; border-radius: 999px; border: 1.5px solid #C9D3E0; background: #FFFFFF; font-size: 18px; font-weight: 700; color: #0F1720">‹</button>
+<button onClick="{{nextMonth}}" aria-label="Próximo mês" style="width: 44px; height: 44px; border-radius: 999px; border: 1.5px solid #C9D3E0; background: #FFFFFF; font-size: 18px; font-weight: 700; color: #0F1720">›</button>
+</div>
+<label style="flex: 0 1 160px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">De
+<input value="{{from}}" onInput="{{onFrom}}" placeholder="" type="date" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+<label style="flex: 0 1 160px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Até
+<input value="{{to}}" onInput="{{onTo}}" placeholder="" type="date" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+<label style="flex: 0 1 170px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Situação
+<select value="{{st}}" onChange="{{onSt}}" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+<sc-for list="{{stOpts}}" as="o" hint-placeholder-count="4"><option value="{{o.v}}" selected="{{o.sel}}">{{o.v}}</option></sc-for>
+</select>
+</label>
+</div>
+<div style="font-size: 13px; font-weight: 600; color: #3A4658">Mostrando {{periodLabel}} · {{countLabel}}</div>
+</section>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px; align-items: stretch">
+<section style="flex: 1 1 440px; min-width: 0; background: #FFFFFF; border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.08); overflow: hidden; display: flex; flex-direction: column">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 20px; background: #DDF3E4; color: #14653A">
+<h2 style="margin: 0; font-size: 17px; font-weight: 800">A receber</h2>
+<span style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 7L7 17M7 9v8h8"></path></svg> Entrada</span>
+</div>
+<div style="padding: 6px 20px 0; flex: 1 1 auto">
+<sc-for list="{{recList}}" as="r" hint-placeholder-count="6">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid #E3E8EF">
+<div style="min-width: 0">
+<div style="font-size: 14px; font-weight: 800; line-height: 1.3">{{r.who}}</div>
+<div style="font-size: 12px; font-weight: 500; color: #3A4658; margin-top: 2px">{{r.what}} · vence {{r.due}}</div>
+</div>
+<div style="flex: 0 0 auto; text-align: right">
+<div style="font-size: 15px; font-weight: 800; color: #14653A">{{r.value}}</div>
+<span style="display: inline-block; margin-top: 4px; border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 700; white-space: nowrap; {{r.chip}}">{{r.status}}</span>
+</div>
+</div>
+</sc-for>
+<sc-if value="{{rec.empty}}" hint-placeholder-val="{{ false }}">
+<div style="padding: 24px 0; text-align: center; font-size: 13px; font-weight: 600; color: #3A4658">Nenhuma conta neste período e filtro.</div>
+</sc-if>
+</div>
+<div style="margin: 8px 20px 0; border-top: 2px solid #0F1720; padding: 12px 0 16px; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 800"><span>Total do período</span><span>{{rec.total}}</span></div>
+<div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: #3A4658"><span>Recebido</span><span>{{rec.done}}</span></div>
+<div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: #3A4658"><span>Em aberto (inclui vencidas)</span><span>{{rec.open}}</span></div>
+</div>
+</section>
+<section style="flex: 1 1 440px; min-width: 0; background: #FFFFFF; border-radius: 24px; box-shadow: 0 8px 28px rgba(20,40,80,0.08); overflow: hidden; display: flex; flex-direction: column">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px 20px; background: #FDE4E1; color: #8E1B10">
+<h2 style="margin: 0; font-size: 17px; font-weight: 800">A pagar</h2>
+<span style="display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 800"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"></path></svg> Saída</span>
+</div>
+<div style="padding: 6px 20px 0; flex: 1 1 auto">
+<sc-for list="{{payList}}" as="r" hint-placeholder-count="6">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid #E3E8EF">
+<div style="min-width: 0">
+<div style="font-size: 14px; font-weight: 800; line-height: 1.3">{{r.who}}</div>
+<div style="font-size: 12px; font-weight: 500; color: #3A4658; margin-top: 2px">{{r.what}} · vence {{r.due}}</div>
+</div>
+<div style="flex: 0 0 auto; text-align: right">
+<div style="font-size: 15px; font-weight: 800; color: #8E1B10">{{r.value}}</div>
+<span style="display: inline-block; margin-top: 4px; border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 700; white-space: nowrap; {{r.chip}}">{{r.status}}</span>
+</div>
+</div>
+</sc-for>
+<sc-if value="{{pay.empty}}" hint-placeholder-val="{{ false }}">
+<div style="padding: 24px 0; text-align: center; font-size: 13px; font-weight: 600; color: #3A4658">Nenhuma conta neste período e filtro.</div>
+</sc-if>
+</div>
+<div style="margin: 8px 20px 0; border-top: 2px solid #0F1720; padding: 12px 0 16px; display: flex; flex-direction: column; gap: 4px">
+<div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 800"><span>Total do período</span><span>{{pay.total}}</span></div>
+<div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: #3A4658"><span>Pago</span><span>{{pay.done}}</span></div>
+<div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: #3A4658"><span>Em aberto (inclui vencidas)</span><span>{{pay.open}}</span></div>
+</div>
+</section>
+</div>
+
+<section style="background: #0F1720; color: #FFFFFF; border-radius: 24px; padding: 20px 24px; display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: center">
+<div>
+<div style="font-size: 13px; font-weight: 600; color: #C9D3E0">Saldo previsto do período (a receber − a pagar)</div>
+<div style="font-size: 30px; font-weight: 800; line-height: 1.15">{{balPlan}}</div>
+</div>
+<div>
+<div style="font-size: 13px; font-weight: 600; color: #C9D3E0">Saldo realizado (recebido − pago)</div>
+<div style="font-size: 30px; font-weight: 800; line-height: 1.15">{{balDone}}</div>
+</div>
+</section>
+
+<div style="font-size: 12px; font-weight: 600; color: #3A4658; line-height: 1.5">Protótipo v0.1 · dados ilustrativos. Fica para a versão real: detectar comprovante duplicado (mesmo ID de transação), pagamento parcial e baixa de contas a pagar com comprovante de saída.</div>
+</main>
+</div>
+
+<sc-if value="{{upOpen}}" hint-placeholder-val="{{ false }}">
+<div style="position: fixed; top: 0; right: 0; bottom: 0; left: 0; z-index: 50; background: rgba(15,23,32,0.55); display: flex; align-items: flex-start; justify-content: center; padding: 72px 16px 16px; box-sizing: border-box; overflow-y: auto">
+<div role="dialog" aria-modal="true" aria-labelledby="up-title" style="width: 100%; max-width: 580px; background: #FFFFFF; border-radius: 28px; box-shadow: 0 24px 60px rgba(15,23,32,0.35); padding: 26px; box-sizing: border-box; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+<h2 id="up-title" style="margin: 0; font-size: 22px; font-weight: 800">Dar baixa com comprovante Pix</h2>
+<button onClick="{{closeUp}}" aria-label="Fechar" style="width: 44px; height: 44px; border-radius: 999px; border: 0; background: #E8ECF2; color: #0F1720; font-size: 20px; font-weight: 700">×</button>
+</div>
+<sc-if value="{{stepUpload}}" hint-placeholder-val="{{ true }}">
+<div style="font-size: 13px; font-weight: 500; color: #3A4658; line-height: 1.45">Envie a foto, o print ou o PDF do comprovante que o cliente mandou. A IA lê, preenche a baixa e você só confere.</div>
+<label style="position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 150px; border: 2px dashed #8793A6; border-radius: 20px; background: #F4F7FB; padding: 20px; text-align: center; cursor: pointer">
+<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1B47B5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"></path><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"></path></svg>
+<span style="font-size: 15px; font-weight: 800">Escolher comprovante</span>
+<span style="font-size: 12px; font-weight: 600; color: #3A4658">Imagem ou PDF</span>
+<input type="file" accept="image/*,application/pdf" onChange="{{onFile}}" aria-label="Escolher comprovante Pix" style="position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden">
+</label>
+<button onClick="{{useSample}}" style="min-height: 48px; border: 1.5px solid #0F1720; border-radius: 999px; background: #FFFFFF; color: #0F1720; font-size: 14px; font-weight: 700">Usar comprovante de exemplo</button>
+</sc-if>
+
+<sc-if value="{{stepAi}}" hint-placeholder-val="{{ false }}">
+<div role="status" aria-live="polite" style="display: flex; flex-wrap: wrap; gap: 20px; align-items: center">
+<div class="ai-card" style="position: relative; flex: 0 0 150px; height: 190px; border-radius: 18px; background: #F4F7FB; border: 1.5px solid #C9D3E0; overflow: hidden; padding: 16px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px">
+<div class="shimmer" style="height: 12px; width: 60%; border-radius: 6px"></div>
+<div class="shimmer" style="height: 22px; width: 85%; border-radius: 6px"></div>
+<div class="shimmer" style="height: 10px; width: 100%; border-radius: 6px"></div>
+<div class="shimmer" style="height: 10px; width: 90%; border-radius: 6px"></div>
+<div class="shimmer" style="height: 10px; width: 70%; border-radius: 6px"></div>
+<div class="shimmer" style="height: 10px; width: 80%; border-radius: 6px"></div>
+<div class="scan"></div>
+</div>
+<div style="flex: 1 1 240px; min-width: 0; display: flex; flex-direction: column; gap: 12px">
+<div class="ai-title" style="font-size: 17px; font-weight: 800">IA analisando o comprovante</div>
+<sc-for list="{{aiSteps}}" as="x" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; {{x.style}}">
+<span style="flex: 0 0 22px; width: 22px; height: 22px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; {{x.dotStyle}}" class="{{x.dotClass}}">{{x.dot}}</span>{{x.label}}
+</div>
+</sc-for>
+<div style="font-size: 12px; font-weight: 600; color: #3A4658">{{aiFile}}</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{stepForm}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+<span style="display: inline-flex; align-items: center; gap: 6px; background: #DCE7FF; color: #1B47B5; border-radius: 999px; padding: 4px 12px; font-size: 12px; font-weight: 800">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1B47B5" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg>
+Preenchido por IA</span>
+<span style="font-size: 12px; font-weight: 600; color: #3A4658">Revise antes de confirmar · {{aiFile}}</span>
+</div>
+<div style="background: #F4F7FB; border-radius: 14px; padding: 10px 14px; font-size: 12px; font-weight: 600; line-height: 1.5; color: #2F3A4A">Lido no comprovante: pagador <span style="font-weight: 800">{{readPayer}}</span> · ID da transação <span style="font-weight: 800; word-break: break-all">{{readTx}}</span></div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Cliente
+<select value="{{fClient}}" onChange="{{onFClient}}" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+<sc-for list="{{clientOpts}}" as="o" hint-placeholder-count="6"><option value="{{o.v}}" selected="{{o.sel}}">{{o.v}}</option></sc-for>
+</select>
+</label>
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Serviço pago
+<select value="{{fItem}}" onChange="{{onFItem}}" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+<sc-for list="{{itemOpts}}" as="o" hint-placeholder-count="3"><option value="{{o.v}}" selected="{{o.sel}}">{{o.l}}</option></sc-for>
+</select>
+</label>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Data do pagamento
+<input value="{{fDate}}" onInput="{{onFDate}}" placeholder="" type="date" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Hora
+<input value="{{fTime}}" onInput="{{onFTime}}" placeholder="" type="time" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+<label style="flex: 1 1 200px; min-width: 0; display: flex; flex-direction: column; gap: 6px; font-size: 12px; font-weight: 700; color: #3A4658">Valor pago (R$)
+<input value="{{fValue}}" onInput="{{onFValue}}" placeholder="" inputmode="numeric" style="height: 48px; box-sizing: border-box; border: 1.5px solid #C9D3E0; border-radius: 14px; padding: 0 14px; font-size: 14px; color: #0F1720; background: #FFFFFF; width: 100%">
+</label>
+</div>
+<div role="status" style="border-radius: 14px; padding: 10px 14px; font-size: 13px; font-weight: 700; line-height: 1.45; {{matchStyle}}">{{matchText}}</div>
+<sc-if value="{{hasError}}" hint-placeholder-val="{{ false }}">
+<div role="alert" style="background: #FDE4E1; color: #8E1B10; border-radius: 14px; padding: 10px 14px; font-size: 13px; font-weight: 700">{{error}}</div>
+</sc-if>
+<div style="display: flex; justify-content: flex-end; gap: 8px">
+<button onClick="{{closeUp}}" style="min-height: 48px; border: 1.5px solid #0F1720; border-radius: 999px; background: #FFFFFF; color: #0F1720; padding: 0 22px; font-size: 14px; font-weight: 700">Cancelar</button>
+<button onClick="{{confirmUp}}" style="min-height: 48px; border: 0; border-radius: 999px; background: #2F5FE0; color: #FFFFFF; padding: 0 24px; font-size: 14px; font-weight: 700">Confirmar baixa</button>
+</div>
+</sc-if>
+</div>
+</div>
+</sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1700}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.today = '2026-11-09';
+    this.R = [
+      { id: 'r1', who: 'Academia Fit', what: 'Dedetização geral', due: '2026-11-09', value: 480, paid: false },
+      { id: 'r2', who: 'Mercado Bom Preço', what: 'Controle de roedores', due: '2026-11-09', value: 640, paid: false },
+      { id: 'r3', who: 'Residência R. Silva', what: 'Baratas e formigas (Pix)', due: '2026-11-09', value: 240, paid: true },
+      { id: 'r4', who: 'Clínica Vida', what: 'Monitoramento mensal', due: '2026-11-05', value: 150, paid: false },
+      { id: 'r5', who: 'Loja Moda Viva', what: 'Pulgas e carrapatos', due: '2026-10-28', value: 260, paid: false },
+      { id: 'r6', who: 'Escritório Alfa', what: 'Dedetização geral', due: '2026-11-12', value: 360, paid: false },
+      { id: 'r7', who: 'Restaurante Sabor & Cia', what: 'Controle de roedores', due: '2026-11-16', value: 720, paid: false },
+      { id: 'r8', who: 'Cond. Vila Verde', what: 'Campanha 14/11 · 8 unidades pagas', due: '2026-11-06', value: 1568, paid: true },
+      { id: 'r9', who: 'Padaria Sol', what: 'Baratas e formigas', due: '2026-11-20', value: 240, paid: false },
+      { id: 'r10', who: 'Casa R. do Ipê', what: 'Baratas e formigas (Pix)', due: '2026-11-03', value: 240, paid: true },
+      { id: 'r11', who: 'Ana Paula Ribeiro', what: 'Pulgas e carrapatos', due: '2026-11-24', value: 260, paid: false },
+      { id: 'r12', who: 'Academia Fit', what: 'Monitoramento mensal', due: '2026-11-30', value: 150, paid: false },
+      { id: 'r14', who: 'Residenciais (Pix)', what: '41 atendimentos de 1 a 8 nov', due: '2026-11-08', value: 9840, paid: true },
+      { id: 'r15', who: 'Contratos mensais', what: 'Monitoramento · 22 empresas', due: '2026-11-15', value: 11400, paid: false },
+      { id: 'r13', who: 'Mercado Bom Preço', what: 'Dedetização geral', due: '2026-10-22', value: 840, paid: true },
+    ];
+    this.P = [
+      { id: 'p1', who: 'Aliança Químicos', what: 'Reposição de produtos químicos', due: '2026-11-09', value: 1280, paid: false },
+      { id: 'p2', who: 'Combustível da frota', what: 'Cartão corporativo', due: '2026-11-09', value: 460, paid: false },
+      { id: 'p3', who: 'Técnicos (Marcos, Ana, Paulo)', what: 'Folha de outubro', due: '2026-11-05', value: 6900, paid: true },
+      { id: 'p4', who: 'Aluguel do galpão', what: 'Novembro', due: '2026-11-10', value: 2200, paid: false },
+      { id: 'p5', who: 'Detetiza OS', what: 'Assinatura mensal', due: '2026-11-10', value: 1000, paid: false },
+      { id: 'p6', who: 'Contador', what: 'Honorários', due: '2026-11-15', value: 650, paid: false },
+      { id: 'p7', who: 'Imposto (Simples Nacional)', what: 'Guia do mês', due: '2026-11-20', value: 1420, paid: false },
+      { id: 'p8', who: 'Seguro da frota', what: 'Parcela 8 de 12', due: '2026-11-07', value: 380, paid: false },
+      { id: 'p9', who: 'Equipamentos de proteção', what: 'EPIs', due: '2026-10-30', value: 540, paid: true },
+      { id: 'p10', who: 'Internet e telefone', what: 'Plano empresarial', due: '2026-11-12', value: 220, paid: false },
+    ];
+    this.state = { from: '2026-11-01', to: '2026-11-30', per: 'Este mês', st: 'Todas', dayOpen: true, msg: '', up: { open: false, step: 'upload', file: '', f: null }, paidIds: {}, sampleN: 0 };
+  }
+
+  brl(n) {
+    return 'R$ ' + String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  }
+
+  iso(d) { return d.toISOString().slice(0, 10); }
+  addDays(s, n) { const d = new Date(s + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return this.iso(d); }
+  monthRange(s, delta) {
+    const d = new Date(s + 'T12:00:00Z');
+    const a = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + delta, 1, 12));
+    const b = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() + delta + 1, 0, 12));
+    return [this.iso(a), this.iso(b)];
+  }
+  fmt(s) { return s.slice(8, 10) + '/' + s.slice(5, 7) + '/' + s.slice(0, 4); }
+
+  status(x) {
+    if (x.paid) return this.kind(x) === 'r' ? 'Recebido' : 'Pago';
+    if (x.due < this.today) return 'Vencido';
+    if (x.due === this.today) return 'Vence hoje';
+    return 'Em aberto';
+  }
+  kind(x) { return x.id.charAt(0); }
+  chip(st) {
+    return { 'Recebido': 'background: #DDF3E4; color: #14653A;', 'Pago': 'background: #DDF3E4; color: #14653A;', 'Vencido': 'background: #FDE4E1; color: #8E1B10;', 'Vence hoje': 'background: #FFF0D1; color: #7A4B00;', 'Em aberto': 'background: #DCE7FF; color: #1B47B5;' }[st];
+  }
+  all(list) { return list.map((x) => Object.assign({}, x, { paid: x.paid || !!this.state.paidIds[x.id] })); }
+  row(x) { const st = this.status(x); return { who: x.who, what: x.what, due: this.fmt(x.due).slice(0, 5), value: this.brl(x.value), status: st, chip: this.chip(st) }; }
+  tot(list) {
+    const sum = (a) => a.reduce((t, x) => t + x.value, 0);
+    return { empty: list.length === 0, total: this.brl(sum(list)), done: this.brl(sum(list.filter((x) => x.paid))), open: this.brl(sum(list.filter((x) => !x.paid))), n: sum(list), nd: sum(list.filter((x) => x.paid)) };
+  }
+
+  setUp(p) { this.setState({ up: Object.assign({}, this.state.up, p) }); }
+  setF(p) { this.setUp({ f: Object.assign({}, this.state.up.f, p) }); }
+
+  runAi(name) {
+    this.setUp({ open: true, step: 'ai', file: name, ai: 0 });
+    const tick = (n) => setTimeout(() => {
+      if (n < 3) { this.setUp({ ai: n }); tick(n + 1); return; }
+      const open = this.all(this.R).filter((x) => !x.paid);
+      const pick = open[this.state.sampleN % Math.max(1, open.length)] || open[0];
+      this.setState({ sampleN: this.state.sampleN + 1 });
+      if (!pick) { this.setUp({ step: 'none' }); return; }
+      this.setUp({ step: 'form', ai: 3, f: { client: pick.who, item: pick.id, date: this.today, time: '10:42', value: String(pick.value), error: '', payer: pick.who.toUpperCase() + ' LTDA', tx: 'E18236120202611091342' + pick.id.slice(1).padStart(3, '0') } });
+    }, 950);
+    tick(0);
+  }
+
+  renderVals() {
+    const s = this.state;
+    const R = this.all(this.R);
+    const P = this.all(this.P);
+    const inRange = (x) => x.due >= s.from && x.due <= s.to;
+    const stOk = (x) => s.st === 'Todas' || (s.st === 'Em aberto' ? !x.paid && x.due >= this.today : s.st === 'Vencidas' ? !x.paid && x.due < this.today : x.paid);
+    const sort = (a) => a.slice().sort((p, q) => (p.due < q.due ? -1 : p.due > q.due ? 1 : 0));
+    const rec = sort(R.filter((x) => inRange(x) && stOk(x)));
+    const pay = sort(P.filter((x) => inRange(x) && stOk(x)));
+    const recT = this.tot(rec);
+    const payT = this.tot(pay);
+    const dayR = R.filter((x) => x.due === this.today);
+    const dayP = P.filter((x) => x.due === this.today);
+    const dRT = this.tot(dayR);
+    const dPT = this.tot(dayP);
+    const od = R.filter((x) => !x.paid && x.due < this.today).length + P.filter((x) => !x.paid && x.due < this.today).length;
+    const val = (e) => (e && e.target ? e.target.value : '');
+    const setRange = (label, a, b) => this.setState({ per: label, from: a, to: b });
+    const t = this.today;
+    const mr = this.monthRange(t, 0);
+    const pm = this.monthRange(t, -1);
+    const wk = [this.addDays(t, 0), this.addDays(t, 6)];
+    const periods = [['Hoje', t, t], ['Esta semana', wk[0], wk[1]], ['Este mês', mr[0], mr[1]], ['Mês anterior', pm[0], pm[1]], ['Próx. 30 dias', t, this.addDays(t, 30)]].map((p) => ({
+      label: p[0], on: s.per === p[0],
+      style: s.per === p[0] ? 'border: 0; background: #0F1720; color: #FFFFFF;' : 'border: 1.5px solid #C9D3E0; background: #F4F7FB; color: #0F1720;',
+      pick: () => setRange(p[0], p[1], p[2]),
+    }));
+    const shiftMonth = (d) => { const r = this.monthRange(s.from, d); this.setState({ per: 'Personalizado', from: r[0], to: r[1] }); };
+    const up = s.up;
+    const f = up.f;
+    const bal = (a, b) => (a >= b ? '' : '-') + this.brl(Math.abs(a - b));
+    const stepIdx = up.ai || 0;
+    const aiLabels = ['Lendo o comprovante', 'Extraindo valor, data e pagador', 'Cruzando com as contas em aberto'];
+    const aiSteps = aiLabels.map((l, i) => {
+      const done = stepIdx > i;
+      const cur = stepIdx === i;
+      return { label: l, dot: done ? '✓' : '', dotClass: cur ? 'spin' : '', dotStyle: done ? 'background: #14653A; color: #FFFFFF;' : cur ? 'border: 2.5px solid #C9D3E0; border-top-color: #2F5FE0;' : 'border: 2px solid #C9D3E0;', style: done ? 'color: #14653A;' : cur ? 'color: #0F1720;' : 'color: #5B6678;' };
+    });
+    const clientNames = Array.from(new Set(R.filter((x) => !x.paid).map((x) => x.who)));
+    const itemsOf = (c) => R.filter((x) => !x.paid && x.who === c);
+    let formVals = { fClient: '', fItem: '', fDate: '', fTime: '', fValue: '', clientOpts: [], itemOpts: [], readPayer: '', readTx: '', matchText: '', matchStyle: '', hasError: false, error: '', onFClient: null, onFItem: null, onFDate: null, onFTime: null, onFValue: null, confirmUp: null };
+    if (f) {
+      const items = itemsOf(f.client);
+      const cur = R.find((x) => x.id === f.item);
+      const v = parseInt(String(f.value).replace(/\D/g, ''), 10) || 0;
+      const ok = cur && v === cur.value;
+      formVals = {
+        fClient: f.client, fItem: f.item, fDate: f.date, fTime: f.time, fValue: f.value, readPayer: f.payer, readTx: f.tx,
+        clientOpts: clientNames.map((n) => ({ v: n, sel: n === f.client })),
+        itemOpts: items.map((x) => ({ v: x.id, l: x.what + ' · vence ' + this.fmt(x.due).slice(0, 5) + ' · ' + this.brl(x.value), sel: x.id === f.item })),
+        matchText: !cur ? 'Este cliente não tem serviço em aberto.' : ok ? 'O valor confere com a conta em aberto (' + this.brl(cur.value) + '). Baixa total.' : 'Atenção: o valor pago (' + this.brl(v) + ') é diferente da conta (' + this.brl(cur.value) + '). Confira o comprovante antes de confirmar.',
+        matchStyle: ok ? 'background: #DDF3E4; color: #14653A;' : 'background: #FFF0D1; color: #7A4B00;',
+        hasError: !!f.error, error: f.error,
+        onFClient: (e) => { const c = val(e); const it = itemsOf(c)[0]; this.setF({ client: c, item: it ? it.id : '', value: it ? String(it.value) : '', error: '' }); },
+        onFItem: (e) => { const it = R.find((x) => x.id === val(e)); this.setF({ item: val(e), value: it ? String(it.value) : f.value, error: '' }); },
+        onFDate: (e) => this.setF({ date: val(e), error: '' }), onFTime: (e) => this.setF({ time: val(e), error: '' }), onFValue: (e) => this.setF({ value: val(e), error: '' }),
+        confirmUp: () => {
+          if (!cur) { this.setF({ error: 'Escolha o serviço que foi pago.' }); return; }
+          if (!(v > 0)) { this.setF({ error: 'Informe o valor pago.' }); return; }
+          if (!f.date || !f.time) { this.setF({ error: 'Informe a data e a hora do pagamento.' }); return; }
+          const ids = Object.assign({}, s.paidIds, { [cur.id]: true });
+          this.setState({ paidIds: ids, msg: 'Baixa feita: ' + cur.who + ' · ' + cur.what + ' · ' + this.brl(v) + ' em ' + this.fmt(f.date).slice(0, 5) + ' às ' + f.time + '. A conta virou Recebido.', up: { open: false, step: 'upload', file: '', f: null } });
+        },
+      };
+    }
+    return Object.assign({
+      hasMsg: !!s.msg, msg: s.msg, dismissMsg: () => this.setState({ msg: '' }),
+      dayOpen: s.dayOpen, toggleDay: () => this.setState({ dayOpen: !s.dayOpen }),
+      dayToggleLabel: s.dayOpen ? 'Recolher' : 'Expandir',
+      chevStyle: s.dayOpen ? 'transform: rotate(180deg)' : '',
+      daySummary: 'Entram ' + this.brl(dRT.n) + ' (' + dayR.length + ') · saem ' + this.brl(dPT.n) + ' (' + dayP.length + ') · ' + od + ' conta(s) vencida(s) no total',
+      dayR: dRT, dayP: dPT, dayRList: dayR.map((x) => this.row(x)), dayPList: dayP.map((x) => this.row(x)),
+      periods: periods, prevMonth: () => shiftMonth(-1), nextMonth: () => shiftMonth(1),
+      from: s.from, to: s.to,
+      onFrom: (e) => this.setState({ from: val(e), per: 'Personalizado' }), onTo: (e) => this.setState({ to: val(e), per: 'Personalizado' }),
+      st: s.st, onSt: (e) => this.setState({ st: val(e) }),
+      stOpts: ['Todas', 'Em aberto', 'Vencidas', 'Pagas'].map((x) => ({ v: x, sel: x === s.st })),
+      periodLabel: this.fmt(s.from) + ' a ' + this.fmt(s.to), countLabel: rec.length + ' a receber, ' + pay.length + ' a pagar',
+      recList: rec.map((x) => this.row(x)), payList: pay.map((x) => this.row(x)), rec: recT, pay: payT,
+      balPlan: bal(recT.n, payT.n), balDone: bal(recT.nd, payT.nd),
+      upOpen: up.open, openUp: () => this.setState({ up: { open: true, step: 'upload', file: '', f: null } }),
+      closeUp: () => this.setUp({ open: false }),
+      stepUpload: up.step === 'upload' || up.step === 'none', stepAi: up.step === 'ai', stepForm: up.step === 'form',
+      aiSteps: aiSteps, aiFile: up.file,
+      onFile: (e) => { const fl = e && e.target && e.target.files && e.target.files[0]; this.runAi(fl ? fl.name : 'comprovante.pdf'); },
+      useSample: () => this.runAi('comprovante-pix-exemplo.pdf'),
+    }, formVals);
+  }
+}
+</script>
+</body>
+</html>
