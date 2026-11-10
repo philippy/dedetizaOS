@@ -1,12 +1,4 @@
-import {
-  pgTable,
-  serial,
-  text,
-  integer,
-  boolean,
-  timestamp,
-  date,
-} from "drizzle-orm/pg-core";
+import { pgTable, serial, text, integer, boolean, timestamp, date } from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -26,18 +18,14 @@ export const session = pgTable("session", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
 });
 
 export const account = pgTable("account", {
   id: text("id").primaryKey(),
   accountId: text("account_id").notNull(),
   providerId: text("provider_id").notNull(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
+  userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
   accessToken: text("access_token"),
   refreshToken: text("refresh_token"),
   idToken: text("id_token"),
@@ -86,18 +74,12 @@ export const tiposServico = pgTable("tipos_servico", {
 
 export const servicos = pgTable("servicos", {
   id: serial("id").primaryKey(),
-  clienteId: integer("cliente_id")
-    .notNull()
-    .references(() => clientes.id, { onDelete: "cascade" }),
-  tipoServicoId: integer("tipo_servico_id")
-    .notNull()
-    .references(() => tiposServico.id),
+  clienteId: integer("cliente_id").notNull().references(() => clientes.id, { onDelete: "cascade" }),
+  tipoServicoId: integer("tipo_servico_id").notNull().references(() => tiposServico.id),
   tecnicoId: integer("tecnico_id").references(() => tecnicos.id),
-  dataHora: timestamp("data_hora", { mode: "string" }).notNull(),
+  dataHora: text("data_hora").notNull(),
   valor: integer("valor").notNull(),
-  status: text("status", { enum: ["agendado", "concluido", "cancelado"] })
-    .notNull()
-    .default("agendado"),
+  status: text("status", { enum: ["agendado", "concluido", "cancelado"] }).notNull().default("agendado"),
   observacoes: text("observacoes").default(""),
 });
 
@@ -109,16 +91,12 @@ export const campanhas = pgTable("campanhas", {
   dataFim: date("data_fim", { mode: "string" }).notNull(),
   descontoPct: integer("desconto_pct").notNull().default(20),
   unidades: integer("unidades").notNull(),
-  status: text("status", { enum: ["agendada", "finalizada", "cancelada"] })
-    .notNull()
-    .default("agendada"),
+  status: text("status", { enum: ["agendada", "finalizada", "cancelada"] }).notNull().default("agendada"),
 });
 
 export const inscricoes = pgTable("inscricoes", {
   id: serial("id").primaryKey(),
-  campanhaId: integer("campanha_id")
-    .notNull()
-    .references(() => campanhas.id, { onDelete: "cascade" }),
+  campanhaId: integer("campanha_id").notNull().references(() => campanhas.id, { onDelete: "cascade" }),
   unidade: text("unidade").notNull(),
   morador: text("morador").notNull(),
   telefone: text("telefone").notNull(),
@@ -130,20 +108,12 @@ export const lancamentos = pgTable("lancamentos", {
   id: serial("id").primaryKey(),
   tipo: text("tipo", { enum: ["receber", "pagar"] }).notNull(),
   descricao: text("descricao").notNull(),
-  clienteId: integer("cliente_id").references(() => clientes.id, {
-    onDelete: "set null",
-  }),
+  clienteId: integer("cliente_id").references(() => clientes.id, { onDelete: "set null" }),
   fornecedor: text("fornecedor"),
-  servicoId: integer("servico_id").references(() => servicos.id, {
-    onDelete: "set null",
-  }),
-  inscricaoId: integer("inscricao_id").references(() => inscricoes.id, {
-    onDelete: "cascade",
-  }),
+  servicoId: integer("servico_id").references(() => servicos.id, { onDelete: "set null" }),
+  inscricaoId: integer("inscricao_id").references(() => inscricoes.id, { onDelete: "cascade" }),
   vencimento: date("vencimento", { mode: "string" }).notNull(),
   valor: integer("valor").notNull(),
-  status: text("status", { enum: ["aberto", "pago"] })
-    .notNull()
-    .default("aberto"),
+  status: text("status", { enum: ["aberto", "pago"] }).notNull().default("aberto"),
   pagoEm: date("pago_em", { mode: "string" }),
 });

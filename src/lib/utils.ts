@@ -6,15 +6,12 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatBRL(cents: number): string {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format((cents || 0) / 100);
+  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format((cents || 0) / 100);
 }
 
 export function parseBRLToCents(val: string | number): number {
   if (typeof val === "number") return Math.round(val * 100);
-  const cleaned = val.replace(/[R$\s.]/g, "").replace(",", ".");
+  const cleaned = String(val).replace(/[R$\s.]/g, "").replace(",", ".");
   const num = parseFloat(cleaned);
   return isNaN(num) ? 0 : Math.round(num * 100);
 }

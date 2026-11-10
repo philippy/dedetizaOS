@@ -4,7 +4,7 @@ import { db } from "@/db";
 import * as schema from "@/db/schema";
 
 export const auth = betterAuth({
-  secret: process.env.BETTER_AUTH_SECRET || "detetiza_impacto_secret_default_2026_key",
+  secret: process.env.BETTER_AUTH_SECRET || "detetiza_impacto_secret_default_2026_key_998877",
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {
@@ -14,7 +14,5 @@ export const auth = betterAuth({
       verification: schema.verification,
     },
   }),
-  emailAndPassword: {
-    enabled: true,
-  },
+  emailAndPassword: { enabled: true },
 });

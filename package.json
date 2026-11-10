@@ -4,11 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "drizzle-kit push --force && next build",
-    "start": "next start",
-    "db:push": "drizzle-kit push --force",
-    "seed:demo": "tsx scripts/seed-demo.ts",
-    "import:clientes": "tsx scripts/import-clientes.ts"
+    "build": "next build",
+    "start": "next start"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
