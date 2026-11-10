@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { servicos, clientes, tiposServico, tecnicos } from "@/db/schema";
+import { servicos, clientes, tiposServico, tecnicos, tipoServicoColunas } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { todaySP } from "@/lib/utils";
 import { AgendaView } from "./agenda-view";
@@ -31,7 +31,7 @@ export default async function AgendaPage() {
       .leftJoin(tecnicos, eq(servicos.tecnicoId, tecnicos.id)),
     db.select().from(tecnicos),
     db.select({ id: clientes.id, nome: clientes.nome, tipo: clientes.tipo }).from(clientes),
-    db.select().from(tiposServico),
+    db.select(tipoServicoColunas).from(tiposServico),
   ]);
 
   return (

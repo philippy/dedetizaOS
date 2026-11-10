@@ -1,10 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { X } from "lucide-react";
+import { Camera, X } from "lucide-react";
 import { concluirServicoAction, cancelarServicoAction, salvarTipoServicoAction } from "@/actions";
 import { addDaysISO, centsToInput, formatBRL, formatDateBR, formatDateTimeBR, monthRangeISO } from "@/lib/utils";
 import { DURACAO_PADRAO, DURACOES, formatDuracao } from "@/lib/agenda";
+import { reduzirImagem } from "@/lib/imagem";
 
 type Servico = {
   id: number;
@@ -17,7 +18,7 @@ type Servico = {
   valor: number;
   status: "agendado" | "concluido" | "cancelado";
 };
-type Tipo = { id: number; nome: string; preco: number; duracaoMin: number };
+type Tipo = { id: number; nome: string; preco: number; duracaoMin: number; imagem: string | null };
 type Tecnico = { id: number; nome: string; ativo: boolean };
 
 type Status = "todos" | Servico["status"];
@@ -45,6 +46,10 @@ export function ServicosView({ servicosList, tiposList, tecnicosList, today }: {
   const [novoTipoPreco, setNovoTipoPreco] = useState("");
   const [novoTipoDuracao, setNovoTipoDuracao] = useState<number>(DURACAO_PADRAO);
   const [editandoTipoId, setEditandoTipoId] = useState<number | null>(null);
+  // Foto no formulário: o que aparece agora e se mudou (ao editar, "não mudou" mantém a foto salva).
+  const [imagemForm, setImagemForm] = useState<string | null>(null);
+  const [imagemMudou, setImagemMudou] = useState(false);
+  const [lendoImagem, setLendoImagem] = useState(false);
   const [tipoErro, setTipoErro] = useState("");
 
   const [aviso, setAviso] = useState<{ texto: string; ok: boolean } | null>(null);
@@ -83,6 +88,8 @@ export function ServicosView({ servicosList, tiposList, tecnicosList, today }: {
     setNovoTipoNome(t.nome);
     setNovoTipoPreco(centsToInput(t.preco));
     setNovoTipoDuracao(t.duracaoMin);
+    setImagemForm(t.imagem);
+    setImagemMudou(false);
     setTipoErro("");
   }
 
@@ -91,14 +98,32 @@ export function ServicosView({ servicosList, tiposList, tecnicosList, today }: {
     setNovoTipoNome("");
     setNovoTipoPreco("");
     setNovoTipoDuracao(DURACAO_PADRAO);
+    setImagemForm(null);
+    setImagemMudou(false);
     setTipoErro("");
+  }
+
+  async function escolherImagem(e: React.ChangeEvent<HTMLInputElement>) {
+    const arquivo = e.target.files?.[0];
+    e.target.value = "";
+    if (!arquivo) return;
+    setTipoErro("");
+    setLendoImagem(true);
+    try {
+      setImagemForm(await reduzirImagem(arquivo));
+      setImagemMudou(true);
+    } catch (err) {
+      setTipoErro(err instanceof Error ? err.message : "Não foi possível usar essa foto.");
+    } finally {
+      setLendoImagem(false);
+    }
   }
 
   async function adicionarTipo(e: React.FormEvent) {
     e.preventDefault();
     setTipoErro("");
     const editando = editandoTipoId !== null;
-    const res = await salvarTipoServicoAction({ id: editandoTipoId ?? undefined, nome: novoTipoNome, precoReais: novoTipoPreco, duracaoMin: novoTipoDuracao });
+    const res = await salvarTipoServicoAction({ id: editandoTipoId ?? undefined, nome: novoTipoNome, precoReais: novoTipoPreco, duracaoMin: novoTipoDuracao, ...(imagemMudou ? { imagem: imagemForm } : {}) });
     if (res && "error" in res && res.error) {
       setTipoErro(res.error);
       return;
@@ -147,23 +172,33 @@ export function ServicosView({ servicosList, tiposList, tecnicosList, today }: {
 
       <section className="bg-white rounded-[24px] p-5 shadow-sm flex flex-col gap-3">
         <h2 className="text-[17px] font-extrabold m-0">Catálogo de tipos de serviço</h2>
-        <div className="flex flex-wrap gap-2.5">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
           {tiposList.map((t) => (
             <button
               key={t.id}
               type="button"
               onClick={() => editarTipo(t)}
               aria-pressed={editandoTipoId === t.id}
-              title="Clique para editar preço e duração"
-              className={`min-h-[44px] border rounded-2xl px-4 py-2 flex items-center gap-3 text-sm text-left ${editandoTipoId === t.id ? "bg-[#DCE7FF] border-[#2F5FE0]" : "bg-[#F4F7FB] border-[#E3E8EF]"}`}
+              title="Clique para editar"
+              className={`flex items-stretch gap-3.5 rounded-[20px] border p-2.5 text-left transition ${editandoTipoId === t.id ? "bg-[#DCE7FF] border-[#2F5FE0]" : "bg-[#F4F7FB] border-[#E3E8EF] hover:border-[#C9D3E0]"}`}
             >
-              <span className="font-bold">{t.nome}</span>
-              <span className="text-xs font-bold text-[#3A4658]">{formatDuracao(t.duracaoMin)}</span>
-              <span className="font-extrabold text-[#1B47B5]">{formatBRL(t.preco)}</span>
+              <div className="w-24 h-24 shrink-0 rounded-2xl overflow-hidden bg-[#E3E8EF] flex items-center justify-center text-[#3A4658]">
+                {t.imagem ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={t.imagem} alt={`Foto de ${t.nome}`} className="w-full h-full object-cover" />
+                ) : (
+                  <Camera className="w-7 h-7 opacity-60" aria-label="Sem foto" />
+                )}
+              </div>
+              <div className="min-w-0 flex flex-col justify-center gap-1">
+                <div className="font-extrabold text-[15px] leading-snug break-words">{t.nome}</div>
+                <div className="text-xs font-bold text-[#3A4658]">{formatDuracao(t.duracaoMin)}</div>
+                <div className="font-extrabold text-[17px] text-[#1B47B5]">{formatBRL(t.preco)}</div>
+              </div>
             </button>
           ))}
         </div>
-        <div className="text-xs font-semibold text-[#3A4658]">Clique em um tipo para editar o preço e a duração. A duração é o padrão ao agendar e pode ser ajustada em cada serviço.</div>
+        <div className="text-xs font-semibold text-[#3A4658]">Clique em um cartão para editar o nome, o preço, a duração e a foto. A duração é o padrão ao agendar e pode ser ajustada em cada serviço.</div>
         <form onSubmit={adicionarTipo} className="flex flex-wrap items-end gap-2.5 pt-2">
           <label className={`${labelCls} basis-56 grow`}>
             {editandoTipoId ? "Editando tipo de serviço" : "Novo tipo de serviço"}
@@ -179,6 +214,24 @@ export function ServicosView({ servicosList, tiposList, tecnicosList, today }: {
               {DURACOES.map((d) => <option key={d} value={d}>{formatDuracao(d)}</option>)}
             </select>
           </label>
+          <div className="basis-full flex flex-wrap items-center gap-3">
+            <div className="w-16 h-16 shrink-0 rounded-2xl overflow-hidden bg-[#E3E8EF] flex items-center justify-center text-[#3A4658]">
+              {imagemForm ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={imagemForm} alt="Prévia da foto do serviço" className="w-full h-full object-cover" />
+              ) : (
+                <Camera className="w-6 h-6 opacity-60" aria-hidden="true" />
+              )}
+            </div>
+            <label className="min-h-[44px] inline-flex items-center rounded-full border-[1.5px] border-[#0F1720] px-4 text-xs font-bold cursor-pointer focus-within:outline focus-within:outline-[3px] focus-within:outline-[#2F5FE0]">
+              {lendoImagem ? "Lendo foto..." : imagemForm ? "Trocar foto" : "Enviar foto do serviço"}
+              <input type="file" accept="image/jpeg,image/png,image/webp" onChange={escolherImagem} className="sr-only" aria-label="Enviar foto do serviço" />
+            </label>
+            {imagemForm && (
+              <button type="button" onClick={() => { setImagemForm(null); setImagemMudou(true); }} className="min-h-[44px] px-2 text-xs font-bold text-[#8E1B10]">Remover foto</button>
+            )}
+            <span className="text-xs font-semibold text-[#3A4658]">JPG, PNG ou WebP. A foto é reduzida automaticamente.</span>
+          </div>
           <button type="submit" className="min-h-[48px] rounded-full bg-[#0F1720] text-white px-5 text-sm font-bold">{editandoTipoId ? "Salvar alterações" : "+ Adicionar"}</button>
           {editandoTipoId && <button type="button" onClick={limparFormTipo} className="min-h-[48px] rounded-full border-[1.5px] border-[#0F1720] px-5 text-sm font-bold">Cancelar edição</button>}
           {tipoErro && <div role="alert" className="basis-full bg-[#FDE4E1] text-[#8E1B10] rounded-[14px] px-3.5 py-2.5 text-[13px] font-bold">{tipoErro}</div>}

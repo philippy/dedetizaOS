@@ -73,7 +73,18 @@ export const tiposServico = pgTable("tipos_servico", {
   preco: integer("preco").notNull(),
   // Tempo que o serviço costuma levar, em minutos. Serve de padrão ao agendar.
   duracaoMin: integer("duracao_min").notNull().default(60),
+  // Foto do serviço, já reduzida no navegador, como data URL (jpeg/png/webp). Pesada: só a
+  // tela Serviços lê; as demais telas usam tipoServicoColunas.
+  imagem: text("imagem"),
 });
+
+// Colunas leves do tipo de serviço (sem a imagem), para telas que só precisam de nome, preço e duração.
+export const tipoServicoColunas = {
+  id: tiposServico.id,
+  nome: tiposServico.nome,
+  preco: tiposServico.preco,
+  duracaoMin: tiposServico.duracaoMin,
+};
 
 export const servicos = pgTable("servicos", {
   id: serial("id").primaryKey(),

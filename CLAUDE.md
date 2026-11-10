@@ -25,7 +25,7 @@ Dados dos protótipos são de exemplo e não vão para o banco.
 ## Modelo de dados
 - tecnicos: nome, telefone, cor, ativo
 - clientes: tipo (PF/PJ), nome, documento, whatsapp, email, endereco, observacoes
-- tipos_servico: nome, preco, duracao_min (padrão ao agendar)
+- tipos_servico: nome, preco, duracao_min (padrão ao agendar), imagem (foto em data URL, reduzida no navegador; só a tela Serviços lê, as outras usam `tipoServicoColunas`)
 - servicos: cliente_id, tipo_servico_id, tecnico_id, data_hora, duracao_min, valor,
   status (agendado, concluido, cancelado), observacoes
 - lancamentos: tipo (receber, pagar), descricao, cliente_id ou fornecedor, servico_id,

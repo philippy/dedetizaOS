@@ -62,6 +62,15 @@ export function CampanhasView({ campanhasList, tiposList }: { campanhasList: any
       c.status.toLowerCase() === statusFilter.toLowerCase()
   );
 
+  const contar = (st: string) => (st === "Todas" ? campanhasList.length : campanhasList.filter((c) => c.status === st.toLowerCase()).length);
+  const receitaFinalizadas = campanhasList.filter((c) => c.status === "finalizada").reduce((a, c) => a + c.receitaPaga, 0);
+  const proxima = campanhasList.filter((c) => c.status === "agendada" && c.dataFim >= todaySP()).sort((a, b) => a.dataInicio.localeCompare(b.dataInicio))[0];
+  const CHIP_STATUS: Record<string, string> = {
+    agendada: "bg-[#DCE7FF] text-[#1B47B5]",
+    finalizada: "bg-[#DDF3E4] text-[#14653A]",
+    cancelada: "bg-[#FDE4E1] text-[#8E1B10]",
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -82,19 +91,34 @@ export function CampanhasView({ campanhasList, tiposList }: { campanhasList: any
         </button>
       </div>
 
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {[
+          { label: "Receita das campanhas finalizadas", value: formatBRL(receitaFinalizadas) },
+          { label: "Campanhas agendadas", value: String(contar("Agendada")) },
+          { label: "Próxima campanha", value: proxima ? proxima.nome : "Nenhuma", sub: proxima ? formatDateBR(proxima.dataInicio) : "" },
+        ].map((k) => (
+          <div key={k.label} className="bg-white rounded-[24px] shadow-sm px-5 py-4 min-w-0">
+            <div className="text-[13px] font-semibold text-[#3A4658]">{k.label}</div>
+            <div className="text-[22px] sm:text-[26px] font-extrabold leading-tight mt-1 break-words">{k.value}</div>
+            {k.sub ? <div className="text-xs font-semibold text-[#3A4658] mt-1">{k.sub}</div> : null}
+          </div>
+        ))}
+      </div>
+
       <section className="bg-white rounded-[24px] p-5 shadow-[0_8px_28px_rgba(20,40,80,0.08)] flex flex-col gap-4">
         <div role="group" aria-label="Filtrar por status" className="flex flex-wrap gap-2">
           {["Todas", "Agendada", "Finalizada", "Cancelada"].map((st) => (
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
+              aria-pressed={statusFilter === st}
               className={`min-h-[44px] rounded-full px-4 text-xs font-bold ${
                 statusFilter === st
                   ? "bg-[#0F1720] text-white"
                   : "border-[1.5px] border-[#C9D3E0] bg-[#F4F7FB] text-[#0F1720]"
               }`}
             >
-              {st}
+              {st} ({contar(st)})
             </button>
           ))}
         </div>
@@ -133,7 +157,7 @@ export function CampanhasView({ campanhasList, tiposList }: { campanhasList: any
                     {formatBRL(c.receitaPaga)}
                   </td>
                   <td className="p-3">
-                    <span className="inline-block rounded-full px-3 py-0.5 text-xs font-bold bg-[#DCE7FF] text-[#1B47B5] capitalize">
+                    <span className={`inline-block rounded-full px-3 py-0.5 text-xs font-bold capitalize ${CHIP_STATUS[c.status] ?? "bg-[#E8ECF2] text-[#3A4658]"}`}>
                       {c.status}
                     </span>
                   </td>
@@ -149,6 +173,11 @@ export function CampanhasView({ campanhasList, tiposList }: { campanhasList: any
               ))}
             </tbody>
           </table>
+          {shown.length === 0 && (
+            <div className="py-8 text-center text-sm font-semibold text-[#3A4658]">
+              {campanhasList.length === 0 ? "Nenhuma campanha cadastrada ainda." : "Nenhuma campanha com esse status."}
+            </div>
+          )}
         </div>
       </section>
 

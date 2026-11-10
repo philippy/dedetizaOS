@@ -6,7 +6,7 @@ import { inscreverUnidadeCampanhaAction, marcarInscricaoPagaAction } from "@/act
 import { formatBRL, formatDateBR } from "@/lib/utils";
 import { X } from "lucide-react";
 
-export function CampanhaDetalheView({ campanha, inscritos, oferecidos, nomesTipos }: { campanha: any; inscritos: any[]; oferecidos: { id: number; nome: string; valorReais: string }[]; nomesTipos: Record<number, string> }) {
+export function CampanhaDetalheView({ campanha, inscritos, oferecidos, nomesTipos }: { campanha: any; inscritos: any[]; oferecidos: { id: number; nome: string; valorReais: string; precoCampanha: number; precoCheio: number }[]; nomesTipos: Record<number, string> }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [unidade, setUnidade] = useState("");
   const [morador, setMorador] = useState("");
@@ -16,6 +16,25 @@ export function CampanhaDetalheView({ campanha, inscritos, oferecidos, nomesTipo
   const [error, setError] = useState("");
   const [aviso, setAviso] = useState<{ texto: string; ok: boolean } | null>(null);
   const [pagandoId, setPagandoId] = useState<number | null>(null);
+  const [filtro, setFiltro] = useState<"todos" | "pagos" | "aguardando">("todos");
+
+  const pagos = inscritos.filter((i: any) => i.pago);
+  const aguardando = inscritos.filter((i: any) => !i.pago);
+  const soma = (l: any[]) => l.reduce((a, i) => a + i.valor, 0);
+  const livres = Math.max(0, campanha.unidades - inscritos.length);
+  const mostrados = filtro === "todos" ? inscritos : filtro === "pagos" ? pagos : aguardando;
+  const periodo = campanha.dataInicio === campanha.dataFim ? formatDateBR(campanha.dataInicio) : `${formatDateBR(campanha.dataInicio)} a ${formatDateBR(campanha.dataFim)}`;
+  const CHIP_STATUS: Record<string, string> = {
+    agendada: "bg-[#DCE7FF] text-[#1B47B5]",
+    finalizada: "bg-[#DDF3E4] text-[#14653A]",
+    cancelada: "bg-[#FDE4E1] text-[#8E1B10]",
+  };
+  const kpis = [
+    { label: "Atendimentos contratados", value: `${inscritos.length} de ${campanha.unidades}`, sub: `${livres} ${livres === 1 ? "unidade ainda sem contratação" : "unidades ainda sem contratação"}` },
+    { label: "Pagos", value: String(pagos.length), sub: `${aguardando.length} aguardando Pix` },
+    { label: "Receita confirmada", value: formatBRL(soma(pagos)), sub: "pagamentos já baixados no Financeiro" },
+    { label: "A confirmar", value: formatBRL(soma(aguardando)), sub: "contratados, ainda sem pagamento" },
+  ];
 
   async function marcarPago(id: number, unidadeNome: string) {
     setPagandoId(id);
@@ -53,15 +72,15 @@ export function CampanhaDetalheView({ campanha, inscritos, oferecidos, nomesTipo
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <Link href="/campanhas" className="text-xs font-bold text-[#1B47B5]">
+          <Link href="/campanhas" className="inline-flex items-center min-h-[44px] text-[13px] font-bold text-[#1B47B5]">
             ← Todas as campanhas
           </Link>
-          <h1 className="text-[28px] font-extrabold mt-1">
-            Campanha · {campanha.nome}
-          </h1>
-          <p className="text-sm font-semibold text-[#3A4658]">
-            {campanha.local} · {formatDateBR(campanha.dataInicio)} a{" "}
-            {formatDateBR(campanha.dataFim)} · Desconto de {campanha.descontoPct}%
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <h1 className="text-[28px] font-extrabold">Campanha · {campanha.nome}</h1>
+            <span className={`rounded-full px-3.5 py-0.5 text-[13px] font-bold capitalize ${CHIP_STATUS[campanha.status] ?? "bg-[#E8ECF2] text-[#3A4658]"}`}>{campanha.status}</span>
+          </div>
+          <p className="text-sm font-semibold text-[#3A4658] mt-1">
+            {campanha.local} · {periodo}
           </p>
         </div>
         <button
@@ -71,7 +90,7 @@ export function CampanhaDetalheView({ campanha, inscritos, oferecidos, nomesTipo
           }}
           className="min-h-[48px] rounded-full bg-[#2F5FE0] text-white px-6 text-sm font-bold"
         >
-          Contratar serviço / Inscrever
+          Contratar serviço
         </button>
       </div>
 
@@ -82,54 +101,106 @@ export function CampanhaDetalheView({ campanha, inscritos, oferecidos, nomesTipo
         </div>
       )}
 
-      <section className="bg-white rounded-[24px] p-5 shadow-sm overflow-x-auto">
-        <table className="w-full min-w-[680px] text-sm">
-          <thead>
-            <tr className="text-left text-xs font-bold text-[#3A4658]">
-              <th className="p-2.5">Unidade</th>
-              <th className="p-2.5">Morador</th>
-              <th className="p-2.5">Serviço</th>
-              <th className="p-2.5">Telefone</th>
-              <th className="p-2.5">Valor</th>
-              <th className="p-2.5">Status</th>
-              <th className="p-2.5 text-right">Ação</th>
-            </tr>
-          </thead>
-          <tbody>
-            {inscritos.map((i: any) => (
-              <tr key={i.id} className="border-t border-[#E3E8EF]">
-                <td className="p-3 font-extrabold">{i.unidade}</td>
-                <td className="p-3 font-bold">{i.morador}</td>
-                <td className="p-3">{i.tipoServicoId ? nomesTipos[i.tipoServicoId] ?? "—" : "—"}</td>
-                <td className="p-3">{i.telefone}</td>
-                <td className="p-3 font-extrabold">{formatBRL(i.valor)}</td>
-                <td className="p-3">
-                  <span
-                    className={`rounded-full px-3 py-0.5 text-xs font-bold ${
-                      i.pago
-                        ? "bg-[#DDF3E4] text-[#14653A]"
-                        : "bg-[#FFF0D1] text-[#7A4B00]"
-                    }`}
-                  >
-                    {i.pago ? "Pago" : "Aguardando Pix"}
-                  </span>
-                </td>
-                <td className="p-3 text-right">
-                  {!i.pago && (
-                    <button
-                      disabled={pagandoId === i.id}
-                      onClick={() => marcarPago(i.id, i.unidade)}
-                      className="min-h-[44px] rounded-full bg-[#14653A] text-white px-4 text-xs font-bold disabled:opacity-60"
-                    >
-                      Marcar como pago
-                    </button>
-                  )}
-                </td>
-              </tr>
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
+        {kpis.map((k) => (
+          <div key={k.label} className="bg-white rounded-[24px] shadow-sm px-4 py-4 sm:px-5 min-w-0">
+            <div className="text-[13px] font-semibold text-[#3A4658]">{k.label}</div>
+            <div className="text-xl sm:text-[26px] font-extrabold leading-tight mt-1 break-words">{k.value}</div>
+            <div className="text-xs font-semibold text-[#3A4658] mt-1">{k.sub}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-[1fr_340px] gap-5 items-start">
+        <section className="bg-white rounded-[24px] p-5 shadow-sm flex flex-col gap-3 min-w-0">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-[17px] font-extrabold">Casas e apartamentos</h2>
+            <div role="group" aria-label="Filtrar lista" className="flex flex-wrap gap-2">
+              {([["todos", "Todos", inscritos.length], ["pagos", "Pagos", pagos.length], ["aguardando", "Aguardando Pix", aguardando.length]] as const).map(([k, rotulo, n]) => (
+                <button
+                  key={k}
+                  onClick={() => setFiltro(k)}
+                  aria-pressed={filtro === k}
+                  className={`min-h-[44px] rounded-full px-4 text-xs font-bold ${filtro === k ? "bg-[#0F1720] text-white" : "border-[1.5px] border-[#C9D3E0] bg-[#F4F7FB] text-[#0F1720]"}`}
+                >
+                  {rotulo} ({n})
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px] text-sm">
+              <thead>
+                <tr className="text-left text-xs font-bold text-[#3A4658]">
+                  <th className="p-2.5">Unidade</th>
+                  <th className="p-2.5">Morador</th>
+                  <th className="p-2.5">Serviço</th>
+                  <th className="p-2.5">Valor</th>
+                  <th className="p-2.5">Pix</th>
+                  <th className="p-2.5 text-right">Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                {mostrados.map((i: any) => (
+                  <tr key={i.id} className="border-t border-[#E3E8EF]">
+                    <td className="p-3 font-extrabold">{i.unidade}</td>
+                    <td className="p-3">
+                      <div className="font-bold">{i.morador}</div>
+                      <div className="text-xs font-semibold text-[#3A4658]">{i.telefone}</div>
+                    </td>
+                    <td className="p-3">{i.tipoServicoId ? nomesTipos[i.tipoServicoId] ?? "—" : "—"}</td>
+                    <td className="p-3 font-extrabold">{formatBRL(i.valor)}</td>
+                    <td className="p-3">
+                      <span className={`inline-block rounded-full px-3 py-0.5 text-xs font-bold whitespace-nowrap ${i.pago ? "bg-[#DDF3E4] text-[#14653A]" : "bg-[#FFF0D1] text-[#7A4B00]"}`}>
+                        {i.pago ? "Pago" : "Aguardando Pix"}
+                      </span>
+                    </td>
+                    <td className="p-3 text-right">
+                      {!i.pago && (
+                        <button
+                          disabled={pagandoId === i.id}
+                          onClick={() => marcarPago(i.id, i.unidade)}
+                          className="min-h-[44px] rounded-full bg-[#14653A] text-white px-4 text-xs font-bold disabled:opacity-60"
+                        >
+                          Marcar como pago
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {mostrados.length === 0 && (
+              <div className="py-8 text-center text-sm font-semibold text-[#3A4658]">
+                {inscritos.length === 0 ? 'Nenhum atendimento contratado ainda. Use "Contratar serviço" para cadastrar o primeiro morador.' : "Nenhuma unidade nesse filtro."}
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section className="bg-white rounded-[24px] p-5 shadow-sm flex flex-col gap-3">
+          <h2 className="text-[17px] font-extrabold">Resumo da campanha</h2>
+          <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+            <dt className="font-semibold text-[#3A4658]">Período</dt>
+            <dd className="font-bold text-right">{periodo}</dd>
+            <dt className="font-semibold text-[#3A4658]">Desconto</dt>
+            <dd className="font-bold text-right">{campanha.descontoPct}%</dd>
+            <dt className="font-semibold text-[#3A4658]">Unidades</dt>
+            <dd className="font-bold text-right">{campanha.unidades}</dd>
+          </dl>
+          <div className="text-xs font-bold text-[#3A4658] mt-1">Serviços e preço na campanha</div>
+          <ul className="flex flex-col gap-2 text-sm">
+            {oferecidos.map((o) => (
+              <li key={o.id} className="flex flex-wrap items-baseline justify-between gap-x-3 border-t border-[#E3E8EF] pt-2">
+                <span className="font-bold">{o.nome}</span>
+                <span className="font-extrabold">
+                  {formatBRL(o.precoCampanha)} <span className="text-xs font-semibold text-[#3A4658]">(de {formatBRL(o.precoCheio)})</span>
+                </span>
+              </li>
             ))}
-          </tbody>
-        </table>
-      </section>
+          </ul>
+        </section>
+      </div>
 
       {modalOpen && (
         <div className="fixed inset-0 z-50 bg-[#0F1720]/55 flex items-start justify-center p-4 pt-14">

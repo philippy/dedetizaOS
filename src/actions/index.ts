@@ -114,7 +114,12 @@ export async function excluirClienteAction(id: number) {
   return { success: true };
 }
 
-export async function salvarTipoServicoAction(input: { id?: number; nome: string; precoReais: string; duracaoMin?: number }) {
+// Foto do serviço: só data URL de jpeg/png/webp (nada de SVG, que pode carregar script) e de tamanho limitado.
+const IMAGEM_REGEX = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/;
+const IMAGEM_MAX_CHARS = 400_000;
+
+// imagem: undefined = não mexe; null = remove; texto = nova imagem.
+export async function salvarTipoServicoAction(input: { id?: number; nome: string; precoReais: string; duracaoMin?: number; imagem?: string | null }) {
   await requireSession();
   const nome = input.nome.trim();
   if (!nome) return { error: "Informe o nome do tipo de serviço." };
@@ -122,6 +127,9 @@ export async function salvarTipoServicoAction(input: { id?: number; nome: string
   if (preco <= 0) return { error: "Informe um preço maior que zero." };
   const duracaoMin = input.duracaoMin ?? DURACAO_PADRAO;
   if (!DURACOES.includes(duracaoMin)) return { error: "Escolha uma duração entre 30 min e 8 h." };
+  if (typeof input.imagem === "string" && (input.imagem.length > IMAGEM_MAX_CHARS || !IMAGEM_REGEX.test(input.imagem))) {
+    return { error: "Imagem inválida ou grande demais. Use uma foto JPG, PNG ou WebP." };
+  }
 
   const todos = await db.select({ id: tiposServico.id, nome: tiposServico.nome }).from(tiposServico);
   if (todos.some((t) => t.id !== input.id && t.nome.trim().toLowerCase() === nome.toLowerCase())) {
@@ -129,9 +137,9 @@ export async function salvarTipoServicoAction(input: { id?: number; nome: string
   }
 
   if (input.id) {
-    await db.update(tiposServico).set({ nome, preco, duracaoMin }).where(eq(tiposServico.id, input.id));
+    await db.update(tiposServico).set({ nome, preco, duracaoMin, ...(input.imagem !== undefined ? { imagem: input.imagem } : {}) }).where(eq(tiposServico.id, input.id));
   } else {
-    await db.insert(tiposServico).values({ nome, preco, duracaoMin });
+    await db.insert(tiposServico).values({ nome, preco, duracaoMin, imagem: input.imagem ?? null });
   }
   revalidatePath("/servicos");
   revalidatePath("/agenda");

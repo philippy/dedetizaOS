@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { db } from "@/db";
-import { campanhas, inscricoes, tiposServico } from "@/db/schema";
+import { campanhas, inscricoes, tiposServico, tipoServicoColunas } from "@/db/schema";
 import { asc, eq } from "drizzle-orm";
 import { centsToInput } from "@/lib/utils";
 import { CampanhaDetalheView } from "./campanha-detalhe-view";
@@ -15,7 +15,7 @@ export default async function CampanhaDetalhePage({ params }: { params: Promise<
 
   const [inscritos, tipos] = await Promise.all([
     db.select().from(inscricoes).where(eq(inscricoes.campanhaId, campId)),
-    db.select().from(tiposServico).orderBy(asc(tiposServico.id)),
+    db.select(tipoServicoColunas).from(tiposServico).orderBy(asc(tiposServico.id)),
   ]);
   // Serviços oferecidos: os escolhidos na campanha (vazio = todo o catálogo), já com o
   // desconto da campanha, em centavos.
@@ -23,6 +23,8 @@ export default async function CampanhaDetalhePage({ params }: { params: Promise<
     id: t.id,
     nome: t.nome,
     valorReais: centsToInput(Math.round((t.preco * (100 - camp.descontoPct)) / 100)),
+    precoCampanha: Math.round((t.preco * (100 - camp.descontoPct)) / 100),
+    precoCheio: t.preco,
   }));
   const nomes = Object.fromEntries(tipos.map((t) => [t.id, t.nome]));
 
