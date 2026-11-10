@@ -62,7 +62,8 @@ Valores em centavos (integer). Datas em texto ISO (`AAAA-MM-DD`, `AAAA-MM-DDTHH:
 ## Desenvolvimento local
 - `.env.local` com `DATABASE_URL`. Se apontar para um Postgres em localhost/127.0.0.1,
   o app usa o driver `pg` em vez do Neon (ver `src/db/index.ts`).
-- Banco novo: `npm run db:push` cria as tabelas; `npm run seed:demo` insere dados de exemplo.
+- Banco novo: `npm run db:push` cria as tabelas; `npm run seed:demo` insere dados de exemplo
+  (`src/lib/demo-data.ts`). `npm run seed:demo -- --reset` apaga os dados de negócio e recarrega.
 
 ## Comandos
 - npm run dev
