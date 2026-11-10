@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { servicos, clientes, tiposServico, tecnicos, lancamentos } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { formatBRL, formatDateBR, todaySP } from "@/lib/utils";
+import ImpactoAnimation from "@/components/impacto/ImpactoAnimation";
 
 export const dynamic = "force-dynamic";
 
@@ -53,6 +54,7 @@ export default async function InicioPage() {
             <h2 className="text-[17px] font-extrabold">Trabalhos de hoje ({formatDateBR(hoje)})</h2>
             <Link href="/agenda" className="text-xs font-bold text-[#1B47B5]">Abrir agenda →</Link>
           </div>
+          <div className="rounded-[16px] overflow-hidden border border-[#E3E8EF]"><ImpactoAnimation type="street" /></div>
           {servicosHoje.length === 0 ? (
             <div className="py-6 text-center text-sm text-[#3A4658]">Nenhum serviço agendado para hoje.</div>
           ) : (
@@ -76,6 +78,7 @@ export default async function InicioPage() {
             <h2 className="text-[17px] font-extrabold">Contas de hoje e vencidas</h2>
             <Link href="/financeiro" className="text-xs font-bold text-[#1B47B5]">Financeiro →</Link>
           </div>
+          <div className="rounded-[16px] overflow-hidden border border-[#E3E8EF]"><ImpactoAnimation type="payment" /></div>
           {[...contasVencidas, ...contasHoje].map((c) => (
             <div key={c.id} className="flex items-center justify-between py-3 border-t border-slate-200">
               <div>
