@@ -63,7 +63,7 @@ Valores em centavos (integer). Datas em texto ISO (`AAAA-MM-DD`, `AAAA-MM-DDTHH:
 - Ao terminar cada etapa, rodar `npm run typecheck` e `npm run build` e corrigir os erros.
 
 ## Desenvolvimento local
-- Mudou `src/db/schema.ts`? Aplique no banco com `npm run db:push` ANTES de publicar: o deploy não aplica o schema sozinho.
+- Mudou `src/db/schema.ts`? Aplique no banco com `npm run db:push` em teste. Na Vercel, o script `vercel-build` roda `drizzle-kit push` antes do build (só aplica mudanças aditivas; se pedir confirmação de perda de dados, o deploy falha e o site antigo continua no ar).
 - `.env.local` com `DATABASE_URL`. Se apontar para um Postgres em localhost/127.0.0.1,
   o app usa o driver `pg` em vez do Neon (ver `src/db/index.ts`).
 - Banco novo: `npm run db:push` cria as tabelas; `npm run seed:demo` insere dados de exemplo
