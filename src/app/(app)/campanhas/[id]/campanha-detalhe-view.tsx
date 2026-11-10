@@ -13,6 +13,19 @@ export function CampanhaDetalheView({ campanha, inscritos, valorSugeridoReais }:
   const [telefone, setTelefone] = useState("");
   const [valorReais, setValorReais] = useState(valorSugeridoReais);
   const [error, setError] = useState("");
+  const [aviso, setAviso] = useState<{ texto: string; ok: boolean } | null>(null);
+  const [pagandoId, setPagandoId] = useState<number | null>(null);
+
+  async function marcarPago(id: number, unidadeNome: string) {
+    setPagandoId(id);
+    const res = await marcarInscricaoPagaAction(id);
+    setPagandoId(null);
+    if (res && "error" in res && res.error) {
+      setAviso({ texto: res.error, ok: false });
+      return;
+    }
+    setAviso({ texto: `${unidadeNome}: pagamento registrado e baixa feita no Financeiro.`, ok: true });
+  }
 
   async function handleInscrever() {
     setError("");
@@ -27,6 +40,7 @@ export function CampanhaDetalheView({ campanha, inscritos, valorSugeridoReais }:
       setError(res.error);
       return;
     }
+    setAviso({ texto: `${unidade.trim()} inscrita. Conta a receber criada no Financeiro.`, ok: true });
     setUnidade("");
     setMorador("");
     setTelefone("");
@@ -58,6 +72,13 @@ export function CampanhaDetalheView({ campanha, inscritos, valorSugeridoReais }:
           Contratar serviço / Inscrever
         </button>
       </div>
+
+      {aviso && (
+        <div role="status" className={`flex items-center justify-between gap-2 rounded-2xl pl-4 pr-2 py-1.5 text-sm font-bold ${aviso.ok ? "bg-[#DDF3E4] text-[#14653A]" : "bg-[#FDE4E1] text-[#8E1B10]"}`}>
+          <span>{aviso.texto}</span>
+          <button onClick={() => setAviso(null)} aria-label="Fechar aviso" className="w-11 h-11 rounded-full flex items-center justify-center"><X className="w-5 h-5" /></button>
+        </div>
+      )}
 
       <section className="bg-white rounded-[24px] p-5 shadow-sm overflow-x-auto">
         <table className="w-full min-w-[600px] text-sm">
@@ -92,8 +113,9 @@ export function CampanhaDetalheView({ campanha, inscritos, valorSugeridoReais }:
                 <td className="p-3 text-right">
                   {!i.pago && (
                     <button
-                      onClick={() => marcarInscricaoPagaAction(i.id)}
-                      className="min-h-[38px] rounded-full bg-[#14653A] text-white px-4 text-xs font-bold"
+                      disabled={pagandoId === i.id}
+                      onClick={() => marcarPago(i.id, i.unidade)}
+                      className="min-h-[44px] rounded-full bg-[#14653A] text-white px-4 text-xs font-bold disabled:opacity-60"
                     >
                       Marcar como pago
                     </button>

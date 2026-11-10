@@ -9,11 +9,46 @@ import {
   alternarAtivoTecnicoAction,
   excluirTecnicoAction,
 } from "@/actions";
-import { addDaysISO, formatBRL, formatDateBR } from "@/lib/utils";
+import { addDaysISO, centsToInput, formatBRL, formatDateBR } from "@/lib/utils";
+import { DURACAO_MIN, HORARIOS, distribuirFaixas, horaDe, inicioDaSemana, minutosDe } from "@/lib/agenda";
 import { Plus, X } from "lucide-react";
 
-const HOURS = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17];
 const SWATCHES = ["#2F5FE0", "#0F1720", "#4A5B78", "#14653A", "#7A4B00"];
+const PX_HORA = 64;
+const DIAS_CURTOS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+
+type Servico = {
+  id: number;
+  clienteId: number;
+  clienteNome: string;
+  tipoServicoId: number;
+  tipoNome: string;
+  tecnicoId: number | null;
+  tecnicoNome: string | null;
+  tecnicoCor: string | null;
+  dataHora: string;
+  valor: number;
+  status: "agendado" | "concluido" | "cancelado";
+  observacoes: string | null;
+};
+
+type Modo = "timeline" | "semana" | "kanban";
+
+function pad(n: number) {
+  return n < 10 ? "0" + n : "" + n;
+}
+
+// Faixa de horas da grade: 08h–18h, ampliada se houver serviço fora disso.
+function faixaDeHoras(itens: Servico[]) {
+  let ini = 8;
+  let fim = 18;
+  for (const s of itens) {
+    const m = minutosDe(s.dataHora);
+    ini = Math.min(ini, Math.floor(m / 60));
+    fim = Math.max(fim, Math.ceil((m + DURACAO_MIN) / 60));
+  }
+  return Array.from({ length: fim - ini }, (_, i) => ini + i);
+}
 
 export function AgendaView({
   initialDate,
@@ -23,14 +58,15 @@ export function AgendaView({
   tiposList,
 }: {
   initialDate: string;
-  servicosList: any[];
+  servicosList: Servico[];
   tecnicosList: { id: number; nome: string; telefone: string; cor: string; ativo: boolean }[];
   clientesList: { id: number; nome: string; tipo: "PF" | "PJ" }[];
   tiposList: { id: number; nome: string; preco: number }[];
 }) {
   const [selectedDate, setSelectedDate] = useState(initialDate);
-  const [viewMode, setViewMode] = useState<"timeline" | "kanban">("timeline");
+  const [viewMode, setViewMode] = useState<Modo>("timeline");
   const [techFilter, setTechFilter] = useState<number>(0);
+  const [aviso, setAviso] = useState<{ texto: string; ok: boolean } | null>(null);
 
   // Modal de Serviço
   const [modalOpen, setModalOpen] = useState(false);
@@ -40,12 +76,14 @@ export function AgendaView({
   const [tecnicoId, setTecnicoId] = useState<number>(tecnicosList[0]?.id || 0);
   const [data, setData] = useState<string>(initialDate);
   const [hora, setHora] = useState<string>("08:00");
-  const [valorReais, setValorReais] = useState<string>("240");
+  const [valorReais, setValorReais] = useState<string>("240,00");
   const [observacoes, setObservacoes] = useState<string>("");
   const [statusAtual, setStatusAtual] = useState<string>("agendado");
   const [svcError, setSvcError] = useState("");
+  const [confirmarCancelar, setConfirmarCancelar] = useState(false);
+  const [salvando, setSalvando] = useState(false);
 
-  // Modal de Técnicos (Novo Técnico / Gerenciar Técnicos — Fiel ao Print 2)
+  // Modal de Técnicos
   const [tmOpen, setTmOpen] = useState(false);
   const [tmMode, setTmMode] = useState<"new" | "manage">("new");
   const [tName, setTName] = useState("");
@@ -55,44 +93,53 @@ export function AgendaView({
   const [tmInfo, setTmInfo] = useState("");
   const [tmInfoOk, setTmInfoOk] = useState(true);
 
-  const activeTechs = tecnicosList.filter(
-    (t) => t.ativo && (techFilter === 0 || t.id === techFilter)
-  );
+  const tecnicosAtivos = tecnicosList.filter((t) => t.ativo);
+  const activeTechs = tecnicosAtivos.filter((t) => techFilter === 0 || t.id === techFilter);
+  const doTecnicoFiltrado = (s: Servico) => techFilter === 0 || s.tecnicoId === techFilter;
 
-  const dayServices = servicosList.filter(
-    (s) => s.status !== "cancelado" && s.dataHora.slice(0, 10) === selectedDate
-  );
-
+  const dayServices = servicosList.filter((s) => s.status !== "cancelado" && s.dataHora.slice(0, 10) === selectedDate);
   const doneCount = dayServices.filter((s) => s.status === "concluido").length;
   const schedCount = dayServices.filter((s) => s.status === "agendado").length;
 
-  function pad(n: number) {
-    return n < 10 ? "0" + n : "" + n;
+  const semanaIni = inicioDaSemana(selectedDate);
+  const diasSemana = Array.from({ length: 7 }, (_, i) => addDaysISO(semanaIni, i));
+  const weekServices = servicosList.filter(
+    (s) => s.status !== "cancelado" && s.dataHora.slice(0, 10) >= diasSemana[0] && s.dataHora.slice(0, 10) <= diasSemana[6] && doTecnicoFiltrado(s)
+  );
+
+  const horasDia = faixaDeHoras(dayServices);
+  const horasSemana = faixaDeHoras(weekServices);
+
+  function precoDoTipo(id: number) {
+    const t = tiposList.find((x) => x.id === id);
+    return t ? centsToInput(t.preco) : "";
   }
 
-  function openNewAtSlot(techId: number, h: number) {
+  function openNewAt(techId: number, dia: string, h: number) {
     setSvcError("");
+    setConfirmarCancelar(false);
     setEditingId(undefined);
     setClienteId(clientesList[0]?.id || 0);
     setTipoId(tiposList[0]?.id || 0);
     setTecnicoId(techId);
-    setData(selectedDate);
+    setData(dia);
     setHora(pad(h) + ":00");
-    setValorReais(tiposList[0] ? String(tiposList[0].preco / 100) : "240");
+    setValorReais(tiposList[0] ? centsToInput(tiposList[0].preco) : "");
     setObservacoes("");
     setStatusAtual("agendado");
     setModalOpen(true);
   }
 
-  function openEditService(s: any) {
+  function openEditService(s: Servico) {
     setSvcError("");
+    setConfirmarCancelar(false);
     setEditingId(s.id);
     setClienteId(s.clienteId);
     setTipoId(s.tipoServicoId);
-    setTecnicoId(s.tecnicoId || tecnicosList[0]?.id || 0);
+    setTecnicoId(s.tecnicoId || tecnicosAtivos[0]?.id || 0);
     setData(s.dataHora.slice(0, 10));
     setHora(s.dataHora.slice(11, 16));
-    setValorReais(String(s.valor / 100));
+    setValorReais(centsToInput(s.valor));
     setObservacoes(s.observacoes || "");
     setStatusAtual(s.status);
     setModalOpen(true);
@@ -100,30 +147,49 @@ export function AgendaView({
 
   async function handleSaveService() {
     setSvcError("");
-    const res = await salvarServicoAction({
-      id: editingId,
-      clienteId,
-      tipoServicoId: tipoId,
-      tecnicoId,
-      data,
-      hora,
-      valorReais,
-      observacoes,
-    });
+    setSalvando(true);
+    const res = await salvarServicoAction({ id: editingId, clienteId, tipoServicoId: tipoId, tecnicoId, data, hora, valorReais, observacoes });
+    setSalvando(false);
     if (res.error) {
       setSvcError(res.error);
       return;
     }
+    setAviso({ texto: editingId ? "Serviço atualizado." : `Serviço agendado para ${formatDateBR(data).slice(0, 5)} às ${hora}.`, ok: true });
+    setModalOpen(false);
+  }
+
+  async function handleConcluir() {
+    if (!editingId) return;
+    setSvcError("");
+    setSalvando(true);
+    const res = await concluirServicoAction(editingId);
+    setSalvando(false);
+    if ("error" in res && res.error) {
+      setSvcError(res.error);
+      return;
+    }
+    const venc = "vencimento" in res && res.vencimento ? formatDateBR(res.vencimento) : "";
+    setAviso({ texto: `Serviço concluído. Conta a receber criada${venc ? `, vence ${venc}` : ""}.`, ok: true });
+    setModalOpen(false);
+  }
+
+  async function handleCancelar() {
+    if (!editingId) return;
+    setSvcError("");
+    setSalvando(true);
+    const res = await cancelarServicoAction(editingId);
+    setSalvando(false);
+    if ("error" in res && res.error) {
+      setSvcError(res.error);
+      return;
+    }
+    setAviso({ texto: "Serviço cancelado. Ele sai da agenda e continua no histórico do cliente.", ok: true });
     setModalOpen(false);
   }
 
   async function handleSaveTech() {
     setTmError("");
-    const res = await salvarTecnicoAction({
-      nome: tName,
-      telefone: tPhone,
-      cor: tColor,
-    });
+    const res = await salvarTecnicoAction({ nome: tName, telefone: tPhone, cor: tColor });
     if (res.error) {
       setTmError(res.error);
       return;
@@ -143,12 +209,7 @@ export function AgendaView({
       setTmInfoOk(false);
       return;
     }
-    setTmInfo(
-      res.nome +
-        (res.ativo
-          ? " ativado. A coluna voltou para a agenda."
-          : " desativado. A coluna saiu da agenda.")
-    );
+    setTmInfo(res.nome + (res.ativo ? " ativado. A coluna voltou para a agenda." : " desativado. A coluna saiu da agenda."));
     setTmInfoOk(true);
   }
 
@@ -167,88 +228,135 @@ export function AgendaView({
   const weekDays = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
   const dtObj = new Date(`${selectedDate}T12:00:00Z`);
   const dayTitle = `${weekDays[dtObj.getUTCDay()]}, ${formatDateBR(selectedDate)}`;
+  const semana = viewMode === "semana";
+  const passo = semana ? 7 : 1;
+  const subtitulo = semana
+    ? `Semana de ${formatDateBR(diasSemana[0]).slice(0, 5)} a ${formatDateBR(diasSemana[6]).slice(0, 5)} · ${weekServices.length} serviços · ${weekServices.filter((s) => s.status === "concluido").length} concluídos · ${weekServices.filter((s) => s.status === "agendado").length} agendados`
+    : `${dayTitle} · ${dayServices.length} serviços · ${doneCount} concluídos · ${schedCount} agendados`;
+
+  // Cartão de serviço posicionado pelo minuto de início, com 1 h de altura.
+  function Cartao({ s, horaIni, faixa = 0, faixas = 1, mostrarTecnico = false }: { s: Servico; horaIni: number; faixa?: number; faixas?: number; mostrarTecnico?: boolean }) {
+    const ini = minutosDe(s.dataHora);
+    const top = ((ini - horaIni * 60) / 60) * PX_HORA + 2;
+    const isDone = s.status === "concluido";
+    const largura = 100 / faixas;
+    const faixaHora = `${horaDe(ini)} – ${horaDe(ini + DURACAO_MIN)}`;
+    return (
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); openEditService(s); }}
+        aria-label={`${faixaHora}, ${s.clienteNome}, ${s.tipoNome}${s.tecnicoNome ? `, ${s.tecnicoNome}` : ""}, ${isDone ? "concluído" : "agendado"}`}
+        style={{
+          top: top + "px",
+          height: (DURACAO_MIN / 60) * PX_HORA - 4 + "px",
+          left: `calc(${faixa * largura}% + 4px)`,
+          width: `calc(${largura}% - 8px)`,
+          ...(mostrarTecnico && s.tecnicoCor ? { borderLeftColor: s.tecnicoCor, borderLeftWidth: 5 } : {}),
+        }}
+        className={`absolute text-left box-border rounded-[14px] px-2.5 py-1.5 overflow-hidden transition ${
+          isDone ? "bg-[#DDF3E4] border-2 border-[#7CC59B]" : "bg-white border-2 border-[#8793A6] shadow-[0_2px_8px_rgba(20,40,80,0.10)]"
+        }`}
+      >
+        <div className="text-[11px] font-bold text-[#2F3A4A] leading-tight">{faixaHora}</div>
+        <div className="text-[13px] font-extrabold text-[#0F1720] leading-tight truncate">{s.clienteNome}</div>
+        <div className="text-[11px] font-medium text-[#3A4658] leading-tight truncate">
+          {mostrarTecnico && s.tecnicoNome ? `${s.tecnicoNome} · ` : ""}{s.tipoNome}
+        </div>
+      </button>
+    );
+  }
+
+  function Grade({ horas, onSlot, children }: { horas: number[]; onSlot: (h: number) => void; children: React.ReactNode }) {
+    return (
+      <div className="relative rounded-2xl bg-[#FAFBFD] border border-[#E3E8EF]" style={{ height: horas.length * PX_HORA + "px" }}>
+        {horas.map((h, i) => (
+          <div
+            key={h}
+            onClick={() => onSlot(h)}
+            aria-hidden="true"
+            style={{ top: i * PX_HORA + "px", height: PX_HORA + "px" }}
+            className="absolute left-0 right-0 box-border border-t border-dashed border-[#D3DAE4] first:border-t-0 cursor-pointer hover:bg-[#2F5FE0]/5 transition"
+          />
+        ))}
+        {children}
+      </div>
+    );
+  }
+
+  function ColunaHoras({ horas, topo }: { horas: number[]; topo: number }) {
+    return (
+      <div className="w-[52px] shrink-0" style={{ paddingTop: topo + "px" }}>
+        {horas.map((h) => (
+          <div key={h} className="text-xs font-bold text-[#3A4658] pt-0.5" style={{ height: PX_HORA + "px" }}>
+            {pad(h)}:00
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  const legenda = (
+    <div className="flex flex-wrap gap-3.5 text-xs font-bold text-[#2F3A4A]">
+      <span className="flex items-center gap-1.5"><span className="w-3.5 h-3.5 rounded bg-white border-2 border-[#8793A6]" />Agendado</span>
+      <span className="flex items-center gap-1.5"><span className="w-3.5 h-3.5 rounded bg-[#DDF3E4] border-2 border-[#7CC59B]" />Concluído</span>
+    </div>
+  );
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Topo da Agenda igual ao Agenda.dc.html */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-[28px] font-extrabold leading-tight">Agenda dos técnicos</h1>
-          <div className="text-sm font-semibold text-[#3A4658] mt-1">
-            {dayTitle} · {dayServices.length} serviços · {doneCount} concluídos · {schedCount} agendados
-          </div>
+          <div className="text-sm font-semibold text-[#3A4658] mt-1">{subtitulo}</div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
           <button
-            onClick={() => openNewAtSlot(activeTechs[0]?.id || tecnicosList[0]?.id || 1, 8)}
+            onClick={() => openNewAt(activeTechs[0]?.id || tecnicosAtivos[0]?.id || 0, selectedDate, 8)}
             className="min-h-[48px] flex items-center gap-2 rounded-full bg-[#2F5FE0] hover:bg-[#1B47B5] text-white px-5 text-sm font-bold transition"
           >
             <Plus className="w-4 h-4" /> Novo serviço
           </button>
-
           <button
-            onClick={() => {
-              setTmError("");
-              setTmInfo("");
-              setTName("");
-              setTPhone("");
-              setTColor("#2F5FE0");
-              setTmMode("new");
-              setTmOpen(true);
-            }}
+            onClick={() => { setTmError(""); setTmInfo(""); setTName(""); setTPhone(""); setTColor("#2F5FE0"); setTmMode("new"); setTmOpen(true); }}
             className="min-h-[48px] border-[1.5px] border-[#0F1720] rounded-full bg-white text-[#0F1720] px-4 text-sm font-bold hover:bg-slate-50"
           >
             Novo técnico
           </button>
-
           <button
-            onClick={() => {
-              setTmError("");
-              setTmInfo("");
-              setTmMode("manage");
-              setTmOpen(true);
-            }}
+            onClick={() => { setTmError(""); setTmInfo(""); setTmMode("manage"); setTmOpen(true); }}
             className="min-h-[48px] border-[1.5px] border-[#0F1720] rounded-full bg-white text-[#0F1720] px-4 text-sm font-bold hover:bg-slate-50"
           >
             Gerenciar técnicos
           </button>
-
-          <div
-            role="group"
-            aria-label="Modo de visualização"
-            className="flex bg-[#E3E8EF] rounded-full p-1 gap-1"
-          >
-            <button
-              onClick={() => setViewMode("timeline")}
-              className={`min-h-[44px] rounded-full px-5 text-sm font-bold transition ${
-                viewMode === "timeline"
-                  ? "bg-[#0F1720] text-white"
-                  : "text-[#2F3A4A]"
-              }`}
-            >
-              Linha do tempo
-            </button>
-            <button
-              onClick={() => setViewMode("kanban")}
-              className={`min-h-[44px] rounded-full px-5 text-sm font-bold transition ${
-                viewMode === "kanban"
-                  ? "bg-[#0F1720] text-white"
-                  : "text-[#2F3A4A]"
-              }`}
-            >
-              Kanban por status
-            </button>
+          <div role="group" aria-label="Modo de visualização" className="flex flex-wrap bg-[#E3E8EF] rounded-full p-1 gap-1">
+            {([["timeline", "Linha do tempo"], ["semana", "Semana"], ["kanban", "Kanban por status"]] as [Modo, string][]).map(([m, rot]) => (
+              <button
+                key={m}
+                onClick={() => setViewMode(m)}
+                aria-pressed={viewMode === m}
+                className={`min-h-[44px] rounded-full px-5 text-sm font-bold transition ${viewMode === m ? "bg-[#0F1720] text-white" : "text-[#2F3A4A]"}`}
+              >
+                {rot}
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Barra de Navegação de Data e Filtro de Técnico */}
+      {aviso && (
+        <div role="status" className={`flex items-center justify-between gap-2 rounded-2xl pl-4 pr-2 py-1.5 text-sm font-bold ${aviso.ok ? "bg-[#DDF3E4] text-[#14653A]" : "bg-[#FDE4E1] text-[#8E1B10]"}`}>
+          <span>{aviso.texto}</span>
+          <button onClick={() => setAviso(null)} aria-label="Fechar aviso" className="w-11 h-11 rounded-full flex items-center justify-center"><X className="w-5 h-5" /></button>
+        </div>
+      )}
+
+      {/* Navegação de data e filtro de técnico */}
       <div className="flex flex-wrap items-center justify-between gap-3 bg-white rounded-[20px] px-4 py-2.5 shadow-sm">
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setSelectedDate(addDaysISO(selectedDate, -1))}
-            aria-label="Dia anterior"
+            onClick={() => setSelectedDate(addDaysISO(selectedDate, -passo))}
+            aria-label={semana ? "Semana anterior" : "Dia anterior"}
             className="w-11 h-11 rounded-full border border-[#C9D3E0] font-extrabold text-lg hover:bg-slate-100"
           >
             ‹
@@ -257,20 +365,17 @@ export function AgendaView({
             type="date"
             aria-label="Escolher data da agenda"
             value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
+            onChange={(e) => e.target.value && setSelectedDate(e.target.value)}
             className="h-11 border-[1.5px] border-[#C9D3E0] rounded-full px-4 text-sm font-bold text-[#0F1720]"
           />
           <button
-            onClick={() => setSelectedDate(addDaysISO(selectedDate, 1))}
-            aria-label="Próximo dia"
+            onClick={() => setSelectedDate(addDaysISO(selectedDate, passo))}
+            aria-label={semana ? "Próxima semana" : "Próximo dia"}
             className="w-11 h-11 rounded-full border border-[#C9D3E0] font-extrabold text-lg hover:bg-slate-100"
           >
             ›
           </button>
-          <button
-            onClick={() => setSelectedDate(initialDate)}
-            className="min-h-[40px] px-3.5 rounded-full bg-[#F1F4F8] text-xs font-bold text-[#0F1720] hover:bg-slate-200"
-          >
+          <button onClick={() => setSelectedDate(initialDate)} className="min-h-[44px] px-3.5 rounded-full bg-[#F1F4F8] text-xs font-bold text-[#0F1720] hover:bg-slate-200">
             Hoje
           </button>
         </div>
@@ -279,218 +384,160 @@ export function AgendaView({
           <span className="text-xs font-bold text-[#3A4658] mr-1">Filtrar técnico:</span>
           <button
             onClick={() => setTechFilter(0)}
-            className={`min-h-[38px] px-3.5 rounded-full text-xs font-bold ${
-              techFilter === 0 ? "bg-[#0F1720] text-white" : "bg-[#F1F4F8] text-[#0F1720]"
-            }`}
+            aria-pressed={techFilter === 0}
+            className={`min-h-[44px] px-3.5 rounded-full text-xs font-bold ${techFilter === 0 ? "bg-[#0F1720] text-white" : "bg-[#F1F4F8] text-[#0F1720]"}`}
           >
             Todos
           </button>
-          {tecnicosList
-            .filter((t) => t.ativo)
-            .map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setTechFilter(t.id)}
-                className={`min-h-[38px] px-3.5 rounded-full text-xs font-bold flex items-center gap-1.5 ${
-                  techFilter === t.id ? "bg-[#0F1720] text-white" : "bg-[#F1F4F8] text-[#0F1720]"
-                }`}
-              >
-                <span
-                  style={{ backgroundColor: t.cor }}
-                  className="w-2.5 h-2.5 rounded-full"
-                />
-                {t.nome}
-              </button>
-            ))}
+          {tecnicosAtivos.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTechFilter(t.id)}
+              aria-pressed={techFilter === t.id}
+              className={`min-h-[44px] px-3.5 rounded-full text-xs font-bold flex items-center gap-1.5 ${techFilter === t.id ? "bg-[#0F1720] text-white" : "bg-[#F1F4F8] text-[#0F1720]"}`}
+            >
+              <span style={{ backgroundColor: t.cor }} className="w-2.5 h-2.5 rounded-full" />
+              {t.nome}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* MODO 1: LINHA DO TEMPO POR TÉCNICO (Fiel ao Print 1) */}
-      {viewMode === "timeline" ? (
+      {viewMode === "timeline" && (
         <div className="bg-white rounded-[24px] shadow-[0_8px_28px_rgba(20,40,80,0.08)] p-[18px] flex flex-col gap-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="text-[13px] font-semibold text-[#3A4658]">
               Clique em um horário vazio da coluna do técnico para agendar ou clique em um serviço para editar/concluir.
             </div>
-            <div className="flex flex-wrap gap-3.5 text-xs font-bold text-[#2F3A4A]">
-              <span className="flex items-center gap-1.5">
-                <span className="w-3.5 h-3.5 rounded bg-white border-2 border-[#8793A6]" />
-                Agendado
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-3.5 h-3.5 rounded bg-[#DDF3E4] border-2 border-[#7CC59B]" />
-                Concluído
-              </span>
-            </div>
+            {legenda}
           </div>
-
           <div className="overflow-x-auto">
-            <div
-              style={{ minWidth: 52 + activeTechs.length * 240 + "px" }}
-              className="flex gap-3"
-            >
-              {/* Coluna de Horas (64px exatos por hora) */}
-              <div className="w-[52px] shrink-0 pt-16">
-                {HOURS.map((h) => (
-                  <div
-                    key={h}
-                    className="h-16 text-xs font-bold text-[#3A4658] pt-0.5"
-                  >
-                    {pad(h)}:00
-                  </div>
-                ))}
-              </div>
-
-              {/* Uma Coluna por Técnico Ativo */}
+            <div style={{ minWidth: 52 + activeTechs.length * 232 + "px" }} className="flex gap-3">
+              <ColunaHoras horas={horasDia} topo={64} />
               {activeTechs.map((tech) => {
                 const mine = dayServices.filter((s) => s.tecnicoId === tech.id);
-                const hrsLoad = mine.length * 1;
                 return (
                   <div key={tech.id} className="flex-1 min-w-[220px]">
-                    {/* Cabeçalho do Técnico */}
                     <div className="h-14 mb-2 bg-[#F1F4F8] rounded-2xl px-3.5 flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2.5">
-                        <div
-                          style={{ backgroundColor: tech.cor }}
-                          className="w-8 h-8 rounded-full text-white text-sm font-extrabold flex items-center justify-center shrink-0"
-                        >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div style={{ backgroundColor: tech.cor }} className="w-8 h-8 rounded-full text-white text-sm font-extrabold flex items-center justify-center shrink-0">
                           {tech.nome.charAt(0).toUpperCase()}
                         </div>
-                        <div className="text-[15px] font-extrabold text-[#0F1720] truncate">
-                          {tech.nome}
-                        </div>
+                        <div className="text-[15px] font-extrabold text-[#0F1720] truncate">{tech.nome}</div>
                       </div>
-                      <div className="text-xs font-bold text-[#3A4658] shrink-0">
-                        {hrsLoad} h de 10 h
-                      </div>
+                      <div className="text-xs font-bold text-[#3A4658] shrink-0">{mine.length} h de {horasDia.length} h</div>
                     </div>
-
-                    {/* Grade Vertical Fixa de 640px (10 horas * 64px) */}
-                    <div className="relative h-[640px] rounded-2xl bg-[#FAFBFD] border border-[#E3E8EF]">
-                      {HOURS.map((h, i) => (
-                        <div
-                          key={h}
-                          onClick={() => openNewAtSlot(tech.id, h)}
-                          style={{ top: i * 64 + "px" }}
-                          className="absolute left-0 right-0 h-16 box-border border-t border-dashed border-[#D3DAE4] first:border-t-0 cursor-pointer hover:bg-[#2F5FE0]/5 transition"
-                        />
+                    <Grade horas={horasDia} onSlot={(h) => openNewAt(tech.id, selectedDate, h)}>
+                      {distribuirFaixas(mine.map((s) => ({ ...s, inicio: minutosDe(s.dataHora) }))).map((s) => (
+                        <Cartao key={s.id} s={s} horaIni={horasDia[0]} faixa={s.faixa} faixas={s.faixas} />
                       ))}
+                    </Grade>
+                  </div>
+                );
+              })}
+              {activeTechs.length === 0 && (
+                <div className="flex-1 py-10 text-center text-sm font-semibold text-[#3A4658]">Nenhum técnico ativo. Cadastre ou ative um técnico em &quot;Gerenciar técnicos&quot;.</div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
-                      {mine.map((svc) => {
-                        const startH = parseInt(svc.dataHora.slice(11, 13), 10) || 8;
-                        const clampedH = Math.max(8, Math.min(17, startH));
-                        const topPx = (clampedH - 8) * 64 + 2;
-                        const heightPx = 60; // 1h exata dentro do slot de 64px, sem sobrepor!
-                        const endH = clampedH + 1;
-                        const isDone = svc.status === "concluido";
-
-                        return (
-                          <div
-                            key={svc.id}
-                            role="button"
-                            tabIndex={0}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              openEditService(svc);
-                            }}
-                            style={{
-                              top: topPx + "px",
-                              height: heightPx + "px",
-                            }}
-                            className={`absolute left-1.5 right-1.5 box-border rounded-[14px] px-2.5 py-1.5 overflow-hidden cursor-pointer transition ${
-                              isDone
-                                ? "bg-[#DDF3E4] border-2 border-[#7CC59B]"
-                                : "bg-white border-2 border-[#8793A6] shadow-[0_2px_8px_rgba(20,40,80,0.10)]"
-                            }`}
-                          >
-                            <div className="text-[11px] font-bold text-[#2F3A4A] leading-tight">
-                              {pad(clampedH)}:00 – {pad(endH)}:00
-                            </div>
-                            <div className="text-[13px] font-extrabold text-[#0F1720] leading-tight truncate">
-                              {svc.clienteNome}
-                            </div>
-                            <div className="text-[11px] font-medium text-[#3A4658] leading-tight truncate">
-                              {svc.tipoNome}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+      {viewMode === "semana" && (
+        <div className="bg-white rounded-[24px] shadow-[0_8px_28px_rgba(20,40,80,0.08)] p-[18px] flex flex-col gap-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="text-[13px] font-semibold text-[#3A4658]">
+              Cada coluna é um dia; a cor da borda é a do técnico. Clique num horário vazio para agendar naquele dia.
+            </div>
+            <div className="flex flex-wrap items-center gap-3.5">
+              {legenda}
+              <div className="flex flex-wrap gap-3 text-xs font-bold text-[#2F3A4A]">
+                {activeTechs.map((t) => (
+                  <span key={t.id} className="flex items-center gap-1.5"><span className="w-3.5 h-3.5 rounded" style={{ backgroundColor: t.cor }} />{t.nome}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <div style={{ minWidth: 52 + 7 * 160 + "px" }} className="flex gap-2">
+              <ColunaHoras horas={horasSemana} topo={64} />
+              {diasSemana.map((dia) => {
+                const doDia = weekServices.filter((s) => s.dataHora.slice(0, 10) === dia);
+                const d = new Date(`${dia}T12:00:00Z`);
+                const hoje = dia === initialDate;
+                return (
+                  <div key={dia} className="flex-1 min-w-[150px]">
+                    <button
+                      type="button"
+                      onClick={() => { setSelectedDate(dia); setViewMode("timeline"); }}
+                      title="Abrir este dia na linha do tempo"
+                      className={`w-full h-14 mb-2 rounded-2xl px-3 flex items-center justify-between gap-2 text-left ${hoje ? "bg-[#2F5FE0] text-white" : "bg-[#F1F4F8] text-[#0F1720]"}`}
+                    >
+                      <span className="flex flex-col leading-tight">
+                        <span className="text-[13px] font-extrabold">{DIAS_CURTOS[d.getUTCDay()]} {formatDateBR(dia).slice(0, 5)}</span>
+                        <span className={`text-[11px] font-bold ${hoje ? "text-white/80" : "text-[#3A4658]"}`}>{hoje ? "Hoje · " : ""}{doDia.length} serviço(s)</span>
+                      </span>
+                    </button>
+                    <Grade horas={horasSemana} onSlot={(h) => openNewAt(techFilter || tecnicosAtivos[0]?.id || 0, dia, h)}>
+                      {distribuirFaixas(doDia.map((s) => ({ ...s, inicio: minutosDe(s.dataHora) }))).map((s) => (
+                        <Cartao key={s.id} s={s} horaIni={horasSemana[0]} faixa={s.faixa} faixas={s.faixas} mostrarTecnico />
+                      ))}
+                    </Grade>
                   </div>
                 );
               })}
             </div>
           </div>
         </div>
-      ) : (
-        /* MODO 2: KANBAN POR STATUS */
+      )}
+
+      {viewMode === "kanban" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[
-            { key: "agendado", label: "Agendados do dia", items: dayServices.filter((x) => x.status === "agendado") },
-            { key: "concluido", label: "Concluídos do dia", items: dayServices.filter((x) => x.status === "concluido") },
+            { key: "agendado", label: "Agendados do dia", items: dayServices.filter((x) => x.status === "agendado" && doTecnicoFiltrado(x)) },
+            { key: "concluido", label: "Concluídos do dia", items: dayServices.filter((x) => x.status === "concluido" && doTecnicoFiltrado(x)) },
           ].map((lane) => (
-            <div
-              key={lane.key}
-              className="bg-white rounded-[22px] shadow-[0_8px_28px_rgba(20,40,80,0.08)] p-4 flex flex-col gap-3"
-            >
+            <div key={lane.key} className="bg-white rounded-[22px] shadow-[0_8px_28px_rgba(20,40,80,0.08)] p-4 flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-extrabold">{lane.label}</span>
-                <span className="text-xs font-bold rounded-full px-2.5 py-0.5 bg-[#E8ECF2] text-[#2F3A4A]">
-                  {lane.items.length}
-                </span>
+                <span className="text-xs font-bold rounded-full px-2.5 py-0.5 bg-[#E8ECF2] text-[#2F3A4A]">{lane.items.length}</span>
               </div>
-              {lane.items.map((kc) => (
-                <div
+              {lane.items.sort((a, b) => a.dataHora.localeCompare(b.dataHora)).map((kc) => (
+                <button
                   key={kc.id}
+                  type="button"
                   onClick={() => openEditService(kc)}
-                  className="bg-[#F4F7FB] border border-[#E3E8EF] rounded-2xl p-3 flex items-center justify-between gap-2 cursor-pointer"
+                  className="text-left bg-[#F4F7FB] border border-[#E3E8EF] rounded-2xl p-3 flex items-center justify-between gap-2"
                 >
                   <div>
                     <div className="text-sm font-extrabold">{kc.clienteNome}</div>
-                    <div className="text-xs text-[#3A4658]">
-                      {kc.tipoNome} · {kc.tecnicoNome} às {kc.dataHora.slice(11, 16)}
-                    </div>
+                    <div className="text-xs text-[#3A4658]">{kc.tipoNome} · {kc.tecnicoNome} às {kc.dataHora.slice(11, 16)}</div>
                   </div>
                   <span className="text-xs font-extrabold">{formatBRL(kc.valor)}</span>
-                </div>
+                </button>
               ))}
+              {lane.items.length === 0 && <div className="text-sm text-[#3A4658] py-2">Nada aqui.</div>}
             </div>
           ))}
         </div>
       )}
 
-      {/* MODAL 1: CRIAR / EDITAR SERVIÇO (COM TODAS AS LABELS) */}
+      {/* MODAL: CRIAR / EDITAR SERVIÇO */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 bg-[#0F1720]/55 flex items-start justify-center p-4 pt-12 overflow-y-auto">
-          <div
-            role="dialog"
-            aria-modal="true"
-            className="w-full max-w-[560px] bg-white rounded-[28px] p-6 flex flex-col gap-4 shadow-2xl"
-          >
+          <div role="dialog" aria-modal="true" aria-labelledby="svc-titulo" className="w-full max-w-[560px] bg-white rounded-[28px] p-6 flex flex-col gap-4 shadow-2xl">
             <div className="flex items-center justify-between">
-              <h2 className="text-[22px] font-extrabold">
-                {editingId ? "Editar serviço" : "Novo serviço"}
-              </h2>
-              <button
-                onClick={() => setModalOpen(false)}
-                aria-label="Fechar"
-                className="w-11 h-11 rounded-full bg-[#E8ECF2] flex items-center justify-center"
-              >
+              <h2 id="svc-titulo" className="text-[22px] font-extrabold">{editingId ? "Editar serviço" : "Novo serviço"}</h2>
+              <button onClick={() => setModalOpen(false)} aria-label="Fechar" className="w-11 h-11 rounded-full bg-[#E8ECF2] flex items-center justify-center">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <label className="flex flex-col gap-1.5 text-xs font-bold text-[#3A4658]">
               Cliente
-              <select
-                value={clienteId}
-                onChange={(e) => setClienteId(Number(e.target.value))}
-                className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm text-[#0F1720] bg-white"
-              >
+              <select value={clienteId} onChange={(e) => setClienteId(Number(e.target.value))} className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm text-[#0F1720] bg-white">
                 {clientesList.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.nome} ({c.tipo})
-                  </option>
+                  <option key={c.id} value={c.id}>{c.nome} ({c.tipo})</option>
                 ))}
               </select>
             </label>
@@ -500,36 +547,20 @@ export function AgendaView({
                 Tipo de serviço
                 <select
                   value={tipoId}
-                  onChange={(e) => {
-                    const id = Number(e.target.value);
-                    setTipoId(id);
-                    const f = tiposList.find((t) => t.id === id);
-                    if (f) setValorReais(String(f.preco / 100));
-                  }}
+                  onChange={(e) => { const id = Number(e.target.value); setTipoId(id); setValorReais(precoDoTipo(id)); }}
                   className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm text-[#0F1720] bg-white"
                 >
                   {tiposList.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.nome} ({formatBRL(t.preco)})
-                    </option>
+                    <option key={t.id} value={t.id}>{t.nome} ({formatBRL(t.preco)})</option>
                   ))}
                 </select>
               </label>
-
               <label className="flex flex-col gap-1.5 text-xs font-bold text-[#3A4658]">
                 Técnico
-                <select
-                  value={tecnicoId}
-                  onChange={(e) => setTecnicoId(Number(e.target.value))}
-                  className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm text-[#0F1720] bg-white"
-                >
-                  {tecnicosList
-                    .filter((t) => t.ativo)
-                    .map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {t.nome}
-                      </option>
-                    ))}
+                <select value={tecnicoId} onChange={(e) => setTecnicoId(Number(e.target.value))} className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm text-[#0F1720] bg-white">
+                  {tecnicosAtivos.map((t) => (
+                    <option key={t.id} value={t.id}>{t.nome}</option>
+                  ))}
                 </select>
               </label>
             </div>
@@ -537,103 +568,65 @@ export function AgendaView({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <label className="flex flex-col gap-1.5 text-xs font-bold text-[#3A4658]">
                 Dia
-                <input
-                  type="date"
-                  value={data}
-                  onChange={(e) => setData(e.target.value)}
-                  className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm text-[#0F1720]"
-                />
+                <input type="date" value={data} onChange={(e) => setData(e.target.value)} className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm text-[#0F1720]" />
               </label>
               <label className="flex flex-col gap-1.5 text-xs font-bold text-[#3A4658]">
                 Horário
-                <select
-                  value={hora}
-                  onChange={(e) => setHora(e.target.value)}
-                  className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm text-[#0F1720] bg-white"
-                >
-                  {HOURS.map((h) => {
-                    const hs = pad(h) + ":00";
-                    return (
-                      <option key={hs} value={hs}>
-                        {hs}
-                      </option>
-                    );
-                  })}
+                <select value={hora} onChange={(e) => setHora(e.target.value)} className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm text-[#0F1720] bg-white">
+                  {(HORARIOS.includes(hora) ? HORARIOS : [hora, ...HORARIOS]).map((hs) => (
+                    <option key={hs} value={hs}>{hs}</option>
+                  ))}
                 </select>
               </label>
               <label className="flex flex-col gap-1.5 text-xs font-bold text-[#3A4658]">
                 Valor (R$)
-                <input
-                  value={valorReais}
-                  onChange={(e) => setValorReais(e.target.value)}
-                  className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm text-[#0F1720]"
-                />
+                <input value={valorReais} onChange={(e) => setValorReais(e.target.value)} inputMode="decimal" className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm text-[#0F1720]" />
               </label>
             </div>
 
             <label className="flex flex-col gap-1.5 text-xs font-bold text-[#3A4658]">
               Observações
-              <input
-                value={observacoes}
-                onChange={(e) => setObservacoes(e.target.value)}
-                placeholder="Instruções para o técnico..."
-                className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm text-[#0F1720]"
-              />
+              <input value={observacoes} onChange={(e) => setObservacoes(e.target.value)} placeholder="Instruções para o técnico..." className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm text-[#0F1720]" />
             </label>
 
+            <div className="text-xs font-medium text-[#3A4658]">Cada serviço ocupa 1 hora na agenda.</div>
+
             {svcError && (
-              <div className="bg-[#FDE4E1] text-[#8E1B10] rounded-[14px] px-3.5 py-2.5 text-xs font-bold">
-                {svcError}
-              </div>
+              <div role="alert" className="bg-[#FDE4E1] text-[#8E1B10] rounded-[14px] px-3.5 py-2.5 text-xs font-bold">{svcError}</div>
             )}
 
-            <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
-              {editingId ? (
+            {confirmarCancelar ? (
+              <div role="group" aria-label="Confirmar cancelamento" className="flex flex-wrap items-center justify-between gap-2 bg-[#FDE4E1] rounded-[18px] p-3">
+                <span className="text-sm font-bold text-[#8E1B10]">Cancelar este serviço? Ele sai da agenda.</span>
                 <div className="flex gap-2">
-                  {statusAtual !== "concluido" && (
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        await concluirServicoAction(editingId);
-                        setModalOpen(false);
-                      }}
-                      className="min-h-[48px] rounded-full bg-[#14653A] text-white px-5 text-xs font-bold"
-                    >
+                  <button type="button" onClick={() => setConfirmarCancelar(false)} className="min-h-[44px] border-[1.5px] border-[#0F1720] bg-white rounded-full px-4 text-xs font-bold">Voltar</button>
+                  <button type="button" disabled={salvando} onClick={handleCancelar} className="min-h-[44px] rounded-full bg-[#8E1B10] text-white px-4 text-xs font-bold disabled:opacity-60">Sim, cancelar serviço</button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
+                {editingId && statusAtual === "agendado" ? (
+                  <div className="flex flex-wrap gap-2">
+                    <button type="button" disabled={salvando} onClick={handleConcluir} className="min-h-[48px] rounded-full bg-[#14653A] text-white px-5 text-xs font-bold disabled:opacity-60">
                       ✓ Concluir e gerar conta
                     </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      await cancelarServicoAction(editingId);
-                      setModalOpen(false);
-                    }}
-                    className="min-h-[48px] rounded-full bg-[#FDE4E1] text-[#8E1B10] px-4 text-xs font-bold"
-                  >
-                    Cancelar serviço
+                    <button type="button" onClick={() => setConfirmarCancelar(true)} className="min-h-[48px] rounded-full bg-[#FDE4E1] text-[#8E1B10] px-4 text-xs font-bold">
+                      Cancelar serviço
+                    </button>
+                  </div>
+                ) : (
+                  <div />
+                )}
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => setModalOpen(false)} className="min-h-[48px] border-[1.5px] border-[#0F1720] rounded-full px-5 text-sm font-bold">
+                    Fechar
+                  </button>
+                  <button type="button" disabled={salvando} onClick={handleSaveService} className="min-h-[48px] rounded-full bg-[#2F5FE0] text-white px-6 text-sm font-bold disabled:opacity-60">
+                    {salvando ? "Salvando..." : "Salvar serviço"}
                   </button>
                 </div>
-              ) : (
-                <div />
-              )}
-
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => setModalOpen(false)}
-                  className="min-h-[48px] border-[1.5px] border-[#0F1720] rounded-full px-5 text-sm font-bold"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSaveService}
-                  className="min-h-[48px] rounded-full bg-[#2F5FE0] text-white px-6 text-sm font-bold"
-                >
-                  Salvar serviço
-                </button>
               </div>
-            </div>
+            )}
           </div>
         </div>
       )}

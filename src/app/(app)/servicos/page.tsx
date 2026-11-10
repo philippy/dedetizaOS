@@ -1,6 +1,7 @@
 import { db } from "@/db";
 import { servicos, clientes, tiposServico, tecnicos } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { todaySP } from "@/lib/utils";
 import { ServicosView } from "./servicos-view";
 
 export const dynamic = "force-dynamic";
@@ -12,5 +13,5 @@ export default async function ServicosPage() {
     db.select().from(tiposServico),
     db.select().from(tecnicos),
   ]);
-  return <ServicosView servicosList={servicosList} tiposList={tiposList} tecnicosList={tecnicosList} />;
+  return <ServicosView servicosList={servicosList} tiposList={tiposList} tecnicosList={tecnicosList} today={todaySP()} />;
 }

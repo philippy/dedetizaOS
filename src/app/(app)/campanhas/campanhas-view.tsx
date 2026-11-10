@@ -6,15 +6,9 @@ import { salvarCampanhaAction } from "@/actions";
 import { formatBRL, formatDateBR, todaySP } from "@/lib/utils";
 import { X } from "lucide-react";
 
-const PRICES: Record<string, number> = {
-  "Baratas e formigas": 240,
-  "Roedores (desratização)": 320,
-  Cupins: 480,
-  "Pulgas e carrapatos": 260,
-  Monitoramento: 150,
-};
-
-export function CampanhasView({ campanhasList }: { campanhasList: any[] }) {
+export function CampanhasView({ campanhasList, tiposList }: { campanhasList: any[]; tiposList: { id: number; nome: string; preco: number }[] }) {
+  // Preços do catálogo (centavos), não valores fixos no código.
+  const PRICES: Record<string, number> = Object.fromEntries(tiposList.map((t) => [t.nome, t.preco]));
   const [modalOpen, setModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("Todas");
 
@@ -24,7 +18,7 @@ export function CampanhasView({ campanhasList }: { campanhasList: any[] }) {
   const [dataFim, setDataFim] = useState(todaySP());
   const [tStart, setTStart] = useState("08:00");
   const [tEnd, setTEnd] = useState("16:00");
-  const [svcs, setSvcs] = useState<string[]>(["Baratas e formigas"]);
+  const [svcs, setSvcs] = useState<string[]>(tiposList[0] ? [tiposList[0].nome] : []);
   const [descontoPct, setDescontoPct] = useState("20");
   const [unidades, setUnidades] = useState("30");
   const [error, setError] = useState("");
@@ -36,7 +30,7 @@ export function CampanhasView({ campanhasList }: { campanhasList: any[] }) {
         svcs
           .map(
             (k) =>
-              `${k} R$ ${Math.round(PRICES[k] * (1 - discNum / 100))}`
+              `${k} ${formatBRL(Math.round((PRICES[k] * (100 - discNum)) / 100))}`
           )
           .join(" · ")
       : "Escolha os serviços e o desconto para ver o preço da campanha.";

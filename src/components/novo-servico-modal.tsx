@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { Plus, X } from "lucide-react";
 import { salvarClienteAction, salvarServicoAction } from "@/actions";
-import { formatBRL, todaySP } from "@/lib/utils";
+import { centsToInput, formatBRL, todaySP } from "@/lib/utils";
+import { HORARIOS } from "@/lib/agenda";
 
 export function NovoServicoModal({ clientes, tipos, tecnicos, triggerLabel = "Novo serviço" }: { clientes: any[]; tipos: any[]; tecnicos: any[]; triggerLabel?: string }) {
   const [open, setOpen] = useState(false);
@@ -16,7 +17,7 @@ export function NovoServicoModal({ clientes, tipos, tecnicos, triggerLabel = "No
   const [tecnicoId, setTecnicoId] = useState<number>(tecnicos[0]?.id || 0);
   const [data, setData] = useState<string>(todaySP());
   const [hora, setHora] = useState<string>("08:00");
-  const [valorReais, setValorReais] = useState<string>(tipos[0] ? String(tipos[0].preco / 100) : "240");
+  const [valorReais, setValorReais] = useState<string>(tipos[0] ? centsToInput(tipos[0].preco) : "");
   const [observacoes, setObservacoes] = useState("");
 
   const [novoNome, setNovoNome] = useState("");
@@ -49,10 +50,10 @@ export function NovoServicoModal({ clientes, tipos, tecnicos, triggerLabel = "No
       </button>
       {open && (
         <div className="fixed inset-0 z-50 bg-[#0F1720]/55 flex items-start justify-center p-4 pt-12 overflow-y-auto">
-          <div role="dialog" aria-modal="true" className="w-full max-w-[560px] bg-white rounded-[28px] p-6 flex flex-col gap-4 text-[#0F1720] shadow-2xl">
+          <div role="dialog" aria-modal="true" aria-label={step === "form" ? "Novo serviço" : "Novo cliente"} className="w-full max-w-[560px] bg-white rounded-[28px] p-6 flex flex-col gap-4 text-[#0F1720] shadow-2xl">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-extrabold">{step === "form" ? "Novo serviço" : "Novo cliente"}</h2>
-              <button onClick={() => setOpen(false)} className="w-11 h-11 rounded-full bg-[#E8ECF2] flex items-center justify-center"><X className="w-5 h-5" /></button>
+              <button onClick={() => setOpen(false)} aria-label="Fechar" className="w-11 h-11 rounded-full bg-[#E8ECF2] flex items-center justify-center"><X className="w-5 h-5" /></button>
             </div>
             {step === "form" ? (
               <>
@@ -69,7 +70,7 @@ export function NovoServicoModal({ clientes, tipos, tecnicos, triggerLabel = "No
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">
                     Tipo de serviço
-                    <select value={tipoId} onChange={(e) => { const id = Number(e.target.value); setTipoId(id); const f = tipos.find((t) => t.id === id); if (f) setValorReais(String(f.preco / 100)); }} className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm bg-white">
+                    <select value={tipoId} onChange={(e) => { const id = Number(e.target.value); setTipoId(id); const f = tipos.find((t) => t.id === id); if (f) setValorReais(centsToInput(f.preco)); }} className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm bg-white">
                       {tipos.map((t) => <option key={t.id} value={t.id}>{t.nome} ({formatBRL(t.preco)})</option>)}
                     </select>
                   </label>
@@ -85,13 +86,13 @@ export function NovoServicoModal({ clientes, tipos, tecnicos, triggerLabel = "No
                   <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">
                     Horário
                     <select value={hora} onChange={(e) => setHora(e.target.value)} className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm bg-white">
-                      {Array.from({ length: 10 }, (_, i) => { const h = String(8 + i).padStart(2, "0") + ":00"; return <option key={h} value={h}>{h}</option>; })}
+                      {HORARIOS.map((h) => <option key={h} value={h}>{h}</option>)}
                     </select>
                   </label>
-                  <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">Valor (R$)<input value={valorReais} onChange={(e) => setValorReais(e.target.value)} className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm" /></label>
+                  <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">Valor (R$)<input value={valorReais} onChange={(e) => setValorReais(e.target.value)} inputMode="decimal" className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm" /></label>
                 </div>
                 <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">Observações<input value={observacoes} onChange={(e) => setObservacoes(e.target.value)} className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm" /></label>
-                {error && <div className="bg-[#FDE4E1] text-[#8E1B10] rounded-xl p-3 text-xs font-bold">{error}</div>}
+                {error && <div role="alert" className="bg-[#FDE4E1] text-[#8E1B10] rounded-xl p-3 text-xs font-bold">{error}</div>}
                 <div className="flex justify-end gap-2">
                   <button type="button" onClick={() => setOpen(false)} className="min-h-[48px] border-[1.5px] border-[#0F1720] rounded-full px-5 text-sm font-bold">Cancelar</button>
                   <button type="button" disabled={loading} onClick={handleSalvarServico} className="min-h-[48px] rounded-full bg-[#2F5FE0] text-white px-6 text-sm font-bold">{loading ? "Salvando..." : "Salvar serviço"}</button>
@@ -109,7 +110,7 @@ export function NovoServicoModal({ clientes, tipos, tecnicos, triggerLabel = "No
                 <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">Nome<input value={novoNome} onChange={(e) => setNovoNome(e.target.value)} className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3.5 text-sm" /></label>
                 <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">WhatsApp<input value={novoWhatsapp} onChange={(e) => setNovoWhatsapp(e.target.value)} className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3.5 text-sm" /></label>
                 <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">Endereço<input value={novoEndereco} onChange={(e) => setNovoEndereco(e.target.value)} className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3.5 text-sm" /></label>
-                {error && <div className="bg-[#FDE4E1] text-[#8E1B10] rounded-xl p-3 text-xs font-bold">{error}</div>}
+                {error && <div role="alert" className="bg-[#FDE4E1] text-[#8E1B10] rounded-xl p-3 text-xs font-bold">{error}</div>}
                 <div className="flex justify-end gap-2">
                   <button type="button" onClick={() => setStep("form")} className="min-h-[48px] border-[1.5px] border-[#0F1720] rounded-full px-5 text-sm font-bold">Voltar</button>
                   <button type="button" onClick={handleSalvarNovoCliente} className="min-h-[48px] rounded-full bg-[#2F5FE0] text-white px-6 text-sm font-bold">Salvar cliente</button>

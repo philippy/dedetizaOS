@@ -3,7 +3,8 @@
 import { db } from "@/db";
 import { requireSession } from "@/lib/session";
 import { tecnicos, clientes, tiposServico, servicos, lancamentos, campanhas, inscricoes, user } from "@/db/schema";
-import { eq, and, ne } from "drizzle-orm";
+import { eq, and, ne, like } from "drizzle-orm";
+import { DURACAO_MIN, horaDe, minutosDe, sobrepoe } from "@/lib/agenda";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { addDaysISO, parseBRLToCents, todaySP } from "@/lib/utils";
@@ -105,15 +106,20 @@ export async function salvarServicoAction(input: {
   const valor = parseBRLToCents(input.valorReais);
   if (valor <= 0) return { error: "Informe um valor válido." };
 
-  const conflitos = await db
-    .select({ id: servicos.id, clienteNome: clientes.nome })
+  // Cada serviço ocupa 1 hora: bloqueia qualquer sobreposição com outro serviço do
+  // mesmo técnico no mesmo dia (não só o mesmo horário exato).
+  const doDia = await db
+    .select({ id: servicos.id, dataHora: servicos.dataHora, clienteNome: clientes.nome })
     .from(servicos)
     .innerJoin(clientes, eq(servicos.clienteId, clientes.id))
-    .where(and(eq(servicos.tecnicoId, input.tecnicoId), eq(servicos.dataHora, dataHora), ne(servicos.status, "cancelado"), input.id ? ne(servicos.id, input.id) : undefined));
+    .where(and(eq(servicos.tecnicoId, input.tecnicoId), like(servicos.dataHora, `${input.data}%`), ne(servicos.status, "cancelado"), input.id ? ne(servicos.id, input.id) : undefined));
+  const inicio = minutosDe(dataHora);
+  const conflito = doDia.find((s) => sobrepoe(inicio, minutosDe(s.dataHora)));
 
-  if (conflitos.length > 0) {
+  if (conflito) {
     const [tech] = await db.select().from(tecnicos).where(eq(tecnicos.id, input.tecnicoId));
-    return { error: `Conflito: ${tech?.nome || "O técnico"} já tem ${conflitos[0].clienteNome} agendado nesse mesmo dia e horário.` };
+    const ini = minutosDe(conflito.dataHora);
+    return { error: `Conflito: ${tech?.nome || "O técnico"} já tem ${conflito.clienteNome} das ${horaDe(ini)} às ${horaDe(ini + DURACAO_MIN)} nesse dia.` };
   }
 
   if (input.id) {
@@ -243,6 +249,7 @@ export async function inscreverUnidadeCampanhaAction(input: { campanhaId: number
   if (inscritosAtuais.length >= camp.unidades) return { error: `Limite máximo de ${camp.unidades} unidades atingido.` };
   if (!input.unidade.trim() || !input.morador.trim()) return { error: "Preencha unidade e morador." };
   const valor = parseBRLToCents(input.valorReais);
+  if (valor <= 0) return { error: "Informe um valor válido." };
 
   const [nova] = await db.insert(inscricoes).values({ campanhaId: camp.id, unidade: input.unidade.trim(), morador: input.morador.trim(), telefone: input.telefone.trim(), valor, pago: false }).returning();
   await db.insert(lancamentos).values({ tipo: "receber", descricao: `Campanha ${camp.nome} · Unid. ${nova.unidade} (${nova.morador})`, inscricaoId: nova.id, vencimento: camp.dataInicio || todaySP(), valor, status: "aberto" });
