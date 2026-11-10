@@ -60,6 +60,7 @@ Valores em centavos (integer). Datas em texto ISO (`AAAA-MM-DD`, `AAAA-MM-DDTHH:
 - Menu lateral: Início, Agenda, Clientes, Serviços, Financeiro, Campanhas. No celular vira menu inferior.
 - Toda tela precisa funcionar no celular.
 - O app conecta com DATABASE_URL (pooled). O drizzle-kit usa DATABASE_URL_UNPOOLED.
+- Variáveis de banco na Vercel (Production): `DATABASE_URL` e `DATABASE_URL_UNPOOLED` foram criadas à mão e a integração Neon↔Vercel está DESCONECTADA (10/11/2026). O passo "Create database branch for deployment" da integração estourava o tempo antes do build e derrubava todos os deploys ("Resource provisioning timed out"). Não reconectar a integração nem apagar essas variáveis sem necessidade. Se a senha do banco mudar na Neon, atualizar as duas variáveis na Vercel e fazer Redeploy. Deploys de Preview ficam sem banco.
 - Ao terminar cada etapa, rodar `npm run typecheck` e `npm run build` e corrigir os erros.
 
 ## Desenvolvimento local
