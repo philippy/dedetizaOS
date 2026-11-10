@@ -24,7 +24,8 @@ export function ClientesView({ clientesList }: { clientesList: any[] }) {
     const matchQ =
       !q.trim() ||
       c.nome.toLowerCase().includes(q.trim().toLowerCase()) ||
-      c.whatsapp.includes(q.trim());
+      c.whatsapp.includes(q.trim()) ||
+      (c.documento || "").replace(/\D/g, "").includes(q.trim().replace(/\D/g, "") || "\u0000");
     return matchTipo && matchQ;
   });
 
@@ -61,12 +62,20 @@ export function ClientesView({ clientesList }: { clientesList: any[] }) {
             Empresas e residências atendidas, com histórico e retorno.
           </div>
         </div>
-        <button
-          onClick={() => setModalOpen(true)}
-          className="min-h-[48px] rounded-full bg-[#2F5FE0] text-white px-6 text-sm font-bold"
-        >
-          Cadastrar cliente
-        </button>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <Link
+            href="/clientes/importar"
+            className="min-h-[48px] inline-flex items-center rounded-full border-[1.5px] border-[#0F1720] bg-white text-[#0F1720] px-5 text-sm font-bold hover:bg-slate-50"
+          >
+            Importar planilha
+          </Link>
+          <button
+            onClick={() => setModalOpen(true)}
+            className="min-h-[48px] rounded-full bg-[#2F5FE0] text-white px-6 text-sm font-bold"
+          >
+            Cadastrar cliente
+          </button>
+        </div>
       </div>
 
       <section className="bg-white rounded-[24px] p-5 shadow-sm flex flex-col gap-4">
@@ -77,7 +86,7 @@ export function ClientesView({ clientesList }: { clientesList: any[] }) {
               type="search"
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Nome do cliente ou WhatsApp..."
+              placeholder="Nome, WhatsApp ou CPF/CNPJ..."
               className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3.5 text-sm text-[#0F1720]"
             />
           </label>

@@ -20,6 +20,7 @@ export default async function AgendaPage() {
         tecnicoNome: tecnicos.nome,
         tecnicoCor: tecnicos.cor,
         dataHora: servicos.dataHora,
+        duracaoMin: servicos.duracaoMin,
         valor: servicos.valor,
         status: servicos.status,
         observacoes: servicos.observacoes,

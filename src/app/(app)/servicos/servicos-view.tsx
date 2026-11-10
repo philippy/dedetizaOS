@@ -3,7 +3,8 @@
 import { useMemo, useState } from "react";
 import { X } from "lucide-react";
 import { concluirServicoAction, cancelarServicoAction, salvarTipoServicoAction } from "@/actions";
-import { addDaysISO, formatBRL, formatDateBR, formatDateTimeBR, monthRangeISO } from "@/lib/utils";
+import { addDaysISO, centsToInput, formatBRL, formatDateBR, formatDateTimeBR, monthRangeISO } from "@/lib/utils";
+import { DURACAO_PADRAO, DURACOES, formatDuracao } from "@/lib/agenda";
 
 type Servico = {
   id: number;
@@ -12,10 +13,11 @@ type Servico = {
   tecnicoId: number | null;
   tecnicoNome: string | null;
   dataHora: string;
+  duracaoMin: number;
   valor: number;
   status: "agendado" | "concluido" | "cancelado";
 };
-type Tipo = { id: number; nome: string; preco: number };
+type Tipo = { id: number; nome: string; preco: number; duracaoMin: number };
 type Tecnico = { id: number; nome: string; ativo: boolean };
 
 type Status = "todos" | Servico["status"];
@@ -41,6 +43,8 @@ export function ServicosView({ servicosList, tiposList, tecnicosList, today }: {
 
   const [novoTipoNome, setNovoTipoNome] = useState("");
   const [novoTipoPreco, setNovoTipoPreco] = useState("");
+  const [novoTipoDuracao, setNovoTipoDuracao] = useState<number>(DURACAO_PADRAO);
+  const [editandoTipoId, setEditandoTipoId] = useState<number | null>(null);
   const [tipoErro, setTipoErro] = useState("");
 
   const [aviso, setAviso] = useState<{ texto: string; ok: boolean } | null>(null);
@@ -74,17 +78,33 @@ export function ServicosView({ servicosList, tiposList, tecnicosList, today }: {
   const totalConcluido = filtrados.filter((s) => s.status === "concluido").reduce((t, s) => t + s.valor, 0);
   const totalAgendado = filtrados.filter((s) => s.status === "agendado").reduce((t, s) => t + s.valor, 0);
 
+  function editarTipo(t: Tipo) {
+    setEditandoTipoId(t.id);
+    setNovoTipoNome(t.nome);
+    setNovoTipoPreco(centsToInput(t.preco));
+    setNovoTipoDuracao(t.duracaoMin);
+    setTipoErro("");
+  }
+
+  function limparFormTipo() {
+    setEditandoTipoId(null);
+    setNovoTipoNome("");
+    setNovoTipoPreco("");
+    setNovoTipoDuracao(DURACAO_PADRAO);
+    setTipoErro("");
+  }
+
   async function adicionarTipo(e: React.FormEvent) {
     e.preventDefault();
     setTipoErro("");
-    const res = await salvarTipoServicoAction({ nome: novoTipoNome, precoReais: novoTipoPreco });
+    const editando = editandoTipoId !== null;
+    const res = await salvarTipoServicoAction({ id: editandoTipoId ?? undefined, nome: novoTipoNome, precoReais: novoTipoPreco, duracaoMin: novoTipoDuracao });
     if (res && "error" in res && res.error) {
       setTipoErro(res.error);
       return;
     }
-    setAviso({ texto: `Tipo "${novoTipoNome.trim()}" adicionado ao catálogo.`, ok: true });
-    setNovoTipoNome("");
-    setNovoTipoPreco("");
+    setAviso({ texto: editando ? `Tipo "${novoTipoNome.trim()}" atualizado. Os serviços já agendados mantêm o valor e a duração que tinham.` : `Tipo "${novoTipoNome.trim()}" adicionado ao catálogo.`, ok: true });
+    limparFormTipo();
   }
 
   async function concluir(s: Servico) {
@@ -129,22 +149,38 @@ export function ServicosView({ servicosList, tiposList, tecnicosList, today }: {
         <h2 className="text-[17px] font-extrabold m-0">Catálogo de tipos de serviço</h2>
         <div className="flex flex-wrap gap-2.5">
           {tiposList.map((t) => (
-            <div key={t.id} className="bg-[#F4F7FB] border border-[#E3E8EF] rounded-2xl px-4 py-2 flex items-center gap-3 text-sm">
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => editarTipo(t)}
+              aria-pressed={editandoTipoId === t.id}
+              title="Clique para editar preço e duração"
+              className={`min-h-[44px] border rounded-2xl px-4 py-2 flex items-center gap-3 text-sm text-left ${editandoTipoId === t.id ? "bg-[#DCE7FF] border-[#2F5FE0]" : "bg-[#F4F7FB] border-[#E3E8EF]"}`}
+            >
               <span className="font-bold">{t.nome}</span>
+              <span className="text-xs font-bold text-[#3A4658]">{formatDuracao(t.duracaoMin)}</span>
               <span className="font-extrabold text-[#1B47B5]">{formatBRL(t.preco)}</span>
-            </div>
+            </button>
           ))}
         </div>
+        <div className="text-xs font-semibold text-[#3A4658]">Clique em um tipo para editar o preço e a duração. A duração é o padrão ao agendar e pode ser ajustada em cada serviço.</div>
         <form onSubmit={adicionarTipo} className="flex flex-wrap items-end gap-2.5 pt-2">
           <label className={`${labelCls} basis-56 grow`}>
-            Novo tipo de serviço
+            {editandoTipoId ? "Editando tipo de serviço" : "Novo tipo de serviço"}
             <input value={novoTipoNome} onChange={(e) => { setNovoTipoNome(e.target.value); setTipoErro(""); }} placeholder="Ex.: Escorpiões" className={inputCls} />
           </label>
           <label className={`${labelCls} basis-36`}>
             Preço (R$)
             <input value={novoTipoPreco} onChange={(e) => { setNovoTipoPreco(e.target.value); setTipoErro(""); }} placeholder="290,00" inputMode="decimal" className={inputCls} />
           </label>
-          <button type="submit" className="min-h-[48px] rounded-full bg-[#0F1720] text-white px-5 text-sm font-bold">+ Adicionar</button>
+          <label className={`${labelCls} basis-36`}>
+            Duração
+            <select value={novoTipoDuracao} onChange={(e) => setNovoTipoDuracao(Number(e.target.value))} className={inputCls}>
+              {DURACOES.map((d) => <option key={d} value={d}>{formatDuracao(d)}</option>)}
+            </select>
+          </label>
+          <button type="submit" className="min-h-[48px] rounded-full bg-[#0F1720] text-white px-5 text-sm font-bold">{editandoTipoId ? "Salvar alterações" : "+ Adicionar"}</button>
+          {editandoTipoId && <button type="button" onClick={limparFormTipo} className="min-h-[48px] rounded-full border-[1.5px] border-[#0F1720] px-5 text-sm font-bold">Cancelar edição</button>}
           {tipoErro && <div role="alert" className="basis-full bg-[#FDE4E1] text-[#8E1B10] rounded-[14px] px-3.5 py-2.5 text-[13px] font-bold">{tipoErro}</div>}
         </form>
       </section>
@@ -211,7 +247,7 @@ export function ServicosView({ servicosList, tiposList, tecnicosList, today }: {
             <tbody>
               {filtrados.map((s) => (
                 <tr key={s.id} className="border-t border-[#E3E8EF]">
-                  <td className="p-3 font-semibold whitespace-nowrap">{formatDateTimeBR(s.dataHora)}</td>
+                  <td className="p-3 font-semibold whitespace-nowrap">{formatDateTimeBR(s.dataHora)}<div className="text-xs font-medium text-[#3A4658]">{formatDuracao(s.duracaoMin)}</div></td>
                   <td className="p-3 font-extrabold">{s.clienteNome}</td>
                   <td className="p-3">{s.tipoNome}</td>
                   <td className="p-3">{s.tecnicoNome || "—"}</td>

@@ -6,12 +6,13 @@ import { inscreverUnidadeCampanhaAction, marcarInscricaoPagaAction } from "@/act
 import { formatBRL, formatDateBR } from "@/lib/utils";
 import { X } from "lucide-react";
 
-export function CampanhaDetalheView({ campanha, inscritos, valorSugeridoReais }: any) {
+export function CampanhaDetalheView({ campanha, inscritos, oferecidos, nomesTipos }: { campanha: any; inscritos: any[]; oferecidos: { id: number; nome: string; valorReais: string }[]; nomesTipos: Record<number, string> }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [unidade, setUnidade] = useState("");
   const [morador, setMorador] = useState("");
   const [telefone, setTelefone] = useState("");
-  const [valorReais, setValorReais] = useState(valorSugeridoReais);
+  const [tipoId, setTipoId] = useState<number>(oferecidos[0]?.id ?? 0);
+  const [valorReais, setValorReais] = useState(oferecidos[0]?.valorReais ?? "");
   const [error, setError] = useState("");
   const [aviso, setAviso] = useState<{ texto: string; ok: boolean } | null>(null);
   const [pagandoId, setPagandoId] = useState<number | null>(null);
@@ -31,6 +32,7 @@ export function CampanhaDetalheView({ campanha, inscritos, valorSugeridoReais }:
     setError("");
     const res = await inscreverUnidadeCampanhaAction({
       campanhaId: campanha.id,
+      tipoServicoId: tipoId || undefined,
       unidade,
       morador,
       telefone,
@@ -81,11 +83,12 @@ export function CampanhaDetalheView({ campanha, inscritos, valorSugeridoReais }:
       )}
 
       <section className="bg-white rounded-[24px] p-5 shadow-sm overflow-x-auto">
-        <table className="w-full min-w-[600px] text-sm">
+        <table className="w-full min-w-[680px] text-sm">
           <thead>
             <tr className="text-left text-xs font-bold text-[#3A4658]">
               <th className="p-2.5">Unidade</th>
               <th className="p-2.5">Morador</th>
+              <th className="p-2.5">Serviço</th>
               <th className="p-2.5">Telefone</th>
               <th className="p-2.5">Valor</th>
               <th className="p-2.5">Status</th>
@@ -97,6 +100,7 @@ export function CampanhaDetalheView({ campanha, inscritos, valorSugeridoReais }:
               <tr key={i.id} className="border-t border-[#E3E8EF]">
                 <td className="p-3 font-extrabold">{i.unidade}</td>
                 <td className="p-3 font-bold">{i.morador}</td>
+                <td className="p-3">{i.tipoServicoId ? nomesTipos[i.tipoServicoId] ?? "—" : "—"}</td>
                 <td className="p-3">{i.telefone}</td>
                 <td className="p-3 font-extrabold">{formatBRL(i.valor)}</td>
                 <td className="p-3">
@@ -144,6 +148,26 @@ export function CampanhaDetalheView({ campanha, inscritos, valorSugeridoReais }:
               </button>
             </div>
 
+            {oferecidos.length > 0 && (
+              <label className="flex flex-col gap-1.5 text-xs font-bold text-[#3A4658]">
+                Serviço contratado
+                <select
+                  value={tipoId}
+                  onChange={(e) => {
+                    const id = Number(e.target.value);
+                    setTipoId(id);
+                    const o = oferecidos.find((x) => x.id === id);
+                    if (o) setValorReais(o.valorReais);
+                  }}
+                  className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3.5 text-sm bg-white"
+                >
+                  {oferecidos.map((o) => (
+                    <option key={o.id} value={o.id}>{o.nome} ({o.valorReais.replace(/^/, "R$ ")})</option>
+                  ))}
+                </select>
+              </label>
+            )}
+
             <label className="flex flex-col gap-1.5 text-xs font-bold text-[#3A4658]">
               Casa ou apartamento
               <input
@@ -186,7 +210,7 @@ export function CampanhaDetalheView({ campanha, inscritos, valorSugeridoReais }:
             </div>
 
             <div className="bg-[#F4F7FB] rounded-2xl p-3 text-xs font-semibold text-[#2F3A4A]">
-              O valor já vem com o desconto da campanha ({campanha.descontoPct}%) e pode ser editado.
+              O valor já vem com o desconto da campanha ({campanha.descontoPct}%) para o serviço escolhido e pode ser editado.
             </div>
 
             {error && (

@@ -25,14 +25,14 @@ Dados dos protótipos são de exemplo e não vão para o banco.
 ## Modelo de dados
 - tecnicos: nome, telefone, cor, ativo
 - clientes: tipo (PF/PJ), nome, documento, whatsapp, email, endereco, observacoes
-- tipos_servico: nome, preco
-- servicos: cliente_id, tipo_servico_id, tecnico_id, data_hora, valor,
+- tipos_servico: nome, preco, duracao_min (padrão ao agendar)
+- servicos: cliente_id, tipo_servico_id, tecnico_id, data_hora, duracao_min, valor,
   status (agendado, concluido, cancelado), observacoes
 - lancamentos: tipo (receber, pagar), descricao, cliente_id ou fornecedor, servico_id,
   inscricao_id, vencimento, valor, status (aberto, pago), pago_em
-- campanhas: nome, local, data_inicio, data_fim, desconto_pct, unidades,
+- campanhas: nome, local, data_inicio, data_fim, desconto_pct, unidades, tipos_servico_ids (vazio = todo o catálogo),
   status (agendada, finalizada, cancelada)
-- inscricoes: campanha_id, unidade, morador, telefone, valor, pago
+- inscricoes: campanha_id, tipo_servico_id, unidade, morador, telefone, valor, pago
 Valores em centavos (integer). Datas em texto ISO (`AAAA-MM-DD`, `AAAA-MM-DDTHH:MM`).
 
 ## Segurança (não remover)
@@ -48,6 +48,9 @@ Valores em centavos (integer). Datas em texto ISO (`AAAA-MM-DD`, `AAAA-MM-DDTHH:
 - Ler dados em Server Components e gravar com Server Actions. Sem API REST.
 - Não instalar bibliotecas além da stack sem perguntar.
 - Moeda R$ 1.234,56, datas dd/mm/aaaa, fuso America/Sao_Paulo (helpers em `src/lib/utils.ts`).
+- Conflito de agenda: serviços do mesmo técnico no mesmo dia não podem se sobrepor, considerando a duração de cada um.
+- Editar serviço concluído com conta em aberto atualiza valor e cliente da conta; com conta paga, valor e cliente ficam travados. Serviço concluído não pode ser cancelado.
+- Importação de clientes: `/clientes/importar` (cola do Excel ou CSV, limpeza em `src/lib/importar-clientes.ts`).
 - Excluir serviço = mudar status para cancelado. Lançamento pago não pode ser excluído.
 - Ao concluir um serviço, criar o lançamento a receber: vence hoje para PF e em 30 dias para PJ.
 - Cada inscrição de campanha cria um lançamento a receber.
@@ -60,6 +63,7 @@ Valores em centavos (integer). Datas em texto ISO (`AAAA-MM-DD`, `AAAA-MM-DDTHH:
 - Ao terminar cada etapa, rodar `npm run typecheck` e `npm run build` e corrigir os erros.
 
 ## Desenvolvimento local
+- Mudou `src/db/schema.ts`? Aplique no banco com `npm run db:push` ANTES de publicar: o deploy não aplica o schema sozinho.
 - `.env.local` com `DATABASE_URL`. Se apontar para um Postgres em localhost/127.0.0.1,
   o app usa o driver `pg` em vez do Neon (ver `src/db/index.ts`).
 - Banco novo: `npm run db:push` cria as tabelas; `npm run seed:demo` insere dados de exemplo

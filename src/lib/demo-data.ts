@@ -8,11 +8,11 @@
 import { addDaysISO, monthRangeISO } from "./utils";
 
 type Tec = { id: number; nome: string; telefone: string; cor: string; ativo: boolean };
-type Tipo = { id: number; nome: string; preco: number };
+type Tipo = { id: number; nome: string; preco: number; duracaoMin: number };
 type Cli = { id: number; tipo: "PF" | "PJ"; nome: string; documento: string; whatsapp: string; email: string; endereco: string; observacoes: string };
-type Svc = { id: number; clienteId: number; tipoServicoId: number; tecnicoId: number; dataHora: string; valor: number; status: "agendado" | "concluido" | "cancelado"; observacoes: string };
-type Camp = { id: number; nome: string; local: string; dataInicio: string; dataFim: string; descontoPct: number; unidades: number; status: "agendada" | "finalizada" | "cancelada" };
-type Insc = { id: number; campanhaId: number; unidade: string; morador: string; telefone: string; valor: number; pago: boolean };
+type Svc = { id: number; clienteId: number; tipoServicoId: number; tecnicoId: number; dataHora: string; duracaoMin: number; valor: number; status: "agendado" | "concluido" | "cancelado"; observacoes: string };
+type Camp = { id: number; nome: string; local: string; dataInicio: string; dataFim: string; descontoPct: number; unidades: number; tiposServicoIds: number[]; status: "agendada" | "finalizada" | "cancelada" };
+type Insc = { id: number; campanhaId: number; tipoServicoId: number; unidade: string; morador: string; telefone: string; valor: number; pago: boolean };
 type Lanc = { tipo: "receber" | "pagar"; descricao: string; clienteId: number | null; fornecedor: string | null; servicoId: number | null; inscricaoId: number | null; vencimento: string; valor: number; status: "aberto" | "pago"; pagoEm: string | null };
 
 const TECNICOS: Tec[] = [
@@ -23,12 +23,12 @@ const TECNICOS: Tec[] = [
 ];
 
 const TIPOS: Tipo[] = [
-  { id: 1, nome: "Baratas e formigas", preco: 24000 },
-  { id: 2, nome: "Roedores", preco: 32000 },
-  { id: 3, nome: "Cupins", preco: 48000 },
-  { id: 4, nome: "Pulgas e carrapatos", preco: 26000 },
-  { id: 5, nome: "Monitoramento mensal", preco: 15000 },
-  { id: 6, nome: "Limpeza de caixa d'água", preco: 38000 },
+  { id: 1, nome: "Baratas e formigas", preco: 24000, duracaoMin: 60 },
+  { id: 2, nome: "Roedores", preco: 32000, duracaoMin: 90 },
+  { id: 3, nome: "Cupins", preco: 48000, duracaoMin: 180 },
+  { id: 4, nome: "Pulgas e carrapatos", preco: 26000, duracaoMin: 60 },
+  { id: 5, nome: "Monitoramento mensal", preco: 15000, duracaoMin: 30 },
+  { id: 6, nome: "Limpeza de caixa d'água", preco: 38000, duracaoMin: 120 },
 ];
 
 const CLIENTES: Cli[] = [
@@ -103,7 +103,7 @@ export function gerarDadosDemo(hoje: string) {
 
   const servicos: Svc[] = SERVICOS.map(([dias, hora, cli, tipo, tec, status, obs], i) => ({
     id: i + 1, clienteId: cli, tipoServicoId: tipo, tecnicoId: tec, dataHora: `${d(dias)}T${hora}`,
-    valor: TIPOS[tipo - 1].preco, status, observacoes: obs,
+    duracaoMin: TIPOS[tipo - 1].duracaoMin, valor: TIPOS[tipo - 1].preco, status, observacoes: obs,
   }));
 
   const lancamentos: Lanc[] = [];
@@ -128,8 +128,8 @@ export function gerarDadosDemo(hoje: string) {
 
   // Campanhas
   const campanhas: Camp[] = [
-    { id: 1, nome: "Condomínio Jardim das Palmeiras", local: "Rua das Palmeiras, 400 · Casas 1 a 40", dataInicio: d(-20), dataFim: d(-19), descontoPct: 15, unidades: 40, status: "finalizada" },
-    { id: 2, nome: "Condomínio Vila Verde", local: "Estrada do Sol, 1200 · Casas 1 a 30", dataInicio: d(4), dataFim: d(5), descontoPct: 20, unidades: 30, status: "agendada" },
+    { id: 1, nome: "Condomínio Jardim das Palmeiras", local: "Rua das Palmeiras, 400 · Casas 1 a 40", dataInicio: d(-20), dataFim: d(-19), descontoPct: 15, unidades: 40, tiposServicoIds: [1, 2], status: "finalizada" },
+    { id: 2, nome: "Condomínio Vila Verde", local: "Estrada do Sol, 1200 · Casas 1 a 30", dataInicio: d(4), dataFim: d(5), descontoPct: 20, unidades: 30, tiposServicoIds: [1, 4], status: "agendada" },
   ];
   const base = TIPOS[0].preco;
   const comDesc = (pct: number) => Math.round((base * (100 - pct)) / 100);
@@ -149,7 +149,7 @@ export function gerarDadosDemo(hoje: string) {
     [2, "Casa 27", "Vanessa Lopes", "(11) 90000-3205", false],
   ];
   const inscricoes: Insc[] = insc.map(([camp, unidade, morador, tel, pago], i) => ({
-    id: i + 1, campanhaId: camp, unidade, morador, telefone: tel, valor: comDesc(campanhas[camp - 1].descontoPct), pago,
+    id: i + 1, campanhaId: camp, tipoServicoId: 1, unidade, morador, telefone: tel, valor: comDesc(campanhas[camp - 1].descontoPct), pago,
   }));
   inscricoes.forEach((x) => {
     const c = campanhas[x.campanhaId - 1];
@@ -197,11 +197,11 @@ export function sqlRecriarDemo(hoje: string): string {
 BEGIN
 TRUNCATE lancamentos, inscricoes, campanhas, servicos, clientes, tipos_servico, tecnicos RESTART IDENTITY CASCADE;
 ${rows("tecnicos", ["id", "nome", "telefone", "cor", "ativo"], g.tecnicos.map((t) => [t.id, t.nome, t.telefone, t.cor, t.ativo]))}
-${rows("tipos_servico", ["id", "nome", "preco"], g.tipos.map((t) => [t.id, t.nome, t.preco]))}
+${rows("tipos_servico", ["id", "nome", "preco", "duracao_min"], g.tipos.map((t) => [t.id, t.nome, t.preco, t.duracaoMin]))}
 ${rows("clientes", ["id", "tipo", "nome", "documento", "whatsapp", "email", "endereco", "observacoes"], g.clientes.map((c) => [c.id, c.tipo, c.nome, c.documento, c.whatsapp, c.email, c.endereco, c.observacoes]))}
-${rows("servicos", ["id", "cliente_id", "tipo_servico_id", "tecnico_id", "data_hora", "valor", "status", "observacoes"], g.servicos.map((s) => [s.id, s.clienteId, s.tipoServicoId, s.tecnicoId, s.dataHora, s.valor, s.status, s.observacoes]))}
-${rows("campanhas", ["id", "nome", "local", "data_inicio", "data_fim", "desconto_pct", "unidades", "status"], g.campanhas.map((c) => [c.id, c.nome, c.local, c.dataInicio, c.dataFim, c.descontoPct, c.unidades, c.status]))}
-${rows("inscricoes", ["id", "campanha_id", "unidade", "morador", "telefone", "valor", "pago"], g.inscricoes.map((i) => [i.id, i.campanhaId, i.unidade, i.morador, i.telefone, i.valor, i.pago]))}
+${rows("servicos", ["id", "cliente_id", "tipo_servico_id", "tecnico_id", "data_hora", "duracao_min", "valor", "status", "observacoes"], g.servicos.map((s) => [s.id, s.clienteId, s.tipoServicoId, s.tecnicoId, s.dataHora, s.duracaoMin, s.valor, s.status, s.observacoes]))}
+${rows("campanhas", ["id", "nome", "local", "data_inicio", "data_fim", "desconto_pct", "unidades", "tipos_servico_ids", "status"], g.campanhas.map((c) => [c.id, c.nome, c.local, c.dataInicio, c.dataFim, c.descontoPct, c.unidades, `{${c.tiposServicoIds.join(",")}}`, c.status]))}
+${rows("inscricoes", ["id", "campanha_id", "tipo_servico_id", "unidade", "morador", "telefone", "valor", "pago"], g.inscricoes.map((i) => [i.id, i.campanhaId, i.tipoServicoId, i.unidade, i.morador, i.telefone, i.valor, i.pago]))}
 ${rows("lancamentos", ["tipo", "descricao", "cliente_id", "fornecedor", "servico_id", "inscricao_id", "vencimento", "valor", "status", "pago_em"], g.lancamentos.map((l) => [l.tipo, l.descricao, l.clienteId, l.fornecedor, l.servicoId, l.inscricaoId, l.vencimento, l.valor, l.status, l.pagoEm]))}
 PERFORM setval(pg_get_serial_sequence('tecnicos', 'id'), (SELECT max(id) FROM tecnicos));
 PERFORM setval(pg_get_serial_sequence('tipos_servico', 'id'), (SELECT max(id) FROM tipos_servico));

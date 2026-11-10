@@ -3,11 +3,12 @@
 import { db } from "@/db";
 import { requireSession } from "@/lib/session";
 import { tecnicos, clientes, tiposServico, servicos, lancamentos, campanhas, inscricoes, user } from "@/db/schema";
-import { eq, and, ne, like } from "drizzle-orm";
-import { DURACAO_MIN, horaDe, minutosDe, sobrepoe } from "@/lib/agenda";
+import { eq, and, ne, like, inArray } from "drizzle-orm";
+import { DURACAO_PADRAO, DURACOES, formatDuracao, horaDe, minutosDe, sobrepoe } from "@/lib/agenda";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { addDaysISO, parseBRLToCents, todaySP } from "@/lib/utils";
+import { soDigitos } from "@/lib/importar-clientes";
 
 export async function canPublicRegister(): Promise<boolean> {
   try {
@@ -65,6 +66,47 @@ export async function salvarClienteAction(data: z.infer<typeof clienteSchema>) {
   return { success: true };
 }
 
+const importacaoSchema = z.array(
+  z.object({
+    tipo: z.enum(["PF", "PJ"]),
+    nome: z.string().trim().min(2).max(200),
+    documento: z.string().trim().max(30).default(""),
+    whatsapp: z.string().trim().max(40).default(""),
+    email: z.string().trim().max(200).default(""),
+    endereco: z.string().trim().max(400).default(""),
+    observacoes: z.string().trim().max(1000).default(""),
+  })
+).max(2000);
+
+// Importação em lote (tela Clientes > Importar planilha). Confere de novo no servidor
+// quem já existe pelo CPF/CNPJ, porque a tela pode estar desatualizada.
+export async function importarClientesAction(linhas: z.input<typeof importacaoSchema>) {
+  await requireSession();
+  const parsed = importacaoSchema.safeParse(linhas);
+  if (!parsed.success) return { error: "Algumas linhas estão inválidas. Confira a pré-visualização e tente de novo." };
+  if (parsed.data.length === 0) return { error: "Nenhuma linha selecionada para importar." };
+
+  const existentes = await db.select({ documento: clientes.documento }).from(clientes);
+  const docs = new Set(existentes.map((e) => soDigitos(e.documento ?? "")).filter((d) => d.length >= 11));
+  const novos: typeof parsed.data = [];
+  let jaExistiam = 0;
+  for (const l of parsed.data) {
+    const d = soDigitos(l.documento);
+    if (d.length >= 11) {
+      if (docs.has(d)) { jaExistiam++; continue; }
+      docs.add(d);
+    }
+    novos.push(l);
+  }
+  for (let i = 0; i < novos.length; i += 200) {
+    await db.insert(clientes).values(novos.slice(i, i + 200));
+  }
+  revalidatePath("/clientes");
+  revalidatePath("/servicos");
+  revalidatePath("/agenda");
+  return { success: true, importados: novos.length, jaExistiam };
+}
+
 export async function excluirClienteAction(id: number) {
   await requireSession();
   await db.delete(clientes).where(eq(clientes.id, id));
@@ -72,17 +114,28 @@ export async function excluirClienteAction(id: number) {
   return { success: true };
 }
 
-export async function salvarTipoServicoAction(input: { id?: number; nome: string; precoReais: string }) {
+export async function salvarTipoServicoAction(input: { id?: number; nome: string; precoReais: string; duracaoMin?: number }) {
   await requireSession();
-  if (!input.nome.trim()) return { error: "Informe o nome do tipo de serviço." };
+  const nome = input.nome.trim();
+  if (!nome) return { error: "Informe o nome do tipo de serviço." };
   const preco = parseBRLToCents(input.precoReais);
   if (preco <= 0) return { error: "Informe um preço maior que zero." };
+  const duracaoMin = input.duracaoMin ?? DURACAO_PADRAO;
+  if (!DURACOES.includes(duracaoMin)) return { error: "Escolha uma duração entre 30 min e 8 h." };
+
+  const todos = await db.select({ id: tiposServico.id, nome: tiposServico.nome }).from(tiposServico);
+  if (todos.some((t) => t.id !== input.id && t.nome.trim().toLowerCase() === nome.toLowerCase())) {
+    return { error: `Já existe o tipo "${nome}" no catálogo.` };
+  }
+
   if (input.id) {
-    await db.update(tiposServico).set({ nome: input.nome.trim(), preco }).where(eq(tiposServico.id, input.id));
+    await db.update(tiposServico).set({ nome, preco, duracaoMin }).where(eq(tiposServico.id, input.id));
   } else {
-    await db.insert(tiposServico).values({ nome: input.nome.trim(), preco });
+    await db.insert(tiposServico).values({ nome, preco, duracaoMin });
   }
   revalidatePath("/servicos");
+  revalidatePath("/agenda");
+  revalidatePath("/campanhas");
   return { success: true };
 }
 
@@ -93,6 +146,7 @@ export async function salvarServicoAction(input: {
   tecnicoId: number;
   data: string;
   hora: string;
+  duracaoMin?: number;
   valorReais: string;
   observacoes?: string;
 }) {
@@ -105,33 +159,63 @@ export async function salvarServicoAction(input: {
   const dataHora = `${input.data}T${input.hora.slice(0, 5)}`;
   const valor = parseBRLToCents(input.valorReais);
   if (valor <= 0) return { error: "Informe um valor válido." };
+  const duracaoMin = input.duracaoMin ?? DURACAO_PADRAO;
+  if (!DURACOES.includes(duracaoMin)) return { error: "Escolha uma duração entre 30 min e 8 h." };
 
-  // Cada serviço ocupa 1 hora: bloqueia qualquer sobreposição com outro serviço do
-  // mesmo técnico no mesmo dia (não só o mesmo horário exato).
-  const doDia = await db
-    .select({ id: servicos.id, dataHora: servicos.dataHora, clienteNome: clientes.nome })
-    .from(servicos)
-    .innerJoin(clientes, eq(servicos.clienteId, clientes.id))
-    .where(and(eq(servicos.tecnicoId, input.tecnicoId), like(servicos.dataHora, `${input.data}%`), ne(servicos.status, "cancelado"), input.id ? ne(servicos.id, input.id) : undefined));
-  const inicio = minutosDe(dataHora);
-  const conflito = doDia.find((s) => sobrepoe(inicio, minutosDe(s.dataHora)));
-
-  if (conflito) {
-    const [tech] = await db.select().from(tecnicos).where(eq(tecnicos.id, input.tecnicoId));
-    const ini = minutosDe(conflito.dataHora);
-    return { error: `Conflito: ${tech?.nome || "O técnico"} já tem ${conflito.clienteNome} das ${horaDe(ini)} às ${horaDe(ini + DURACAO_MIN)} nesse dia.` };
+  let atual: typeof servicos.$inferSelect | undefined;
+  if (input.id) {
+    [atual] = await db.select().from(servicos).where(eq(servicos.id, input.id));
+    if (!atual) return { error: "Serviço não encontrado." };
+    if (atual.status === "cancelado") return { error: "Serviço cancelado não pode ser editado." };
   }
 
-  if (input.id) {
-    await db.update(servicos).set({ clienteId: input.clienteId, tipoServicoId: input.tipoServicoId, tecnicoId: input.tecnicoId, dataHora, valor, observacoes: input.observacoes || "" }).where(eq(servicos.id, input.id));
+  // Serviço concluído: o valor e o cliente ficam na conta a receber. Enquanto a conta
+  // está em aberto, a edição acompanha; depois de paga, fica travada.
+  let lancamentoDoServico: typeof lancamentos.$inferSelect | undefined;
+  if (atual?.status === "concluido") {
+    [lancamentoDoServico] = await db.select().from(lancamentos).where(eq(lancamentos.servicoId, atual.id));
+    if (lancamentoDoServico?.status === "pago" && (valor !== atual.valor || input.clienteId !== atual.clienteId)) {
+      return { error: "A conta a receber deste serviço já foi paga: o valor e o cliente não podem mudar. Se precisar corrigir, ajuste pelo Financeiro." };
+    }
+  }
+
+  // Bloqueia sobreposição com outro serviço do mesmo técnico no mesmo dia, levando em
+  // conta a duração de cada um. Só confere quando algo do horário mudou.
+  const mudouHorario = !atual || atual.dataHora !== dataHora || atual.tecnicoId !== input.tecnicoId || atual.duracaoMin !== duracaoMin;
+  if (mudouHorario) {
+    const doDia = await db
+      .select({ id: servicos.id, dataHora: servicos.dataHora, duracaoMin: servicos.duracaoMin, clienteNome: clientes.nome })
+      .from(servicos)
+      .innerJoin(clientes, eq(servicos.clienteId, clientes.id))
+      .where(and(eq(servicos.tecnicoId, input.tecnicoId), like(servicos.dataHora, `${input.data}%`), ne(servicos.status, "cancelado"), input.id ? ne(servicos.id, input.id) : undefined));
+    const inicio = minutosDe(dataHora);
+    const conflito = doDia.find((s) => sobrepoe(inicio, duracaoMin, minutosDe(s.dataHora), s.duracaoMin));
+    if (conflito) {
+      const [tech] = await db.select().from(tecnicos).where(eq(tecnicos.id, input.tecnicoId));
+      const ini = minutosDe(conflito.dataHora);
+      return { error: `Conflito: ${tech?.nome || "O técnico"} já tem ${conflito.clienteNome} das ${horaDe(ini)} às ${horaDe(ini + conflito.duracaoMin)} nesse dia. Este serviço ocuparia ${horaDe(inicio)} às ${horaDe(inicio + duracaoMin)} (${formatDuracao(duracaoMin)}).` };
+    }
+  }
+
+  let contaAtualizada = false;
+  if (atual) {
+    await db.update(servicos).set({ clienteId: input.clienteId, tipoServicoId: input.tipoServicoId, tecnicoId: input.tecnicoId, dataHora, duracaoMin, valor, observacoes: input.observacoes || "" }).where(eq(servicos.id, atual.id));
+    if (lancamentoDoServico && lancamentoDoServico.status === "aberto") {
+      const [cli] = await db.select({ nome: clientes.nome }).from(clientes).where(eq(clientes.id, input.clienteId));
+      const [tipo] = await db.select({ nome: tiposServico.nome }).from(tiposServico).where(eq(tiposServico.id, input.tipoServicoId));
+      await db.update(lancamentos).set({ valor, clienteId: input.clienteId, descricao: `${tipo?.nome ?? "Serviço"} · ${cli?.nome ?? ""}` }).where(eq(lancamentos.id, lancamentoDoServico.id));
+      contaAtualizada = valor !== lancamentoDoServico.valor || input.clienteId !== lancamentoDoServico.clienteId;
+    }
   } else {
-    await db.insert(servicos).values({ clienteId: input.clienteId, tipoServicoId: input.tipoServicoId, tecnicoId: input.tecnicoId, dataHora, valor, status: "agendado", observacoes: input.observacoes || "" });
+    await db.insert(servicos).values({ clienteId: input.clienteId, tipoServicoId: input.tipoServicoId, tecnicoId: input.tecnicoId, dataHora, duracaoMin, valor, status: "agendado", observacoes: input.observacoes || "" });
   }
   revalidatePath("/");
   revalidatePath("/agenda");
   revalidatePath("/servicos");
+  revalidatePath("/financeiro");
   revalidatePath(`/clientes/${input.clienteId}`);
-  return { success: true };
+  if (atual && atual.clienteId !== input.clienteId) revalidatePath(`/clientes/${atual.clienteId}`);
+  return { success: true, contaAtualizada };
 }
 
 export async function concluirServicoAction(servicoId: number) {
@@ -175,6 +259,7 @@ export async function cancelarServicoAction(servicoId: number) {
   await requireSession();
   const [svc] = await db.select().from(servicos).where(eq(servicos.id, servicoId));
   if (!svc) return { error: "Serviço não encontrado." };
+  if (svc.status === "concluido") return { error: "Serviço concluído não pode ser cancelado: a conta a receber já existe. Ajuste pelo Financeiro." };
   await db.update(servicos).set({ status: "cancelado" }).where(eq(servicos.id, servicoId));
   revalidatePath("/");
   revalidatePath("/agenda");
@@ -225,23 +310,32 @@ export async function excluirLancamentoAction(id: number) {
   return { success: true };
 }
 
-export async function salvarCampanhaAction(input: { id?: number; nome: string; local: string; dataInicio: string; dataFim: string; descontoPct: number; unidades: number; status?: "agendada" | "finalizada" | "cancelada" }) {
+export async function salvarCampanhaAction(input: { id?: number; nome: string; local: string; dataInicio: string; dataFim: string; descontoPct: number; unidades: number; tiposServicoIds?: number[]; status?: "agendada" | "finalizada" | "cancelada" }) {
   await requireSession();
   if (!input.nome.trim() || !input.local.trim()) return { error: "Preencha nome e local." };
-  if (input.unidades < 1) return { error: "Informe pelo menos 1 unidade." };
+  if (!(input.unidades >= 1)) return { error: "Informe pelo menos 1 unidade." };
+  if (!(input.descontoPct >= 0 && input.descontoPct <= 100)) return { error: "O desconto deve ficar entre 0 e 100%." };
+  if (!input.dataInicio || !input.dataFim) return { error: "Informe as datas de início e fim." };
+  if (input.dataFim < input.dataInicio) return { error: "A data de fim não pode ser antes da data de início." };
 
+  // Só guarda tipos que existem no catálogo.
+  const pedidos = Array.from(new Set(input.tiposServicoIds ?? []));
+  const existentes = pedidos.length ? await db.select({ id: tiposServico.id }).from(tiposServico).where(inArray(tiposServico.id, pedidos)) : [];
+  const tiposServicoIds = existentes.map((t) => t.id).sort((a, b) => a - b);
+
+  const base = { nome: input.nome.trim(), local: input.local.trim(), dataInicio: input.dataInicio, dataFim: input.dataFim, descontoPct: Math.round(input.descontoPct), unidades: Math.round(input.unidades), tiposServicoIds };
   if (input.id) {
-    await db.update(campanhas).set({ nome: input.nome.trim(), local: input.local.trim(), dataInicio: input.dataInicio, dataFim: input.dataFim, descontoPct: input.descontoPct, unidades: input.unidades, status: input.status || "agendada" }).where(eq(campanhas.id, input.id));
+    await db.update(campanhas).set({ ...base, status: input.status || "agendada" }).where(eq(campanhas.id, input.id));
     revalidatePath("/campanhas");
+    revalidatePath(`/campanhas/${input.id}`);
     return { success: true, id: input.id };
-  } else {
-    const [nova] = await db.insert(campanhas).values({ nome: input.nome.trim(), local: input.local.trim(), dataInicio: input.dataInicio, dataFim: input.dataFim, descontoPct: input.descontoPct, unidades: input.unidades, status: "agendada" }).returning();
-    revalidatePath("/campanhas");
-    return { success: true, id: nova.id };
   }
+  const [nova] = await db.insert(campanhas).values({ ...base, status: "agendada" }).returning();
+  revalidatePath("/campanhas");
+  return { success: true, id: nova.id };
 }
 
-export async function inscreverUnidadeCampanhaAction(input: { campanhaId: number; unidade: string; morador: string; telefone: string; valorReais: string }) {
+export async function inscreverUnidadeCampanhaAction(input: { campanhaId: number; tipoServicoId?: number; unidade: string; morador: string; telefone: string; valorReais: string }) {
   await requireSession();
   const [camp] = await db.select().from(campanhas).where(eq(campanhas.id, input.campanhaId));
   if (!camp) return { error: "Campanha não encontrada." };
@@ -251,7 +345,15 @@ export async function inscreverUnidadeCampanhaAction(input: { campanhaId: number
   const valor = parseBRLToCents(input.valorReais);
   if (valor <= 0) return { error: "Informe um valor válido." };
 
-  const [nova] = await db.insert(inscricoes).values({ campanhaId: camp.id, unidade: input.unidade.trim(), morador: input.morador.trim(), telefone: input.telefone.trim(), valor, pago: false }).returning();
+  let tipoServicoId: number | null = null;
+  if (input.tipoServicoId) {
+    if (camp.tiposServicoIds.length > 0 && !camp.tiposServicoIds.includes(input.tipoServicoId)) return { error: "Esse serviço não faz parte desta campanha." };
+    const [tipo] = await db.select({ id: tiposServico.id }).from(tiposServico).where(eq(tiposServico.id, input.tipoServicoId));
+    if (!tipo) return { error: "Tipo de serviço não encontrado." };
+    tipoServicoId = tipo.id;
+  }
+
+  const [nova] = await db.insert(inscricoes).values({ campanhaId: camp.id, tipoServicoId, unidade: input.unidade.trim(), morador: input.morador.trim(), telefone: input.telefone.trim(), valor, pago: false }).returning();
   await db.insert(lancamentos).values({ tipo: "receber", descricao: `Campanha ${camp.nome} · Unid. ${nova.unidade} (${nova.morador})`, inscricaoId: nova.id, vencimento: camp.dataInicio || todaySP(), valor, status: "aberto" });
 
   revalidatePath(`/campanhas/${camp.id}`);

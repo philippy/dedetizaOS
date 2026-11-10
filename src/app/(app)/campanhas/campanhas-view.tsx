@@ -7,8 +7,7 @@ import { formatBRL, formatDateBR, todaySP } from "@/lib/utils";
 import { X } from "lucide-react";
 
 export function CampanhasView({ campanhasList, tiposList }: { campanhasList: any[]; tiposList: { id: number; nome: string; preco: number }[] }) {
-  // Preços do catálogo (centavos), não valores fixos no código.
-  const PRICES: Record<string, number> = Object.fromEntries(tiposList.map((t) => [t.nome, t.preco]));
+  const nomeDoTipo = (id: number) => tiposList.find((t) => t.id === id)?.nome ?? "";
   const [modalOpen, setModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("Todas");
 
@@ -18,7 +17,7 @@ export function CampanhasView({ campanhasList, tiposList }: { campanhasList: any
   const [dataFim, setDataFim] = useState(todaySP());
   const [tStart, setTStart] = useState("08:00");
   const [tEnd, setTEnd] = useState("16:00");
-  const [svcs, setSvcs] = useState<string[]>(tiposList[0] ? [tiposList[0].nome] : []);
+  const [svcs, setSvcs] = useState<number[]>(tiposList[0] ? [tiposList[0].id] : []);
   const [descontoPct, setDescontoPct] = useState("20");
   const [unidades, setUnidades] = useState("30");
   const [error, setError] = useState("");
@@ -27,16 +26,18 @@ export function CampanhasView({ campanhasList, tiposList }: { campanhasList: any
   const previewText =
     svcs.length > 0
       ? "Preço na campanha: " +
-        svcs
-          .map(
-            (k) =>
-              `${k} ${formatBRL(Math.round((PRICES[k] * (100 - discNum)) / 100))}`
-          )
+        tiposList
+          .filter((t) => svcs.includes(t.id))
+          .map((t) => `${t.nome} ${formatBRL(Math.round((t.preco * (100 - discNum)) / 100))}`)
           .join(" · ")
       : "Escolha os serviços e o desconto para ver o preço da campanha.";
 
   async function handleSave() {
     setError("");
+    if (svcs.length === 0) {
+      setError("Escolha pelo menos um tipo de serviço para a campanha.");
+      return;
+    }
     const res = await salvarCampanhaAction({
       nome,
       local: local || `${unidades} unidades · ${tStart} às ${tEnd}`,
@@ -44,6 +45,7 @@ export function CampanhasView({ campanhasList, tiposList }: { campanhasList: any
       dataFim,
       descontoPct: Number(descontoPct),
       unidades: Number(unidades),
+      tiposServicoIds: svcs,
     });
     if (res.error) {
       setError(res.error);
@@ -116,6 +118,9 @@ export function CampanhasView({ campanhasList, tiposList }: { campanhasList: any
                   <td className="p-3">
                     <div className="font-extrabold">{c.nome}</div>
                     <div className="text-xs text-[#3A4658]">{c.local}</div>
+                    <div className="text-xs font-semibold text-[#1B47B5] mt-0.5">
+                      {c.tiposServicoIds?.length ? c.tiposServicoIds.map(nomeDoTipo).filter(Boolean).join(" · ") : "Todo o catálogo"}
+                    </div>
                   </td>
                   <td className="p-3 font-semibold">
                     {formatDateBR(c.dataInicio)} a {formatDateBR(c.dataFim)}
@@ -244,15 +249,15 @@ export function CampanhasView({ campanhasList, tiposList }: { campanhasList: any
                 aria-label="Tipos de serviço disponíveis"
                 className="flex flex-wrap gap-2"
               >
-                {Object.keys(PRICES).map((k) => {
-                  const on = svcs.includes(k);
+                {tiposList.map((t) => {
+                  const on = svcs.includes(t.id);
                   return (
                     <button
-                      key={k}
+                      key={t.id}
                       type="button"
                       onClick={() =>
                         setSvcs(
-                          on ? svcs.filter((x) => x !== k) : [...svcs, k]
+                          on ? svcs.filter((x) => x !== t.id) : [...svcs, t.id]
                         )
                       }
                       aria-pressed={on}
@@ -262,7 +267,7 @@ export function CampanhasView({ campanhasList, tiposList }: { campanhasList: any
                           : "border-[1.5px] border-[#C9D3E0] bg-[#F4F7FB] text-[#0F1720]"
                       }`}
                     >
-                      {k}
+                      {t.nome}
                     </button>
                   );
                 })}

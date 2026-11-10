@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Plus, X } from "lucide-react";
 import { salvarClienteAction, salvarServicoAction } from "@/actions";
 import { centsToInput, formatBRL, todaySP } from "@/lib/utils";
-import { HORARIOS } from "@/lib/agenda";
+import { DURACAO_PADRAO, DURACOES, HORARIOS, formatDuracao, horaDe, minutosDe } from "@/lib/agenda";
 
 export function NovoServicoModal({ clientes, tipos, tecnicos, triggerLabel = "Novo serviço" }: { clientes: any[]; tipos: any[]; tecnicos: any[]; triggerLabel?: string }) {
   const [open, setOpen] = useState(false);
@@ -17,6 +17,7 @@ export function NovoServicoModal({ clientes, tipos, tecnicos, triggerLabel = "No
   const [tecnicoId, setTecnicoId] = useState<number>(tecnicos[0]?.id || 0);
   const [data, setData] = useState<string>(todaySP());
   const [hora, setHora] = useState<string>("08:00");
+  const [duracaoMin, setDuracaoMin] = useState<number>(tipos[0]?.duracaoMin ?? DURACAO_PADRAO);
   const [valorReais, setValorReais] = useState<string>(tipos[0] ? centsToInput(tipos[0].preco) : "");
   const [observacoes, setObservacoes] = useState("");
 
@@ -37,7 +38,7 @@ export function NovoServicoModal({ clientes, tipos, tecnicos, triggerLabel = "No
   async function handleSalvarServico() {
     setError("");
     setLoading(true);
-    const res = await salvarServicoAction({ clienteId, tipoServicoId: tipoId, tecnicoId, data, hora, valorReais, observacoes });
+    const res = await salvarServicoAction({ clienteId, tipoServicoId: tipoId, tecnicoId, data, hora, duracaoMin, valorReais, observacoes });
     setLoading(false);
     if (res.error) { setError(res.error); return; }
     setOpen(false);
@@ -70,8 +71,8 @@ export function NovoServicoModal({ clientes, tipos, tecnicos, triggerLabel = "No
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">
                     Tipo de serviço
-                    <select value={tipoId} onChange={(e) => { const id = Number(e.target.value); setTipoId(id); const f = tipos.find((t) => t.id === id); if (f) setValorReais(centsToInput(f.preco)); }} className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm bg-white">
-                      {tipos.map((t) => <option key={t.id} value={t.id}>{t.nome} ({formatBRL(t.preco)})</option>)}
+                    <select value={tipoId} onChange={(e) => { const id = Number(e.target.value); setTipoId(id); const f = tipos.find((t) => t.id === id); if (f) { setValorReais(centsToInput(f.preco)); setDuracaoMin(f.duracaoMin ?? DURACAO_PADRAO); } }} className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm bg-white">
+                      {tipos.map((t) => <option key={t.id} value={t.id}>{t.nome} ({formatBRL(t.preco)} · {formatDuracao(t.duracaoMin ?? DURACAO_PADRAO)})</option>)}
                     </select>
                   </label>
                   <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">
@@ -81,7 +82,7 @@ export function NovoServicoModal({ clientes, tipos, tecnicos, triggerLabel = "No
                     </select>
                   </label>
                 </div>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">Data<input type="date" value={data} onChange={(e) => setData(e.target.value)} className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm" /></label>
                   <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">
                     Horário
@@ -89,9 +90,16 @@ export function NovoServicoModal({ clientes, tipos, tecnicos, triggerLabel = "No
                       {HORARIOS.map((h) => <option key={h} value={h}>{h}</option>)}
                     </select>
                   </label>
+                  <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">
+                    Duração
+                    <select value={duracaoMin} onChange={(e) => setDuracaoMin(Number(e.target.value))} className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm bg-white">
+                      {DURACOES.map((d) => <option key={d} value={d}>{formatDuracao(d)}</option>)}
+                    </select>
+                  </label>
                   <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">Valor (R$)<input value={valorReais} onChange={(e) => setValorReais(e.target.value)} inputMode="decimal" className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm" /></label>
                 </div>
                 <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">Observações<input value={observacoes} onChange={(e) => setObservacoes(e.target.value)} className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm" /></label>
+                <div className="text-xs font-medium text-[#3A4658]">Ocupa a agenda de {hora} até {horaDe(minutosDe(hora) + duracaoMin)}.</div>
                 {error && <div role="alert" className="bg-[#FDE4E1] text-[#8E1B10] rounded-xl p-3 text-xs font-bold">{error}</div>}
                 <div className="flex justify-end gap-2">
                   <button type="button" onClick={() => setOpen(false)} className="min-h-[48px] border-[1.5px] border-[#0F1720] rounded-full px-5 text-sm font-bold">Cancelar</button>

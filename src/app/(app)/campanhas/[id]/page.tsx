@@ -17,11 +17,14 @@ export default async function CampanhaDetalhePage({ params }: { params: Promise<
     db.select().from(inscricoes).where(eq(inscricoes.campanhaId, campId)),
     db.select().from(tiposServico).orderBy(asc(tiposServico.id)),
   ]);
-  // A campanha não guarda o tipo de serviço: usa "Baratas e formigas" (o mais comum
-  // em condomínio) ou o primeiro do catálogo, com o desconto da campanha, em centavos.
-  const base = tipos.find((t) => t.nome === "Baratas e formigas") ?? tipos[0];
-  const precoBase = base?.preco ?? 24000;
-  const valorComDesconto = Math.round((precoBase * (100 - camp.descontoPct)) / 100);
+  // Serviços oferecidos: os escolhidos na campanha (vazio = todo o catálogo), já com o
+  // desconto da campanha, em centavos.
+  const oferecidos = (camp.tiposServicoIds.length ? tipos.filter((t) => camp.tiposServicoIds.includes(t.id)) : tipos).map((t) => ({
+    id: t.id,
+    nome: t.nome,
+    valorReais: centsToInput(Math.round((t.preco * (100 - camp.descontoPct)) / 100)),
+  }));
+  const nomes = Object.fromEntries(tipos.map((t) => [t.id, t.nome]));
 
-  return <CampanhaDetalheView campanha={camp} inscritos={inscritos} valorSugeridoReais={centsToInput(valorComDesconto)} />;
+  return <CampanhaDetalheView campanha={camp} inscritos={inscritos} oferecidos={oferecidos} nomesTipos={nomes} />;
 }

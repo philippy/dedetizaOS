@@ -1,4 +1,5 @@
 import { pgTable, serial, text, integer, boolean, timestamp, date } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -70,6 +71,8 @@ export const tiposServico = pgTable("tipos_servico", {
   id: serial("id").primaryKey(),
   nome: text("nome").notNull(),
   preco: integer("preco").notNull(),
+  // Tempo que o serviço costuma levar, em minutos. Serve de padrão ao agendar.
+  duracaoMin: integer("duracao_min").notNull().default(60),
 });
 
 export const servicos = pgTable("servicos", {
@@ -79,6 +82,8 @@ export const servicos = pgTable("servicos", {
   tecnicoId: integer("tecnico_id").references(() => tecnicos.id),
   dataHora: text("data_hora").notNull(),
   valor: integer("valor").notNull(),
+  // Duração deste serviço, em minutos (começa igual à do tipo e pode ser ajustada).
+  duracaoMin: integer("duracao_min").notNull().default(60),
   status: text("status", { enum: ["agendado", "concluido", "cancelado"] }).notNull().default("agendado"),
   observacoes: text("observacoes").default(""),
 });
@@ -91,6 +96,8 @@ export const campanhas = pgTable("campanhas", {
   dataFim: date("data_fim", { mode: "string" }).notNull(),
   descontoPct: integer("desconto_pct").notNull().default(20),
   unidades: integer("unidades").notNull(),
+  // Tipos de serviço oferecidos na campanha. Vazio = todo o catálogo.
+  tiposServicoIds: integer("tipos_servico_ids").array().notNull().default(sql`'{}'::integer[]`),
   status: text("status", { enum: ["agendada", "finalizada", "cancelada"] }).notNull().default("agendada"),
 });
 
@@ -98,6 +105,7 @@ export const inscricoes = pgTable("inscricoes", {
   id: serial("id").primaryKey(),
   campanhaId: integer("campanha_id").notNull().references(() => campanhas.id, { onDelete: "cascade" }),
   unidade: text("unidade").notNull(),
+  tipoServicoId: integer("tipo_servico_id").references(() => tiposServico.id, { onDelete: "set null" }),
   morador: text("morador").notNull(),
   telefone: text("telefone").notNull(),
   valor: integer("valor").notNull(),

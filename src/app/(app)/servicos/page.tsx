@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export default async function ServicosPage() {
   const [servicosList, tiposList, tecnicosList] = await Promise.all([
-    db.select({ id: servicos.id, clienteNome: clientes.nome, tipoNome: tiposServico.nome, tecnicoId: servicos.tecnicoId, tecnicoNome: tecnicos.nome, dataHora: servicos.dataHora, valor: servicos.valor, status: servicos.status })
+    db.select({ id: servicos.id, clienteNome: clientes.nome, tipoNome: tiposServico.nome, tecnicoId: servicos.tecnicoId, tecnicoNome: tecnicos.nome, dataHora: servicos.dataHora, duracaoMin: servicos.duracaoMin, valor: servicos.valor, status: servicos.status })
       .from(servicos).innerJoin(clientes, eq(servicos.clienteId, clientes.id)).innerJoin(tiposServico, eq(servicos.tipoServicoId, tiposServico.id)).leftJoin(tecnicos, eq(servicos.tecnicoId, tecnicos.id)),
     db.select().from(tiposServico),
     db.select().from(tecnicos),

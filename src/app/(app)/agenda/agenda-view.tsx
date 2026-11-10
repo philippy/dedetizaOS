@@ -9,8 +9,8 @@ import {
   alternarAtivoTecnicoAction,
   excluirTecnicoAction,
 } from "@/actions";
-import { addDaysISO, centsToInput, formatBRL, formatDateBR } from "@/lib/utils";
-import { DURACAO_MIN, HORARIOS, distribuirFaixas, horaDe, inicioDaSemana, minutosDe } from "@/lib/agenda";
+import { addDaysISO, centsToInput, formatBRL, formatDateBR, parseBRLToCents } from "@/lib/utils";
+import { DURACAO_PADRAO, DURACOES, HORARIOS, distribuirFaixas, formatDuracao, horaDe, inicioDaSemana, minutosDe } from "@/lib/agenda";
 import { Plus, X } from "lucide-react";
 
 const SWATCHES = ["#2F5FE0", "#0F1720", "#4A5B78", "#14653A", "#7A4B00"];
@@ -27,6 +27,7 @@ type Servico = {
   tecnicoNome: string | null;
   tecnicoCor: string | null;
   dataHora: string;
+  duracaoMin: number;
   valor: number;
   status: "agendado" | "concluido" | "cancelado";
   observacoes: string | null;
@@ -45,7 +46,7 @@ function faixaDeHoras(itens: Servico[]) {
   for (const s of itens) {
     const m = minutosDe(s.dataHora);
     ini = Math.min(ini, Math.floor(m / 60));
-    fim = Math.max(fim, Math.ceil((m + DURACAO_MIN) / 60));
+    fim = Math.max(fim, Math.ceil((m + s.duracaoMin) / 60));
   }
   return Array.from({ length: fim - ini }, (_, i) => ini + i);
 }
@@ -61,7 +62,7 @@ export function AgendaView({
   servicosList: Servico[];
   tecnicosList: { id: number; nome: string; telefone: string; cor: string; ativo: boolean }[];
   clientesList: { id: number; nome: string; tipo: "PF" | "PJ" }[];
-  tiposList: { id: number; nome: string; preco: number }[];
+  tiposList: { id: number; nome: string; preco: number; duracaoMin: number }[];
 }) {
   const [selectedDate, setSelectedDate] = useState(initialDate);
   const [viewMode, setViewMode] = useState<Modo>("timeline");
@@ -76,6 +77,7 @@ export function AgendaView({
   const [tecnicoId, setTecnicoId] = useState<number>(tecnicosList[0]?.id || 0);
   const [data, setData] = useState<string>(initialDate);
   const [hora, setHora] = useState<string>("08:00");
+  const [duracaoMin, setDuracaoMin] = useState<number>(DURACAO_PADRAO);
   const [valorReais, setValorReais] = useState<string>("240,00");
   const [observacoes, setObservacoes] = useState<string>("");
   const [statusAtual, setStatusAtual] = useState<string>("agendado");
@@ -115,6 +117,10 @@ export function AgendaView({
     return t ? centsToInput(t.preco) : "";
   }
 
+  function duracaoDoTipo(id: number) {
+    return tiposList.find((x) => x.id === id)?.duracaoMin ?? DURACAO_PADRAO;
+  }
+
   function openNewAt(techId: number, dia: string, h: number) {
     setSvcError("");
     setConfirmarCancelar(false);
@@ -125,6 +131,7 @@ export function AgendaView({
     setData(dia);
     setHora(pad(h) + ":00");
     setValorReais(tiposList[0] ? centsToInput(tiposList[0].preco) : "");
+    setDuracaoMin(tiposList[0]?.duracaoMin ?? DURACAO_PADRAO);
     setObservacoes("");
     setStatusAtual("agendado");
     setModalOpen(true);
@@ -140,6 +147,7 @@ export function AgendaView({
     setData(s.dataHora.slice(0, 10));
     setHora(s.dataHora.slice(11, 16));
     setValorReais(centsToInput(s.valor));
+    setDuracaoMin(s.duracaoMin);
     setObservacoes(s.observacoes || "");
     setStatusAtual(s.status);
     setModalOpen(true);
@@ -148,13 +156,19 @@ export function AgendaView({
   async function handleSaveService() {
     setSvcError("");
     setSalvando(true);
-    const res = await salvarServicoAction({ id: editingId, clienteId, tipoServicoId: tipoId, tecnicoId, data, hora, valorReais, observacoes });
+    const res = await salvarServicoAction({ id: editingId, clienteId, tipoServicoId: tipoId, tecnicoId, data, hora, duracaoMin, valorReais, observacoes });
     setSalvando(false);
     if (res.error) {
       setSvcError(res.error);
       return;
     }
-    setAviso({ texto: editingId ? "Serviço atualizado." : `Serviço agendado para ${formatDateBR(data).slice(0, 5)} às ${hora}.`, ok: true });
+    const contaAtualizada = "contaAtualizada" in res && res.contaAtualizada;
+    setAviso({
+      texto: editingId
+        ? `Serviço atualizado${contaAtualizada ? `. A conta a receber em aberto foi ajustada para ${formatBRL(parseBRLToCents(valorReais))}` : ""}.`
+        : `Serviço agendado para ${formatDateBR(data).slice(0, 5)} às ${hora}, até ${horaDe(minutosDe(hora) + duracaoMin)}.`,
+      ok: true,
+    });
     setModalOpen(false);
   }
 
@@ -234,13 +248,13 @@ export function AgendaView({
     ? `Semana de ${formatDateBR(diasSemana[0]).slice(0, 5)} a ${formatDateBR(diasSemana[6]).slice(0, 5)} · ${weekServices.length} serviços · ${weekServices.filter((s) => s.status === "concluido").length} concluídos · ${weekServices.filter((s) => s.status === "agendado").length} agendados`
     : `${dayTitle} · ${dayServices.length} serviços · ${doneCount} concluídos · ${schedCount} agendados`;
 
-  // Cartão de serviço posicionado pelo minuto de início, com 1 h de altura.
+  // Cartão de serviço posicionado pelo minuto de início, com altura proporcional à duração.
   function Cartao({ s, horaIni, faixa = 0, faixas = 1, mostrarTecnico = false }: { s: Servico; horaIni: number; faixa?: number; faixas?: number; mostrarTecnico?: boolean }) {
     const ini = minutosDe(s.dataHora);
     const top = ((ini - horaIni * 60) / 60) * PX_HORA + 2;
     const isDone = s.status === "concluido";
     const largura = 100 / faixas;
-    const faixaHora = `${horaDe(ini)} – ${horaDe(ini + DURACAO_MIN)}`;
+    const faixaHora = `${horaDe(ini)} – ${horaDe(ini + s.duracaoMin)}`;
     return (
       <button
         type="button"
@@ -248,7 +262,7 @@ export function AgendaView({
         aria-label={`${faixaHora}, ${s.clienteNome}, ${s.tipoNome}${s.tecnicoNome ? `, ${s.tecnicoNome}` : ""}, ${isDone ? "concluído" : "agendado"}`}
         style={{
           top: top + "px",
-          height: (DURACAO_MIN / 60) * PX_HORA - 4 + "px",
+          height: Math.max(26, (s.duracaoMin / 60) * PX_HORA - 4) + "px",
           left: `calc(${faixa * largura}% + 4px)`,
           width: `calc(${largura}% - 8px)`,
           ...(mostrarTecnico && s.tecnicoCor ? { borderLeftColor: s.tecnicoCor, borderLeftWidth: 5 } : {}),
@@ -425,10 +439,10 @@ export function AgendaView({
                         </div>
                         <div className="text-[15px] font-extrabold text-[#0F1720] truncate">{tech.nome}</div>
                       </div>
-                      <div className="text-xs font-bold text-[#3A4658] shrink-0">{mine.length} h de {horasDia.length} h</div>
+                      <div className="text-xs font-bold text-[#3A4658] shrink-0">{formatDuracao(mine.reduce((t, s) => t + s.duracaoMin, 0))} de {horasDia.length} h</div>
                     </div>
                     <Grade horas={horasDia} onSlot={(h) => openNewAt(tech.id, selectedDate, h)}>
-                      {distribuirFaixas(mine.map((s) => ({ ...s, inicio: minutosDe(s.dataHora) }))).map((s) => (
+                      {distribuirFaixas(mine.map((s) => ({ ...s, inicio: minutosDe(s.dataHora), duracao: s.duracaoMin }))).map((s) => (
                         <Cartao key={s.id} s={s} horaIni={horasDia[0]} faixa={s.faixa} faixas={s.faixas} />
                       ))}
                     </Grade>
@@ -479,7 +493,7 @@ export function AgendaView({
                       </span>
                     </button>
                     <Grade horas={horasSemana} onSlot={(h) => openNewAt(techFilter || tecnicosAtivos[0]?.id || 0, dia, h)}>
-                      {distribuirFaixas(doDia.map((s) => ({ ...s, inicio: minutosDe(s.dataHora) }))).map((s) => (
+                      {distribuirFaixas(doDia.map((s) => ({ ...s, inicio: minutosDe(s.dataHora), duracao: s.duracaoMin }))).map((s) => (
                         <Cartao key={s.id} s={s} horaIni={horasSemana[0]} faixa={s.faixa} faixas={s.faixas} mostrarTecnico />
                       ))}
                     </Grade>
@@ -547,11 +561,11 @@ export function AgendaView({
                 Tipo de serviço
                 <select
                   value={tipoId}
-                  onChange={(e) => { const id = Number(e.target.value); setTipoId(id); setValorReais(precoDoTipo(id)); }}
+                  onChange={(e) => { const id = Number(e.target.value); setTipoId(id); if (statusAtual !== "concluido") { setValorReais(precoDoTipo(id)); } setDuracaoMin(duracaoDoTipo(id)); }}
                   className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm text-[#0F1720] bg-white"
                 >
                   {tiposList.map((t) => (
-                    <option key={t.id} value={t.id}>{t.nome} ({formatBRL(t.preco)})</option>
+                    <option key={t.id} value={t.id}>{t.nome} ({formatBRL(t.preco)} · {formatDuracao(t.duracaoMin)})</option>
                   ))}
                 </select>
               </label>
@@ -565,7 +579,7 @@ export function AgendaView({
               </label>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <label className="flex flex-col gap-1.5 text-xs font-bold text-[#3A4658]">
                 Dia
                 <input type="date" value={data} onChange={(e) => setData(e.target.value)} className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm text-[#0F1720]" />
@@ -575,6 +589,14 @@ export function AgendaView({
                 <select value={hora} onChange={(e) => setHora(e.target.value)} className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm text-[#0F1720] bg-white">
                   {(HORARIOS.includes(hora) ? HORARIOS : [hora, ...HORARIOS]).map((hs) => (
                     <option key={hs} value={hs}>{hs}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="flex flex-col gap-1.5 text-xs font-bold text-[#3A4658]">
+                Duração
+                <select value={duracaoMin} onChange={(e) => setDuracaoMin(Number(e.target.value))} className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm text-[#0F1720] bg-white">
+                  {(DURACOES.includes(duracaoMin) ? DURACOES : [duracaoMin, ...DURACOES]).map((d) => (
+                    <option key={d} value={d}>{formatDuracao(d)}</option>
                   ))}
                 </select>
               </label>
@@ -589,7 +611,10 @@ export function AgendaView({
               <input value={observacoes} onChange={(e) => setObservacoes(e.target.value)} placeholder="Instruções para o técnico..." className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm text-[#0F1720]" />
             </label>
 
-            <div className="text-xs font-medium text-[#3A4658]">Cada serviço ocupa 1 hora na agenda.</div>
+            <div className="text-xs font-medium text-[#3A4658]">
+              Ocupa a agenda de {hora} até {horaDe(minutosDe(hora) + duracaoMin)}. A duração começa igual à do tipo de serviço e pode ser ajustada.
+              {editingId && statusAtual === "concluido" && " Este serviço já foi concluído: mudar o valor ou o cliente também muda a conta a receber, enquanto ela estiver em aberto."}
+            </div>
 
             {svcError && (
               <div role="alert" className="bg-[#FDE4E1] text-[#8E1B10] rounded-[14px] px-3.5 py-2.5 text-xs font-bold">{svcError}</div>
