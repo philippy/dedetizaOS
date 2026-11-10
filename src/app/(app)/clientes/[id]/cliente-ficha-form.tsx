@@ -12,6 +12,7 @@ export function ClienteFichaForm({ cliente }: { cliente: any }) {
   const [endereco, setEndereco] = useState(cliente.endereco || "");
   const [observacoes, setObservacoes] = useState(cliente.observacoes || "");
   const [msg, setMsg] = useState("");
+  const [erro, setErro] = useState("");
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -25,7 +26,13 @@ export function ClienteFichaForm({ cliente }: { cliente: any }) {
       endereco,
       observacoes,
     });
-    if (!res.error) setMsg("Dados de " + nome + " salvos com sucesso!");
+    if (res.error) {
+      setMsg("");
+      setErro(res.error);
+      return;
+    }
+    setErro("");
+    setMsg("Dados de " + nome + " salvos com sucesso!");
   }
 
   return (
@@ -34,6 +41,11 @@ export function ClienteFichaForm({ cliente }: { cliente: any }) {
       className="bg-white rounded-[24px] p-5 shadow-sm flex flex-col gap-3.5"
     >
       <h2 className="text-[17px] font-extrabold">Dados do cliente</h2>
+      {erro && (
+        <div role="alert" className="bg-[#FDE4E1] text-[#8E1B10] rounded-xl p-2.5 text-xs font-bold">
+          {erro}
+        </div>
+      )}
       {msg && (
         <div className="bg-[#DDF3E4] text-[#14653A] rounded-xl p-2.5 text-xs font-bold">
           {msg}

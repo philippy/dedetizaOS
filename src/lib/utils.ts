@@ -65,6 +65,24 @@ export function addDaysISO(isoDate: string, days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
+// Soma meses a uma data ISO. Se o dia não existe no mês de destino, usa o último dia dele
+// (31/08 + 6 meses = 28/02, e não 03/03).
+export function addMonthsISO(isoDate: string, months: number): string {
+  const [y, m, d] = isoDate.slice(0, 10).split("-").map((x) => parseInt(x, 10));
+  const total = y * 12 + (m - 1) + months;
+  const ny = Math.floor(total / 12);
+  const nm = total % 12;
+  const ultimoDia = new Date(Date.UTC(ny, nm + 1, 0, 12)).getUTCDate();
+  return `${ny}-${String(nm + 1).padStart(2, "0")}-${String(Math.min(d, ultimoDia)).padStart(2, "0")}`;
+}
+
+// Dias entre duas datas ISO (b - a). Positivo quando b é depois de a.
+export function diffDaysISO(a: string, b: string): number {
+  const da = Date.UTC(+a.slice(0, 4), +a.slice(5, 7) - 1, +a.slice(8, 10));
+  const db = Date.UTC(+b.slice(0, 4), +b.slice(5, 7) - 1, +b.slice(8, 10));
+  return Math.round((db - da) / 86400000);
+}
+
 export function formatDateBR(isoDate?: string | null): string {
   if (!isoDate) return "—";
   const clean = isoDate.slice(0, 10);
