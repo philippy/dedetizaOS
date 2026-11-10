@@ -42,17 +42,50 @@ export function FinanceiroView({ today, lancamentosList }: { today: string; lanc
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-[28px] font-extrabold">Financeiro</h1>
-        <button onClick={() => setNewOpen(true)} className="min-h-[48px] rounded-full bg-[#2F5FE0] text-white px-6 text-sm font-bold">+ Novo lançamento a pagar</button>
+        <div>
+          <h1 className="text-[28px] font-extrabold">Financeiro</h1>
+          <div className="text-sm font-semibold text-[#3A4658] mt-1">
+            Contas a receber e a pagar da Dedetizadora Impacto.
+          </div>
+        </div>
+        <button
+          onClick={() => setNewOpen(true)}
+          className="min-h-[48px] rounded-full bg-[#2F5FE0] text-white px-6 text-sm font-bold"
+        >
+          + Novo lançamento a pagar
+        </button>
       </div>
 
       <section className="bg-white rounded-[24px] p-4 shadow-sm flex flex-wrap items-end gap-3">
-        <label className="flex flex-col gap-1 text-xs font-bold">De<input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="h-11 border rounded-xl px-3 text-sm" /></label>
-        <label className="flex flex-col gap-1 text-xs font-bold">Até<input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="h-11 border rounded-xl px-3 text-sm" /></label>
-        <label className="flex flex-col gap-1 text-xs font-bold">
-          Status
-          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className="h-11 border rounded-xl px-3 text-sm bg-white">
-            <option value="Todas">Todas</option><option value="Em aberto">Em aberto</option><option value="Vencidas">Vencidas</option><option value="Pagas">Pagas</option>
+        <label className="flex flex-col gap-1.5 text-xs font-bold text-[#3A4658]">
+          De
+          <input
+            type="date"
+            value={from}
+            onChange={(e) => setFrom(e.target.value)}
+            className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm"
+          />
+        </label>
+        <label className="flex flex-col gap-1.5 text-xs font-bold text-[#3A4658]">
+          Até
+          <input
+            type="date"
+            value={to}
+            onChange={(e) => setTo(e.target.value)}
+            className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm"
+          />
+        </label>
+        <label className="flex flex-col gap-1.5 text-xs font-bold text-[#3A4658]">
+          Situação
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm bg-white"
+          >
+            <option value="Todas">Todas</option>
+            <option value="Em aberto">Em aberto</option>
+            <option value="Vencidas">Vencidas</option>
+            <option value="Pagas">Pagas</option>
           </select>
         </label>
       </section>
@@ -60,90 +93,279 @@ export function FinanceiroView({ today, lancamentosList }: { today: string; lanc
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <section className="bg-white rounded-[24px] shadow-sm overflow-hidden flex flex-col">
           <div className="flex items-center justify-between px-5 py-3.5 bg-[#DDF3E4] text-[#14653A] font-extrabold">
-            <span>A receber</span><span className="inline-flex items-center gap-1 text-xs"><ArrowDownLeft className="w-4 h-4" /> Entrada</span>
+            <span>A receber</span>
+            <span className="inline-flex items-center gap-1 text-xs">
+              <ArrowDownLeft className="w-4 h-4" /> Entrada
+            </span>
           </div>
           <div className="p-5 flex-1 flex flex-col gap-2">
             {recList.map((r) => (
               <div key={r.id} className="flex items-center justify-between py-2.5 border-b">
                 <div>
                   <div className="text-sm font-extrabold">{r.descricao}</div>
-                  <div className="text-xs text-[#3A4658]">Vence {formatDateBR(r.vencimento)}</div>
+                  <div className="text-xs text-[#3A4658]">
+                    Vence {formatDateBR(r.vencimento)}
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-extrabold text-[#14653A]">{formatBRL(r.valor)}</span>
+                  <span className="text-sm font-extrabold text-[#14653A]">
+                    {formatBRL(r.valor)}
+                  </span>
                   {r.status === "aberto" ? (
-                    <button onClick={() => { setBaixaItem(r); setPagoEm(today); setValorPagoReais(String(r.valor / 100)); }} className="min-h-[38px] rounded-full border border-[#0F1720] px-3 text-xs font-bold">Dar baixa</button>
-                  ) : <span className="text-xs font-bold text-[#14653A] bg-[#DDF3E4] px-2.5 py-1 rounded-full">Pago</span>}
+                    <button
+                      onClick={() => {
+                        setBaixaItem(r);
+                        setPagoEm(today);
+                        setValorPagoReais(String(r.valor / 100));
+                      }}
+                      className="min-h-[38px] rounded-full border-[1.5px] border-[#0F1720] px-3 text-xs font-bold"
+                    >
+                      Dar baixa
+                    </button>
+                  ) : (
+                    <span className="text-xs font-bold text-[#14653A] bg-[#DDF3E4] px-2.5 py-1 rounded-full">
+                      Recebido
+                    </span>
+                  )}
                 </div>
               </div>
             ))}
           </div>
           <div className="mx-5 border-t-2 border-[#0F1720] py-3 text-xs font-bold flex justify-between">
-            <span>Total: {formatBRL(recTotal)}</span><span>Recebido: {formatBRL(recDone)}</span>
+            <span>Total: {formatBRL(recTotal)}</span>
+            <span>Recebido: {formatBRL(recDone)}</span>
           </div>
         </section>
 
         <section className="bg-white rounded-[24px] shadow-sm overflow-hidden flex flex-col">
           <div className="flex items-center justify-between px-5 py-3.5 bg-[#FDE4E1] text-[#8E1B10] font-extrabold">
-            <span>A pagar</span><span className="inline-flex items-center gap-1 text-xs"><ArrowUpRight className="w-4 h-4" /> Saída</span>
+            <span>A pagar</span>
+            <span className="inline-flex items-center gap-1 text-xs">
+              <ArrowUpRight className="w-4 h-4" /> Saída
+            </span>
           </div>
           <div className="p-5 flex-1 flex flex-col gap-2">
             {payList.map((p) => (
               <div key={p.id} className="flex items-center justify-between py-2.5 border-b">
                 <div>
-                  <div className="text-sm font-extrabold">{p.fornecedor} · {p.descricao}</div>
-                  <div className="text-xs text-[#3A4658]">Vence {formatDateBR(p.vencimento)}</div>
+                  <div className="text-sm font-extrabold">
+                    {p.fornecedor} · {p.descricao}
+                  </div>
+                  <div className="text-xs text-[#3A4658]">
+                    Vence {formatDateBR(p.vencimento)}
+                  </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-extrabold text-[#8E1B10]">{formatBRL(p.valor)}</span>
+                  <span className="text-sm font-extrabold text-[#8E1B10]">
+                    {formatBRL(p.valor)}
+                  </span>
                   {p.status === "aberto" ? (
                     <>
-                      <button onClick={() => { setBaixaItem(p); setPagoEm(today); setValorPagoReais(String(p.valor / 100)); }} className="min-h-[38px] rounded-full border border-[#0F1720] px-3 text-xs font-bold">Dar baixa</button>
-                      <button onClick={() => excluirLancamentoAction(p.id)} className="text-[#8E1B10] font-bold px-2">×</button>
+                      <button
+                        onClick={() => {
+                          setBaixaItem(p);
+                          setPagoEm(today);
+                          setValorPagoReais(String(p.valor / 100));
+                        }}
+                        className="min-h-[38px] rounded-full border-[1.5px] border-[#0F1720] px-3 text-xs font-bold"
+                      >
+                        Dar baixa
+                      </button>
+                      <button
+                        onClick={() => excluirLancamentoAction(p.id)}
+                        className="text-[#8E1B10] font-bold px-2"
+                      >
+                        ×
+                      </button>
                     </>
-                  ) : <span className="text-xs font-bold text-[#14653A] bg-[#DDF3E4] px-2.5 py-1 rounded-full">Pago</span>}
+                  ) : (
+                    <span className="text-xs font-bold text-[#14653A] bg-[#DDF3E4] px-2.5 py-1 rounded-full">
+                      Pago
+                    </span>
+                  )}
                 </div>
               </div>
             ))}
           </div>
           <div className="mx-5 border-t-2 border-[#0F1720] py-3 text-xs font-bold flex justify-between">
-            <span>Total: {formatBRL(payTotal)}</span><span>Pago: {formatBRL(payDone)}</span>
+            <span>Total: {formatBRL(payTotal)}</span>
+            <span>Pago: {formatBRL(payDone)}</span>
           </div>
         </section>
       </div>
 
       <section className="bg-[#0F1720] text-white rounded-[24px] p-5 flex flex-wrap justify-between gap-4">
-        <div><div className="text-xs text-[#C9D3E0]">Saldo previsto</div><div className="text-2xl font-extrabold">{formatBRL(recTotal - payTotal)}</div></div>
-        <div><div className="text-xs text-[#C9D3E0]">Saldo realizado</div><div className="text-2xl font-extrabold">{formatBRL(recDone - payDone)}</div></div>
+        <div>
+          <div className="text-xs text-[#C9D3E0]">
+            Saldo previsto do período (a receber − a pagar)
+          </div>
+          <div className="text-2xl font-extrabold">
+            {formatBRL(recTotal - payTotal)}
+          </div>
+        </div>
+        <div>
+          <div className="text-xs text-[#C9D3E0]">
+            Saldo realizado (recebido − pago)
+          </div>
+          <div className="text-2xl font-extrabold">
+            {formatBRL(recDone - payDone)}
+          </div>
+        </div>
       </section>
 
       {newOpen && (
         <div className="fixed inset-0 z-50 bg-[#0F1720]/55 flex items-start justify-center p-4 pt-16">
-          <div className="w-full max-w-md bg-white rounded-[28px] p-6 flex flex-col gap-3">
-            <div className="flex justify-between items-center"><h2 className="text-xl font-extrabold">Nova conta a pagar</h2><button onClick={() => setNewOpen(false)}><X className="w-5 h-5" /></button></div>
-            <input value={fornecedor} onChange={(e) => setFornecedor(e.target.value)} placeholder="Fornecedor" className="h-11 border rounded-xl px-3 text-sm" />
-            <input value={descricao} onChange={(e) => setDescricao(e.target.value)} placeholder="Descrição" className="h-11 border rounded-xl px-3 text-sm" />
-            <div className="grid grid-cols-2 gap-2">
-              <input type="date" value={vencimento} onChange={(e) => setVencimento(e.target.value)} className="h-11 border rounded-xl px-3 text-sm" />
-              <input value={valorReais} onChange={(e) => setValorReais(e.target.value)} placeholder="Valor (R$)" className="h-11 border rounded-xl px-3 text-sm" />
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="w-full max-w-md bg-white rounded-[28px] p-6 flex flex-col gap-3.5 text-[#0F1720]"
+          >
+            <div className="flex justify-between items-center">
+              <h2 className="text-[22px] font-extrabold">Nova conta a pagar</h2>
+              <button
+                onClick={() => setNewOpen(false)}
+                className="w-11 h-11 rounded-full bg-[#E8ECF2] flex items-center justify-center"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
-            <button onClick={async () => { await criarLancamentoPagarAction({ fornecedor, descricao, vencimento, valorReais }); setNewOpen(false); }} className="min-h-[44px] rounded-full bg-[#2F5FE0] text-white font-bold text-sm">Salvar</button>
+
+            <label className="flex flex-col gap-1.5 text-xs font-bold text-[#3A4658]">
+              Fornecedor
+              <input
+                value={fornecedor}
+                onChange={(e) => setFornecedor(e.target.value)}
+                placeholder="Ex.: Aliança Químicos"
+                className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3.5 text-sm"
+              />
+            </label>
+
+            <label className="flex flex-col gap-1.5 text-xs font-bold text-[#3A4658]">
+              Descrição
+              <input
+                value={descricao}
+                onChange={(e) => setDescricao(e.target.value)}
+                placeholder="Ex.: Reposição de produtos químicos"
+                className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3.5 text-sm"
+              />
+            </label>
+
+            <div className="grid grid-cols-2 gap-3">
+              <label className="flex flex-col gap-1.5 text-xs font-bold text-[#3A4658]">
+                Data de vencimento
+                <input
+                  type="date"
+                  value={vencimento}
+                  onChange={(e) => setVencimento(e.target.value)}
+                  className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm"
+                />
+              </label>
+
+              <label className="flex flex-col gap-1.5 text-xs font-bold text-[#3A4658]">
+                Valor (R$)
+                <input
+                  value={valorReais}
+                  onChange={(e) => setValorReais(e.target.value)}
+                  placeholder="1280"
+                  className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm"
+                />
+              </label>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setNewOpen(false)}
+                className="min-h-[48px] border-[1.5px] border-[#0F1720] rounded-full px-5 text-sm font-bold"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  await criarLancamentoPagarAction({
+                    fornecedor,
+                    descricao,
+                    vencimento,
+                    valorReais,
+                  });
+                  setNewOpen(false);
+                }}
+                className="min-h-[48px] rounded-full bg-[#2F5FE0] text-white px-6 font-bold text-sm"
+              >
+                Salvar lançamento
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {baixaItem && (
         <div className="fixed inset-0 z-50 bg-[#0F1720]/55 flex items-start justify-center p-4 pt-16">
-          <div className="w-full max-w-md bg-white rounded-[28px] p-6 flex flex-col gap-3">
-            <h2 className="text-xl font-extrabold">Confirmar baixa</h2>
-            <div className="text-xs font-bold bg-[#F4F7FB] p-3 rounded-xl">{baixaItem.descricao}</div>
-            <div className="grid grid-cols-2 gap-2">
-              <input type="date" value={pagoEm} onChange={(e) => setPagoEm(e.target.value)} className="h-11 border rounded-xl px-3 text-sm" />
-              <input value={valorPagoReais} onChange={(e) => setValorPagoReais(e.target.value)} className="h-11 border rounded-xl px-3 text-sm" />
+          <div
+            role="dialog"
+            aria-modal="true"
+            className="w-full max-w-md bg-white rounded-[28px] p-6 flex flex-col gap-3.5 text-[#0F1720]"
+          >
+            <div className="flex justify-between items-center">
+              <h2 className="text-[22px] font-extrabold">Confirmar baixa</h2>
+              <button
+                onClick={() => setBaixaItem(null)}
+                className="w-11 h-11 rounded-full bg-[#E8ECF2] flex items-center justify-center"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
-            <div className="flex justify-end gap-2">
-              <button onClick={() => setBaixaItem(null)} className="min-h-[44px] border rounded-full px-4 text-xs font-bold">Cancelar</button>
-              <button onClick={async () => { await darBaixaLancamentoAction({ lancamentoId: baixaItem.id, pagoEm, valorPagoReais }); setBaixaItem(null); }} className="min-h-[44px] rounded-full bg-[#14653A] text-white px-5 text-xs font-bold">Confirmar</button>
+
+            <div className="text-xs font-bold bg-[#F4F7FB] p-3.5 rounded-xl">
+              {baixaItem.fornecedor
+                ? `${baixaItem.fornecedor} · ${baixaItem.descricao}`
+                : baixaItem.descricao}
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <label className="flex flex-col gap-1.5 text-xs font-bold text-[#3A4658]">
+                Data do pagamento
+                <input
+                  type="date"
+                  value={pagoEm}
+                  onChange={(e) => setPagoEm(e.target.value)}
+                  className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm"
+                />
+              </label>
+
+              <label className="flex flex-col gap-1.5 text-xs font-bold text-[#3A4658]">
+                Valor pago (R$)
+                <input
+                  value={valorPagoReais}
+                  onChange={(e) => setValorPagoReais(e.target.value)}
+                  className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3 text-sm"
+                />
+              </label>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-1">
+              <button
+                type="button"
+                onClick={() => setBaixaItem(null)}
+                className="min-h-[48px] border-[1.5px] border-[#0F1720] rounded-full px-5 text-sm font-bold"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  await darBaixaLancamentoAction({
+                    lancamentoId: baixaItem.id,
+                    pagoEm,
+                    valorPagoReais,
+                  });
+                  setBaixaItem(null);
+                }}
+                className="min-h-[48px] rounded-full bg-[#14653A] text-white px-6 text-sm font-bold"
+              >
+                Confirmar baixa
+              </button>
             </div>
           </div>
         </div>

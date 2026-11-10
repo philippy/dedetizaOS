@@ -341,3 +341,103 @@ export async function marcarInscricaoPagaAction(inscricaoId: number) {
   revalidatePath("/");
   return { success: true };
 }
+
+
+// --- GESTÃO DE TÉCNICOS E DEDUPLICAÇÃO ---
+export async function limparDuplicadosAction() {
+  try {
+    await sqlClient`
+      DELETE FROM "servicos" a USING "servicos" b
+      WHERE a.id > b.id
+        AND a.cliente_id = b.cliente_id
+        AND a.data_hora = b.data_hora;
+    `;
+    await sqlClient`
+      DELETE FROM "tecnicos" a USING "tecnicos" b
+      WHERE a.id > b.id AND LOWER(a.nome) = LOWER(b.nome);
+    `;
+    await sqlClient`
+      DELETE FROM "tipos_servico" a USING "tipos_servico" b
+      WHERE a.id > b.id AND LOWER(a.nome) = LOWER(b.nome);
+    `;
+  } catch (e) {
+    console.error("Erro ao limpar duplicados:", e);
+  }
+}
+
+export async function salvarTecnicoAction(input: {
+  nome: string;
+  telefone: string;
+  cor: string;
+}) {
+  const nm = (input.nome || "").trim();
+  if (!nm) return { error: "Informe o nome do técnico." };
+
+  const existentes = await db.select().from(tecnicos);
+  if (existentes.some((t) => t.nome.toLowerCase() === nm.toLowerCase())) {
+    return { error: "Já existe um técnico com esse nome." };
+  }
+
+  await db.insert(tecnicos).values({
+    nome: nm,
+    telefone: (input.telefone || "").trim() || "sem telefone",
+    cor: input.cor || "#2F5FE0",
+    ativo: true,
+  });
+
+  revalidatePath("/agenda");
+  revalidatePath("/servicos");
+  revalidatePath("/");
+  return { success: true };
+}
+
+export async function alternarAtivoTecnicoAction(tecnicoId: number) {
+  const [tech] = await db.select().from(tecnicos).where(eq(tecnicos.id, tecnicoId));
+  if (!tech) return { error: "Técnico não encontrado." };
+
+  if (tech.ativo) {
+    const pendentes = await db
+      .select()
+      .from(servicos)
+      .where(and(eq(servicos.tecnicoId, tecnicoId), eq(servicos.status, "agendado")));
+    if (pendentes.length > 0) {
+      return {
+        error: `${tech.nome} tem ${pendentes.length} serviço(s) agendado(s). Reagende ou conclua antes de desativar.`,
+      };
+    }
+  }
+
+  await db
+    .update(tecnicos)
+    .set({ ativo: !tech.ativo })
+    .where(eq(tecnicos.id, tecnicoId));
+
+  revalidatePath("/agenda");
+  revalidatePath("/servicos");
+  revalidatePath("/");
+  return { success: true, ativo: !tech.ativo, nome: tech.nome };
+}
+
+export async function excluirTecnicoAction(tecnicoId: number) {
+  const [tech] = await db.select().from(tecnicos).where(eq(tecnicos.id, tecnicoId));
+  if (!tech) return { error: "Técnico não encontrado." };
+
+  const vinculados = await db
+    .select()
+    .from(servicos)
+    .where(and(eq(servicos.tecnicoId, tecnicoId), eq(servicos.status, "agendado")));
+
+  if (vinculados.length > 0) {
+    return {
+      error: `${tech.nome} possui ${vinculados.length} serviço(s) agendado(s). Reagende antes de remover.`,
+    };
+  }
+
+  await db.update(servicos).set({ tecnicoId: null }).where(eq(servicos.tecnicoId, tecnicoId));
+  await db.delete(tecnicos).where(eq(tecnicos.id, tecnicoId));
+
+  revalidatePath("/agenda");
+  revalidatePath("/servicos");
+  revalidatePath("/");
+  return { success: true };
+}
