@@ -2,13 +2,11 @@ import { db } from "@/db";
 import { servicos, clientes, tiposServico, tecnicos } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { todaySP } from "@/lib/utils";
-import { limparDuplicadosAction } from "@/actions";
 import { AgendaView } from "./agenda-view";
 
 export const dynamic = "force-dynamic";
 
 export default async function AgendaPage() {
-  await limparDuplicadosAction();
 
   const [servicosList, tecnicosList, clientesList, tiposList] = await Promise.all([
     db

@@ -1,15 +1,26 @@
+import { createHash } from "crypto";
 import { betterAuth } from "better-auth";
+import { APIError } from "better-auth/api";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "@/db";
 import * as schema from "@/db/schema";
 
+// Sem BETTER_AUTH_SECRET configurado, deriva a chave de um valor que só existe no
+// ambiente (a URL do banco), em vez de usar uma chave escrita no código.
+// O ideal é configurar BETTER_AUTH_SECRET na Vercel.
+function resolveSecret() {
+  if (process.env.BETTER_AUTH_SECRET) return process.env.BETTER_AUTH_SECRET;
+  const base = process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.DATABASE_URL_UNPOOLED || "";
+  return createHash("sha256").update(`detetiza-os:${base}`).digest("hex");
+}
+
 export const auth = betterAuth({
-  secret: process.env.BETTER_AUTH_SECRET || "detetiza_impacto_secret_default_2026_key_998877",
+  secret: resolveSecret(),
   baseURL: process.env.BETTER_AUTH_URL || (process.env.VERCEL_URL ? "https://" + process.env.VERCEL_URL : "https://dedetiza-os.vercel.app"),
   trustedOrigins: [
     "https://dedetiza-os.vercel.app",
     "https://*.vercel.app",
-    "http://localhost:3000"
+    "http://localhost:3000",
   ],
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -21,4 +32,21 @@ export const auth = betterAuth({
     },
   }),
   emailAndPassword: { enabled: true },
+  databaseHooks: {
+    user: {
+      create: {
+        // Cadastro público só vale para o primeiro usuário. Depois disso, qualquer
+        // tentativa de criar conta (pela tela ou direto na API) é recusada.
+        // Para liberar de novo, defina ALLOW_SIGNUP=true no ambiente.
+        before: async (novoUsuario) => {
+          if (process.env.ALLOW_SIGNUP === "true") return { data: novoUsuario };
+          const existentes = await db.select({ id: schema.user.id }).from(schema.user).limit(1);
+          if (existentes.length > 0) {
+            throw new APIError("FORBIDDEN", { message: "Cadastro desativado. Peça acesso ao administrador." });
+          }
+          return { data: novoUsuario };
+        },
+      },
+    },
+  },
 });

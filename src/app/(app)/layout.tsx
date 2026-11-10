@@ -5,13 +5,11 @@ import { db } from "@/db";
 import { clientes, tiposServico, tecnicos } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { AppShell } from "@/components/app-shell";
-import { ensureSeedData } from "@/actions";
 import { formatDateBR, todaySP } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  await ensureSeedData();
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/login");
 

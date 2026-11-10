@@ -3,12 +3,10 @@ import { db } from "@/db";
 import { servicos, clientes, tiposServico, tecnicos, lancamentos } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { formatBRL, formatDateBR, todaySP } from "@/lib/utils";
-import { ensureSeedData } from "@/actions";
 
 export const dynamic = "force-dynamic";
 
 export default async function InicioPage() {
-  await ensureSeedData();
   const hoje = todaySP();
   const mesPrefix = hoje.slice(0, 7);
 
