@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { obterContexto } from "@/lib/contexto";
-import { ROTULO_PAPEL } from "@/lib/permissoes";
+import { ROTULO_PAPEL, pode } from "@/lib/permissoes";
 import { db } from "@/db";
 import { clientes, tiposServico, tecnicos, tipoServicoColunas } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -32,6 +32,7 @@ export default async function ProtectedLayout({ children }: { children: React.Re
       tecnicosList={tecnicosList}
       todayLabel={formatDateBR(todaySP())}
       empresaNome={ctx.empresa?.nome ?? "Detetiza OS"}
+      verFinanceiro={pode(ctx.papel, "financeiro.acessar")}
       usuario={{ nome: ctx.nome, email: ctx.email, rotuloPapel: ROTULO_PAPEL[ctx.papel] }}
     >
       {children}

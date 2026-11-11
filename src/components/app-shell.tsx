@@ -15,8 +15,10 @@ const NAV_ITEMS = [
   { href: "/campanhas", label: "Campanhas", icon: Megaphone },
 ];
 
-export function AppShell({ children, clientesList, tiposList, tecnicosList, todayLabel, empresaNome, usuario }: any) {
+export function AppShell({ children, clientesList, tiposList, tecnicosList, todayLabel, empresaNome, usuario, verFinanceiro }: any) {
   const pathname = usePathname();
+  // Quem não tem acesso ao Financeiro não vê o item no menu (a tela e as ações também são bloqueadas no servidor).
+  const itens = verFinanceiro ? NAV_ITEMS : NAV_ITEMS.filter((i) => i.href !== "/financeiro");
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
   return (
@@ -40,7 +42,7 @@ export function AppShell({ children, clientesList, tiposList, tecnicosList, toda
         </header>
         <div className="flex gap-5 items-start">
           <nav aria-label="Navegação principal" className="hidden md:flex flex-col gap-1.5 p-2 bg-white rounded-[22px] shadow-md shrink-0">
-            {NAV_ITEMS.map((item) => {
+            {itens.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.href);
               return (
@@ -54,7 +56,7 @@ export function AppShell({ children, clientesList, tiposList, tecnicosList, toda
         </div>
       </div>
       <nav aria-label="Navegação móvel" className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-slate-200 px-2 py-1.5 flex justify-around items-center shadow-lg">
-        {NAV_ITEMS.map((item) => {
+        {itens.map((item) => {
           const Icon = item.icon;
           const active = isActive(item.href);
           return (

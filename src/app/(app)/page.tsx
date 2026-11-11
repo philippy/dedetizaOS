@@ -4,12 +4,15 @@ import { eq } from "drizzle-orm";
 import { formatBRL, formatDateBR, todaySP } from "@/lib/utils";
 import { contaDeLancamento, quemEOque } from "@/lib/cobranca";
 import { obterContexto, pixDaEmpresa } from "@/lib/contexto";
+import { pode } from "@/lib/permissoes";
 import { InicioView, type ContaInicio, type ServicoHoje } from "./inicio-view";
 
 export const dynamic = "force-dynamic";
 
 export default async function InicioPage() {
   const ctx = await obterContexto();
+  // Sem acesso ao Financeiro, nenhum dado de dinheiro é nem lido: o painel de contas e os totais não existem para a pessoa.
+  const verFinanceiro = !!ctx && pode(ctx.papel, "financeiro.acessar");
   const hoje = todaySP();
   const mesPrefix = hoje.slice(0, 7);
 
@@ -33,7 +36,7 @@ export default async function InicioPage() {
 
   const servicosHoje = allServicos.filter((s) => s.dataHora.startsWith(hoje) && s.status !== "cancelado").sort((a, b) => a.dataHora.localeCompare(b.dataHora));
 
-  const lancRows = await db
+  const lancRows = !verFinanceiro ? [] : await db
     .select({
       lancamento: lancamentos,
       clienteNome: clientes.nome,
@@ -58,7 +61,9 @@ export default async function InicioPage() {
   const contaDoServico = new Map(allLancamentos.filter((l) => l.servicoId).map((l) => [l.servicoId as number, l]));
   const servicosView: ServicoHoje[] = servicosHoje.map((s) => {
     const c = contaDoServico.get(s.id);
-    const pagamento = c
+    const pagamento = !verFinanceiro
+      ? ""
+      : c
       ? c.status === "pago"
         ? `Pago${c.pagoEm ? ` em ${formatDateBR(c.pagoEm)}` : ""}`
         : `Conta em aberto · vence ${formatDateBR(c.vencimento)}`
@@ -103,7 +108,7 @@ export default async function InicioPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+      {verFinanceiro && <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         <div className="bg-white rounded-[24px] p-5 shadow-sm">
           <div className="text-xs font-semibold text-[#3A4658]">A receber no mês</div>
           <div className="text-[26px] font-extrabold text-[#14653A] mt-1">{formatBRL(receberMesTotal)}</div>
@@ -120,9 +125,9 @@ export default async function InicioPage() {
           <div className="text-xs font-semibold text-[#3A4658]">Contas vencidas</div>
           <div className="text-[26px] font-extrabold text-[#B42318] mt-1">{formatBRL(totalVencido)}</div>
         </div>
-      </section>
+      </section>}
 
-      <InicioView hoje={hoje} pix={pixDaEmpresa(ctx?.empresa ?? null)} servicos={servicosView} contas={contasView} />
+      <InicioView hoje={hoje} pix={verFinanceiro ? pixDaEmpresa(ctx?.empresa ?? null) : null} servicos={servicosView} contas={contasView} verFinanceiro={verFinanceiro} />
     </div>
   );
 }

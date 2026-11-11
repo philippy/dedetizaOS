@@ -2,6 +2,7 @@
 
 import { db } from "@/db";
 import { requireSession } from "@/lib/session";
+import { autorizar } from "@/lib/contexto";
 import { tecnicos, clientes, tiposServico, servicos, lancamentos, campanhas, inscricoes, user } from "@/db/schema";
 import { eq, and, ne, like, inArray } from "drizzle-orm";
 import { DURACAO_PADRAO, DURACOES, formatDuracao, horaDe, minutosDe, sobrepoe } from "@/lib/agenda";
@@ -278,6 +279,8 @@ export async function cancelarServicoAction(servicoId: number) {
 
 export async function criarLancamentoPagarAction(input: { fornecedor: string; descricao: string; vencimento: string; valorReais: string }) {
   await requireSession();
+  const aut = await autorizar("financeiro.acessar");
+  if ("erro" in aut) return { error: aut.erro };
   if (!input.fornecedor.trim()) return { error: "Informe o fornecedor." };
   if (!input.descricao.trim()) return { error: "Informe a descrição." };
   if (!input.vencimento) return { error: "Informe o vencimento." };
@@ -292,6 +295,8 @@ export async function criarLancamentoPagarAction(input: { fornecedor: string; de
 
 export async function darBaixaLancamentoAction(input: { lancamentoId: number; pagoEm: string; valorPagoReais: string }) {
   await requireSession();
+  const aut = await autorizar("financeiro.acessar");
+  if ("erro" in aut) return { error: aut.erro };
   const [lanc] = await db.select().from(lancamentos).where(eq(lancamentos.id, input.lancamentoId));
   if (!lanc) return { error: "Lançamento não encontrado." };
   const valorPago = parseBRLToCents(input.valorPagoReais);
@@ -310,6 +315,8 @@ export async function darBaixaLancamentoAction(input: { lancamentoId: number; pa
 
 export async function excluirLancamentoAction(id: number) {
   await requireSession();
+  const aut = await autorizar("financeiro.acessar");
+  if ("erro" in aut) return { error: aut.erro };
   const [lanc] = await db.select().from(lancamentos).where(eq(lancamentos.id, id));
   if (!lanc || lanc.status === "pago") return { error: "Lançamento pago não pode ser excluído." };
   await db.delete(lancamentos).where(eq(lancamentos.id, id));
@@ -373,6 +380,8 @@ export async function inscreverUnidadeCampanhaAction(input: { campanhaId: number
 
 export async function marcarInscricaoPagaAction(inscricaoId: number) {
   await requireSession();
+  const aut = await autorizar("financeiro.acessar");
+  if ("erro" in aut) return { error: aut.erro };
   const [insc] = await db.select().from(inscricoes).where(eq(inscricoes.id, inscricaoId));
   if (!insc) return { error: "Inscrição não encontrada." };
   const hoje = todaySP();

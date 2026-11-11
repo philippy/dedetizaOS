@@ -6,7 +6,7 @@ import { salvarCampanhaAction } from "@/actions";
 import { formatBRL, formatDateBR, todaySP } from "@/lib/utils";
 import { X } from "lucide-react";
 
-export function CampanhasView({ campanhasList, tiposList }: { campanhasList: any[]; tiposList: { id: number; nome: string; preco: number }[] }) {
+export function CampanhasView({ campanhasList, tiposList, verFinanceiro }: { campanhasList: any[]; tiposList: { id: number; nome: string; preco: number }[]; verFinanceiro: boolean }) {
   const nomeDoTipo = (id: number) => tiposList.find((t) => t.id === id)?.nome ?? "";
   const [modalOpen, setModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState("Todas");
@@ -91,9 +91,9 @@ export function CampanhasView({ campanhasList, tiposList }: { campanhasList: any
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className={`grid grid-cols-1 ${verFinanceiro ? "sm:grid-cols-3" : "sm:grid-cols-2"} gap-3`}>
         {[
-          { label: "Receita das campanhas finalizadas", value: formatBRL(receitaFinalizadas) },
+          ...(verFinanceiro ? [{ label: "Receita das campanhas finalizadas", value: formatBRL(receitaFinalizadas), sub: "" }] : []),
           { label: "Campanhas agendadas", value: String(contar("Agendada")) },
           { label: "Próxima campanha", value: proxima ? proxima.nome : "Nenhuma", sub: proxima ? formatDateBR(proxima.dataInicio) : "" },
         ].map((k) => (
@@ -131,7 +131,7 @@ export function CampanhasView({ campanhasList, tiposList }: { campanhasList: any
                 <th className="p-2.5">Período</th>
                 <th className="p-2.5">Atendimentos</th>
                 <th className="p-2.5">Desconto</th>
-                <th className="p-2.5">Receita paga</th>
+                {verFinanceiro && <th className="p-2.5">Receita paga</th>}
                 <th className="p-2.5">Status</th>
                 <th className="p-2.5 text-right">Ação</th>
               </tr>
@@ -153,9 +153,11 @@ export function CampanhasView({ campanhasList, tiposList }: { campanhasList: any
                     {c.inscritosCount} de {c.unidades}
                   </td>
                   <td className="p-3 font-bold">{c.descontoPct}%</td>
-                  <td className="p-3 font-extrabold text-[#14653A]">
-                    {formatBRL(c.receitaPaga)}
-                  </td>
+                  {verFinanceiro && (
+                    <td className="p-3 font-extrabold text-[#14653A]">
+                      {formatBRL(c.receitaPaga)}
+                    </td>
+                  )}
                   <td className="p-3">
                     <span className={`inline-block rounded-full px-3 py-0.5 text-xs font-bold capitalize ${CHIP_STATUS[c.status] ?? "bg-[#E8ECF2] text-[#3A4658]"}`}>
                       {c.status}

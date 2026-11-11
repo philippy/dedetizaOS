@@ -6,7 +6,7 @@ import { salvarClienteAction, excluirClienteAction } from "@/actions";
 import { formatBRL, formatDateBR } from "@/lib/utils";
 import { X } from "lucide-react";
 
-export function ClientesView({ clientesList }: { clientesList: any[] }) {
+export function ClientesView({ clientesList, verFinanceiro }: { clientesList: any[]; verFinanceiro: boolean }) {
   const [q, setQ] = useState("");
   const [tipoFilter, setTipoFilter] = useState<"Todos" | "PJ" | "PF">("Todos");
   const [modalOpen, setModalOpen] = useState(false);
@@ -118,7 +118,7 @@ export function ClientesView({ clientesList }: { clientesList: any[] }) {
                 <th className="p-2.5">Contato</th>
                 <th className="p-2.5">Endereço</th>
                 <th className="p-2.5">Último serviço</th>
-                <th className="p-2.5">Total pago</th>
+                {verFinanceiro && <th className="p-2.5">Total pago</th>}
                 <th className="p-2.5 text-right">Ação</th>
               </tr>
             </thead>
@@ -136,9 +136,11 @@ export function ClientesView({ clientesList }: { clientesList: any[] }) {
                   <td className="p-3">
                     {c.ultimoServico ? formatDateBR(c.ultimoServico) : "Sem serviço"}
                   </td>
-                  <td className="p-3 font-extrabold text-[#14653A]">
-                    {formatBRL(c.totalPago)}
-                  </td>
+                  {verFinanceiro && (
+                    <td className="p-3 font-extrabold text-[#14653A]">
+                      {formatBRL(c.totalPago)}
+                    </td>
+                  )}
                   <td className="p-3 text-right">
                     <div className="inline-flex gap-2">
                       <Link

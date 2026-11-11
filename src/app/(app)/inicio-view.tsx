@@ -39,11 +39,12 @@ type Detalhe = { t: "servico"; id: number } | { t: "conta"; id: number } | null;
 const OUTLINE = "inline-flex items-center min-h-[48px] rounded-full border-[1.5px] border-[#0F1720] bg-white px-5 text-sm font-bold";
 const PRIMARY = "inline-flex items-center min-h-[48px] rounded-full bg-[#2F5FE0] text-white px-5 text-sm font-bold";
 
-export function InicioView({ hoje, pix, servicos, contas }: {
+export function InicioView({ hoje, pix, servicos, contas, verFinanceiro }: {
   hoje: string;
   pix: PixConfig | null;
   servicos: ServicoHoje[];
   contas: ContaInicio[];
+  verFinanceiro: boolean;
 }) {
   const [detalhe, setDetalhe] = useState<Detalhe>(null);
   const [cobrar, setCobrar] = useState<ContaCobranca | null>(null);
@@ -67,7 +68,7 @@ export function InicioView({ hoje, pix, servicos, contas }: {
 
   return (
     <>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+      <div className={`grid grid-cols-1 ${verFinanceiro ? "lg:grid-cols-2" : ""} gap-5 items-start`}>
         <section className="bg-white rounded-[24px] p-5 shadow-sm flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <h2 className="text-[17px] font-extrabold">Trabalhos de hoje ({formatDateBR(hoje)})</h2>
@@ -102,7 +103,7 @@ export function InicioView({ hoje, pix, servicos, contas }: {
           )}
         </section>
 
-        <section className="bg-white rounded-[24px] p-5 shadow-sm flex flex-col gap-3">
+        {verFinanceiro && <section className="bg-white rounded-[24px] p-5 shadow-sm flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <h2 className="text-[17px] font-extrabold">Contas de hoje e vencidas</h2>
             <Link href="/financeiro" className="text-xs font-bold text-[#1B47B5]">Financeiro →</Link>
@@ -152,7 +153,7 @@ export function InicioView({ hoje, pix, servicos, contas }: {
               <div className="text-xs font-semibold text-[#3A4658]">Toque em uma conta para ver os detalhes.</div>
             </>
           )}
-        </section>
+        </section>}
       </div>
 
       {servico && (
@@ -174,7 +175,7 @@ export function InicioView({ hoje, pix, servicos, contas }: {
               ["Endereço", servico.endereco || "Não informado"],
               ["Contato", servico.whatsapp || "Não informado"],
               ["Valor", formatBRL(servico.valor)],
-              ["Pagamento", servico.pagamento],
+              ...(servico.pagamento ? ([["Pagamento", servico.pagamento]] as [string, string][]) : []),
               ...(servico.observacoes ? ([["Observações", servico.observacoes]] as [string, string][]) : []),
             ]}
           />

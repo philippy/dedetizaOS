@@ -48,8 +48,12 @@ Valores em centavos (integer). Datas em texto ISO (`AAAA-MM-DD`, `AAAA-MM-DDTHH:
   libera de novo.
 - Permissões: papel vem da tabela `membros`, lido no servidor por `obterContexto()` (`src/lib/contexto.ts`). Regras em
   `src/lib/permissoes.ts` (`pode(papel, acao)`). Toda Server Action de dados da empresa ou da equipe usa `autorizar(acao)`;
-  a empresa vem da sessão, nunca do navegador. Hoje só `empresa.editar` e `equipe.gerenciar` (só admin) dependem do papel;
-  Financeiro e Normal veem as mesmas telas. Sempre deve restar um administrador (checado numa única instrução SQL).
+  a empresa vem da sessão, nunca do navegador. Ações: `empresa.editar` e `equipe.gerenciar` (só admin) e `financeiro.acessar`
+  (admin e financeiro). O papel Normal não vê o item Financeiro no menu, `/financeiro` redireciona para o Início, e os dados de dinheiro
+  nem são lidos no servidor para ele: KPIs e painel de contas do Início, Cobrar, "Pagamento" no modal do serviço, LTV/pendente/atraso e
+  chips de pagamento do cliente, "Total pago" em Clientes, receita em Campanhas e "Marcar como pago". As ações que gravam dinheiro
+  (baixa, criar/excluir conta, marcar inscrição paga) conferem `financeiro.acessar` no servidor. O preço do serviço continua visível.
+  Sempre deve restar um administrador (checado numa única instrução SQL).
 - Trocar a chave Pix (tipo, chave ou favorecido) pede a senha do usuário e grava quem/quando. Não tirar.
 - Nada de rotinas que gravam ou apagam dados ao abrir uma página (seed, limpeza,
   migração). Dados de demonstração só com `npm run seed:demo`, em banco de teste.

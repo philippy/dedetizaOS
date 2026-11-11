@@ -4,11 +4,15 @@ import { campanhas, inscricoes, tiposServico, tipoServicoColunas } from "@/db/sc
 import { asc, eq } from "drizzle-orm";
 import { centsToInput } from "@/lib/utils";
 import { CampanhaDetalheView } from "./campanha-detalhe-view";
+import { obterContexto } from "@/lib/contexto";
+import { pode } from "@/lib/permissoes";
 
 export const dynamic = "force-dynamic";
 
 export default async function CampanhaDetalhePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const ctx = await obterContexto();
+  const verFinanceiro = !!ctx && pode(ctx.papel, "financeiro.acessar");
   const campId = Number(id);
   const [camp] = await db.select().from(campanhas).where(eq(campanhas.id, campId));
   if (!camp) notFound();
@@ -28,5 +32,5 @@ export default async function CampanhaDetalhePage({ params }: { params: Promise<
   }));
   const nomes = Object.fromEntries(tipos.map((t) => [t.id, t.nome]));
 
-  return <CampanhaDetalheView campanha={camp} inscritos={inscritos} oferecidos={oferecidos} nomesTipos={nomes} />;
+  return <CampanhaDetalheView campanha={camp} inscritos={inscritos} oferecidos={oferecidos} nomesTipos={nomes} verFinanceiro={verFinanceiro} />;
 }

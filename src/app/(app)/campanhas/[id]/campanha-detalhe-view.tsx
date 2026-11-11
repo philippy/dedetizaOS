@@ -6,7 +6,7 @@ import { inscreverUnidadeCampanhaAction, marcarInscricaoPagaAction } from "@/act
 import { formatBRL, formatDateBR } from "@/lib/utils";
 import { X } from "lucide-react";
 
-export function CampanhaDetalheView({ campanha, inscritos, oferecidos, nomesTipos }: { campanha: any; inscritos: any[]; oferecidos: { id: number; nome: string; valorReais: string; precoCampanha: number; precoCheio: number }[]; nomesTipos: Record<number, string> }) {
+export function CampanhaDetalheView({ campanha, inscritos, oferecidos, nomesTipos, verFinanceiro }: { campanha: any; inscritos: any[]; oferecidos: { id: number; nome: string; valorReais: string; precoCampanha: number; precoCheio: number }[]; nomesTipos: Record<number, string>; verFinanceiro: boolean }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [unidade, setUnidade] = useState("");
   const [morador, setMorador] = useState("");
@@ -32,8 +32,12 @@ export function CampanhaDetalheView({ campanha, inscritos, oferecidos, nomesTipo
   const kpis = [
     { label: "Atendimentos contratados", value: `${inscritos.length} de ${campanha.unidades}`, sub: `${livres} ${livres === 1 ? "unidade ainda sem contratação" : "unidades ainda sem contratação"}` },
     { label: "Pagos", value: String(pagos.length), sub: `${aguardando.length} aguardando Pix` },
-    { label: "Receita confirmada", value: formatBRL(soma(pagos)), sub: "pagamentos já baixados no Financeiro" },
-    { label: "A confirmar", value: formatBRL(soma(aguardando)), sub: "contratados, ainda sem pagamento" },
+    ...(verFinanceiro
+      ? [
+          { label: "Receita confirmada", value: formatBRL(soma(pagos)), sub: "pagamentos já baixados no Financeiro" },
+          { label: "A confirmar", value: formatBRL(soma(aguardando)), sub: "contratados, ainda sem pagamento" },
+        ]
+      : []),
   ];
 
   async function marcarPago(id: number, unidadeNome: string) {
@@ -156,7 +160,7 @@ export function CampanhaDetalheView({ campanha, inscritos, oferecidos, nomesTipo
                       </span>
                     </td>
                     <td className="p-3 text-right">
-                      {!i.pago && (
+                      {!i.pago && verFinanceiro && (
                         <button
                           disabled={pagandoId === i.id}
                           onClick={() => marcarPago(i.id, i.unidade)}

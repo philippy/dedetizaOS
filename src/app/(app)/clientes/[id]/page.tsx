@@ -6,6 +6,8 @@ import { desc, eq } from "drizzle-orm";
 import { diffDaysISO, formatBRL, formatDateBR, formatDateTimeBR, todaySP } from "@/lib/utils";
 import { calcularPainel, statusDaLinha, textoPrazo, MESES_RETORNO, type StatusLinha } from "@/lib/cliente-painel";
 import { ClienteFichaForm } from "./cliente-ficha-form";
+import { obterContexto } from "@/lib/contexto";
+import { pode } from "@/lib/permissoes";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +34,8 @@ function Kpi({ label, value, sub, tom = "neutro", data = false }: { label: strin
 
 export default async function ClienteDetalhePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const ctx = await obterContexto();
+  const verFinanceiro = !!ctx && pode(ctx.papel, "financeiro.acessar");
   const clienteId = Number(id);
   if (!Number.isInteger(clienteId)) notFound();
   const [cliente] = await db.select().from(clientes).where(eq(clientes.id, clienteId));
@@ -45,7 +49,8 @@ export default async function ClienteDetalhePage({ params }: { params: Promise<{
     .where(eq(servicos.clienteId, clienteId))
     .orderBy(desc(servicos.dataHora));
 
-  const lancCliente = await db.select().from(lancamentos).where(eq(lancamentos.clienteId, clienteId));
+  // Sem acesso ao Financeiro, as contas do cliente nem são lidas.
+  const lancCliente = verFinanceiro ? await db.select().from(lancamentos).where(eq(lancamentos.clienteId, clienteId)) : [];
 
   const hoje = todaySP();
   const p = calcularPainel(historico, lancCliente, hoje);
@@ -74,7 +79,8 @@ export default async function ClienteDetalhePage({ params }: { params: Promise<{
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3">
+      <div className={`grid grid-cols-2 ${verFinanceiro ? "md:grid-cols-3 xl:grid-cols-5" : ""} gap-3`}>
+        {verFinanceiro && (<>
         <Kpi
           label="Total gasto (LTV)"
           value={formatBRL(p.ltv)}
@@ -91,6 +97,7 @@ export default async function ClienteDetalhePage({ params }: { params: Promise<{
           sub={p.qtdAtraso ? `${p.qtdAtraso} ${p.qtdAtraso === 1 ? "conta vencida" : "contas vencidas"} · a mais antiga há ${p.diasAtrasoMaisAntigo} ${p.diasAtrasoMaisAntigo === 1 ? "dia" : "dias"}` : "Nenhuma conta vencida"}
           tom={p.qtdAtraso ? "alerta" : "neutro"}
         />
+        </>)}
         <Kpi
           label="Último serviço"
           data
