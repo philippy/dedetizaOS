@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { salvarEmpresaAction } from "@/actions/configuracoes";
+import { pedirDesbloqueioPixAction, salvarEmpresaAction } from "@/actions/configuracoes";
 import { TIPOS_PIX, ehTipoPix, normalizarChavePix, type TipoPix } from "@/lib/validacao";
 import { Aviso, Campo, Cartao, classeInput } from "../campos";
 
@@ -28,16 +28,22 @@ const EXEMPLO_CHAVE: Record<TipoPix, string> = {
   Aleatória: "123e4567-e89b-12d3-a456-426614174000",
 };
 
+function horaBR(iso: string) {
+  return new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", timeStyle: "short" }).format(new Date(iso));
+}
+
 function dataHoraBR(iso: string) {
   return new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", dateStyle: "short", timeStyle: "short" }).format(new Date(iso));
 }
 
-export function EmpresaForm({ inicial, podeEditar, pixAuditoria }: { inicial: Dados; podeEditar: boolean; pixAuditoria: PixAuditoria | null }) {
+export function EmpresaForm({ inicial, podeEditar, pixAuditoria, pixBloqueadoAte, emailAtivo }: { inicial: Dados; podeEditar: boolean; pixAuditoria: PixAuditoria | null; pixBloqueadoAte: string | null; emailAtivo: boolean }) {
   const router = useRouter();
   const [d, setD] = useState<Dados>(inicial);
   const [senha, setSenha] = useState("");
   const [salvando, setSalvando] = useState(false);
   const [msg, setMsg] = useState<{ tipo: "ok" | "erro"; texto: string; campo?: string } | null>(null);
+  const [pedindo, setPedindo] = useState(false);
+  const [avisoDesbloqueio, setAvisoDesbloqueio] = useState<{ tipo: "ok" | "erro"; texto: string } | null>(null);
 
   const set = (campo: keyof Dados) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setD((a) => ({ ...a, [campo]: e.target.value }));
@@ -50,6 +56,14 @@ export function EmpresaForm({ inicial, podeEditar, pixAuditoria }: { inicial: Da
   const chaveSalvaInvalida = inicial.pixChave !== "" && ehTipoPix(inicial.pixTipo) && !normalizarChavePix(inicial.pixTipo, inicial.pixChave).ok;
   const erroDe = (campo: string) => (msg?.tipo === "erro" && msg.campo === campo ? msg.texto : undefined);
 
+  async function pedirDesbloqueio() {
+    setPedindo(true);
+    setAvisoDesbloqueio(null);
+    const res = await pedirDesbloqueioPixAction();
+    setPedindo(false);
+    setAvisoDesbloqueio("error" in res ? { tipo: "erro", texto: res.error } : { tipo: "ok", texto: `Enviamos um link de desbloqueio para ${res.email}. Ele vale por 30 minutos.` });
+  }
+
   async function salvar(e: React.FormEvent) {
     e.preventDefault();
     if (!podeEditar) return;
@@ -59,6 +73,7 @@ export function EmpresaForm({ inicial, podeEditar, pixAuditoria }: { inicial: Da
     setSalvando(false);
     if ("error" in res) {
       setMsg({ tipo: "erro", texto: res.error, campo: res.campo });
+      if (res.campo === "senhaAtual") router.refresh(); // atualiza o estado de bloqueio mostrado na tela
       return;
     }
     setSenha("");
@@ -118,7 +133,22 @@ export function EmpresaForm({ inicial, podeEditar, pixAuditoria }: { inicial: Da
         ) : (
           <p className="text-xs font-semibold text-[#3A4658]">A chave ainda não foi alterada por esta tela.</p>
         )}
-        {podeEditar && pixMudou && (
+        {podeEditar && pixBloqueadoAte && (
+          <div className="rounded-[16px] bg-[#FDE4E1] p-4 flex flex-col gap-3">
+            <p className="text-xs font-bold text-[#8E1B10]">
+              A troca da chave Pix está bloqueada por excesso de senhas erradas. Libera sozinha às {horaBR(pixBloqueadoAte)}.
+            </p>
+            {emailAtivo && (
+              <div>
+                <button type="button" onClick={pedirDesbloqueio} disabled={pedindo} className="min-h-[44px] px-4 rounded-full bg-white text-[#8E1B10] text-xs font-bold disabled:opacity-60">
+                  {pedindo ? "Enviando..." : "Desbloquear agora por e-mail"}
+                </button>
+              </div>
+            )}
+            {avisoDesbloqueio && <Aviso tipo={avisoDesbloqueio.tipo}>{avisoDesbloqueio.texto}</Aviso>}
+          </div>
+        )}
+        {podeEditar && pixMudou && !pixBloqueadoAte && (
           <div className="rounded-[16px] bg-[#FFF0D1] p-4 flex flex-col gap-3">
             <p className="text-xs font-bold text-[#7A4B00]">Trocar a chave redireciona os pagamentos dos clientes. Confirme com a sua senha.</p>
             <Campo rotulo="Sua senha" erro={erroDe("senhaAtual")}>
@@ -131,7 +161,7 @@ export function EmpresaForm({ inicial, podeEditar, pixAuditoria }: { inicial: Da
       {msg && (!msg.campo || msg.tipo === "ok") && <Aviso tipo={msg.tipo}>{msg.texto}</Aviso>}
       {podeEditar && (
         <div>
-          <button type="submit" disabled={salvando} className="min-h-[48px] px-6 rounded-full bg-[#2F5FE0] text-white font-bold text-sm disabled:opacity-60">
+          <button type="submit" disabled={salvando || (!!pixBloqueadoAte && pixMudou)} className="min-h-[48px] px-6 rounded-full bg-[#2F5FE0] text-white font-bold text-sm disabled:opacity-60">
             {salvando ? "Salvando..." : "Salvar alterações"}
           </button>
         </div>

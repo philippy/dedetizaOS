@@ -8,9 +8,9 @@ import { Aviso, Campo, Cartao, classeInput } from "../campos";
 
 export type Membro = { userId: string; nome: string; email: string; papel: Papel; senhaProvisoria: boolean };
 
-type Credencial = { motivo: "criado" | "redefinida"; nome: string; email: string; senha: string };
+type Credencial = { motivo: "criado" | "redefinida"; nome: string; email: string; senha: string; emailEnviado: boolean | null };
 
-export function EquipePapeis({ membros, meuId }: { membros: Membro[]; meuId: string }) {
+export function EquipePapeis({ membros, meuId, emailAtivo }: { membros: Membro[]; meuId: string; emailAtivo: boolean }) {
   const router = useRouter();
   const [ocupado, setOcupado] = useState<string | null>(null);
   const [msg, setMsg] = useState<{ tipo: "ok" | "erro"; texto: string } | null>(null);
@@ -21,6 +21,7 @@ export function EquipePapeis({ membros, meuId }: { membros: Membro[]; meuId: str
   const [email, setEmail] = useState("");
   const [papel, setPapel] = useState<Papel>("normal");
   const [criando, setCriando] = useState(false);
+  const [enviarEmail, setEnviarEmail] = useState(false);
   const [erroForm, setErroForm] = useState<{ texto: string; campo?: string } | null>(null);
 
   async function trocar(m: Membro, novo: string) {
@@ -44,13 +45,13 @@ export function EquipePapeis({ membros, meuId }: { membros: Membro[]; meuId: str
     setErroForm(null);
     setMsg(null);
     setCriando(true);
-    const res = await criarUsuarioAction({ nome, email, papel });
+    const res = await criarUsuarioAction({ nome, email, papel, enviarEmail: emailAtivo && enviarEmail });
     setCriando(false);
     if ("error" in res) {
       setErroForm({ texto: res.error, campo: res.campo });
       return;
     }
-    setCredencial({ motivo: "criado", nome, email: res.email, senha: res.senhaProvisoria });
+    setCredencial({ motivo: "criado", nome, email: res.email, senha: res.senhaProvisoria, emailEnviado: res.emailEnviado });
     setCopiado(false);
     setNome("");
     setEmail("");
@@ -59,22 +60,22 @@ export function EquipePapeis({ membros, meuId }: { membros: Membro[]; meuId: str
   }
 
   async function redefinir(m: Membro) {
-    if (!window.confirm(`Gerar uma nova senha provisória para ${m.nome}? A senha atual deixa de valer e a pessoa é desconectada.`)) return;
+    if (!window.confirm(`Gerar uma nova senha provisória para ${m.nome}? A senha atual deixa de valer e a pessoa é desconectada.${emailAtivo && enviarEmail ? " A nova senha também será enviada por e-mail." : ""}`)) return;
     setMsg(null);
     setOcupado(m.userId);
-    const res = await redefinirSenhaAction({ userId: m.userId });
+    const res = await redefinirSenhaAction({ userId: m.userId, enviarEmail: emailAtivo && enviarEmail });
     setOcupado(null);
     if ("error" in res) {
       setMsg({ tipo: "erro", texto: res.error });
       return;
     }
-    setCredencial({ motivo: "redefinida", nome: m.nome, email: res.email, senha: res.senhaProvisoria });
+    setCredencial({ motivo: "redefinida", nome: m.nome, email: res.email, senha: res.senhaProvisoria, emailEnviado: res.emailEnviado });
     setCopiado(false);
     router.refresh();
   }
 
   async function remover(m: Membro) {
-    if (!window.confirm(`Remover o acesso de ${m.nome}? A conta é apagada e não dá para desfazer.`)) return;
+    if (!window.confirm(`Remover o acesso de ${m.nome}?\n\nEsta ação é IRREVERSÍVEL: a conta é apagada e a pessoa nunca mais consegue entrar (para voltar, seria preciso criar um novo acesso).\n\nO registro de atividades dela continua guardado no sistema.`)) return;
     setMsg(null);
     setOcupado(m.userId);
     const res = await removerUsuarioAction({ userId: m.userId });
@@ -106,6 +107,8 @@ export function EquipePapeis({ membros, meuId }: { membros: Membro[]; meuId: str
           <div className="text-sm font-semibold">
             Senha provisória: <span className="font-mono font-extrabold text-base select-all">{credencial.senha}</span>
           </div>
+          {credencial.emailEnviado === true && <p className="text-xs font-bold">O acesso também foi enviado para {credencial.email}.</p>}
+          {credencial.emailEnviado === false && <p className="text-xs font-bold text-[#7A4B00]">Não foi possível enviar o e-mail. Passe a senha à pessoa por outro canal.</p>}
           <p className="text-xs font-bold">
             Esta senha aparece só agora e não fica guardada em lugar nenhum. Passe para a pessoa por um canal seguro; ela vai precisar trocá-la no primeiro acesso.
           </p>
@@ -172,6 +175,15 @@ export function EquipePapeis({ membros, meuId }: { membros: Membro[]; meuId: str
             </select>
           </Campo>
         </div>
+        {emailAtivo && (
+          <label className="flex items-start gap-2 text-xs font-bold text-[#3A4658]">
+            <input type="checkbox" checked={enviarEmail} onChange={(e) => setEnviarEmail(e.target.checked)} className="mt-0.5 w-5 h-5" />
+            <span>
+              Enviar o acesso (e-mail e senha provisória) para a pessoa por e-mail. Vale também para o botão "Nova senha".
+              <span className="block font-medium text-[#5A6678]">A senha fica na caixa de e-mail dela até ser apagada; por isso ela é provisória e obrigatoriamente trocada no primeiro acesso.</span>
+            </span>
+          </label>
+        )}
         {erroForm && !erroForm.campo && <Aviso tipo="erro">{erroForm.texto}</Aviso>}
         <div>
           <button type="submit" disabled={criando} className="min-h-[48px] px-6 rounded-full bg-[#2F5FE0] text-white font-bold text-sm disabled:opacity-60">

@@ -2,7 +2,9 @@ import { createHash } from "crypto";
 import { betterAuth } from "better-auth";
 import { APIError } from "better-auth/api";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { eq } from "drizzle-orm";
 import { db } from "@/db";
+import { emailConfigurado, enviarEmail, montarEmail } from "@/lib/email";
 import * as schema from "@/db/schema";
 
 // Sem BETTER_AUTH_SECRET configurado, deriva a chave de um valor que só existe no
@@ -31,7 +33,32 @@ export const auth = betterAuth({
       verification: schema.verification,
     },
   }),
-  emailAndPassword: { enabled: true },
+  emailAndPassword: {
+    enabled: true,
+    // "Esqueci minha senha": só existe com SMTP configurado (ver src/lib/email.ts). O link vale 1 hora e todas as sessões caem.
+    ...(emailConfigurado()
+      ? {
+          sendResetPassword: async ({ user, url }: { user: { name: string; email: string }; url: string }) => {
+            const { texto, html } = montarEmail({
+              titulo: "Redefinir a sua senha",
+              linhas: [
+                `Olá, ${user.name.split(" ")[0]}.`,
+                "Recebemos um pedido para redefinir a senha do seu acesso ao Detetiza OS. O link abaixo vale por 1 hora.",
+                "Se não foi você, ignore este e-mail: a sua senha continua a mesma.",
+              ],
+              botao: { texto: "Criar nova senha", url },
+            });
+            await enviarEmail({ para: user.email, assunto: "Redefinir senha - Detetiza OS", texto, html });
+          },
+        }
+      : {}),
+    resetPasswordTokenExpiresIn: 60 * 60,
+    revokeSessionsOnPasswordReset: true,
+    // Quem redefine por e-mail escolheu a própria senha: não precisa mais trocar a provisória.
+    onPasswordReset: async ({ user }: { user: { id: string } }) => {
+      await db.update(schema.membros).set({ senhaProvisoria: false }).where(eq(schema.membros.userId, user.id)).catch(() => {});
+    },
+  },
   databaseHooks: {
     user: {
       create: {

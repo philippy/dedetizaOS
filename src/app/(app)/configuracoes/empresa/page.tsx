@@ -1,12 +1,15 @@
 import { redirect } from "next/navigation";
-import { asc, eq } from "drizzle-orm";
+import { asc, desc, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { membros, user } from "@/db/schema";
+import { auditoria, membros, user } from "@/db/schema";
 import { obterContexto } from "@/lib/contexto";
 import { pode } from "@/lib/permissoes";
+import { emailConfigurado } from "@/lib/email";
+import { estadoBloqueioPix } from "@/lib/pix-limite";
 import { Aviso } from "../campos";
 import { EmpresaForm, type PixAuditoria } from "./empresa-form";
 import { EquipePapeis, type Membro } from "./equipe-papeis";
+import { RegistroAtividades, type Evento } from "./registro-atividades";
 
 export const dynamic = "force-dynamic";
 
@@ -45,10 +48,32 @@ export default async function DadosDaEmpresaPage() {
         .orderBy(asc(user.name))
     : [];
 
+  const pixBloqueadoAte = podeEditar ? await estadoBloqueioPix(ctx.userId) : null;
+
+  const eventos: Evento[] = podeGerenciar
+    ? (
+        await db
+          .select()
+          .from(auditoria)
+          .where(eq(auditoria.empresaId, empresa.id))
+          .orderBy(desc(auditoria.quando), desc(auditoria.id))
+          .limit(60)
+      ).map((e) => ({
+        id: e.id,
+        quando: e.quando.toISOString(),
+        acao: e.acao,
+        ator: `${e.atorNome} (${e.atorEmail})`,
+        alvo: e.alvoNome ? `${e.alvoNome} (${e.alvoEmail ?? ""})` : "",
+        detalhe: e.detalhe,
+      }))
+    : [];
+
   return (
     <div className="flex flex-col gap-4">
       <EmpresaForm
         podeEditar={podeEditar}
+        pixBloqueadoAte={pixBloqueadoAte ? pixBloqueadoAte.toISOString() : null}
+        emailAtivo={emailConfigurado()}
         pixAuditoria={pixAuditoria}
         inicial={{
           nome: empresa.nome,
@@ -62,7 +87,8 @@ export default async function DadosDaEmpresaPage() {
           pixFavorecido: empresa.pixFavorecido,
         }}
       />
-      {podeGerenciar && <EquipePapeis membros={equipe} meuId={ctx.userId} />}
+      {podeGerenciar && <EquipePapeis membros={equipe} meuId={ctx.userId} emailAtivo={emailConfigurado()} />}
+      {podeGerenciar && <RegistroAtividades eventos={eventos} />}
     </div>
   );
 }

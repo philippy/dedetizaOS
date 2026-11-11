@@ -36,7 +36,10 @@ Dados dos protótipos são de exemplo e não vão para o banco.
 - inscricoes: campanha_id, tipo_servico_id, unidade, morador, telefone, valor, pago
 - empresas: nome, cnpj, endereco, telefone, email, responsavel, pix_tipo, pix_chave, pix_favorecido,
   pix_atualizado_em/por (quem mexeu na chave), atualizado_em/por. Hoje existe uma só.
-- membros: user_id (um por usuário), empresa_id, papel (admin, financeiro, normal), telefone, senha_provisoria.
+- membros: user_id (um por usuário), empresa_id, papel (admin, financeiro, normal), telefone, senha_provisoria,
+  pix_falhas/pix_ultima_falha/pix_bloqueado_ate (limite de senha na troca da chave Pix).
+- auditoria: registro de atividades (empresa_id, quando, ator_id/nome/email, acao, alvo_id/nome/email, detalhe). SEM chave estrangeira para o
+  usuário: guarda nome e e-mail no momento do fato, então o histórico sobrevive à remoção da conta. Só o admin lê (Dados da empresa). Nunca apagar linhas.
   `empresa_id` já existe aqui, mas as tabelas de negócio (clientes, servicos, lancamentos...) AINDA NÃO têm
   `empresa_id`: antes de atender uma segunda empresa é preciso incluí-lo nelas e filtrar todas as consultas.
 Valores em centavos (integer). Datas em texto ISO (`AAAA-MM-DD`, `AAAA-MM-DDTHH:MM`).
@@ -54,7 +57,14 @@ Valores em centavos (integer). Datas em texto ISO (`AAAA-MM-DD`, `AAAA-MM-DDTHH:
   chips de pagamento do cliente, "Total pago" em Clientes, receita em Campanhas e "Marcar como pago". As ações que gravam dinheiro
   (baixa, criar/excluir conta, marcar inscrição paga) conferem `financeiro.acessar` no servidor. O preço do serviço continua visível.
   Sempre deve restar um administrador (checado numa única instrução SQL).
-- Trocar a chave Pix (tipo, chave ou favorecido) pede a senha do usuário e grava quem/quando. Não tirar.
+- Trocar a chave Pix (tipo, chave ou favorecido) pede a senha do usuário e grava quem/quando. Não tirar. Limite: 3 senhas erradas bloqueiam a
+  troca por 1 hora (`src/lib/pix-limite.ts`; a tentativa é reservada numa única instrução SQL ANTES de conferir a senha, para a rajada paralela
+  não furar o limite). Com SMTP, o admin pode desbloquear por link enviado ao seu e-mail (30 min, uso único, só vale logado na mesma conta, confirma
+  por clique/POST, nunca ao abrir o link).
+- Registro de atividades (`src/lib/auditoria.ts`, `registrarAuditoria`): grava equipe (criar/remover/papel/nova senha/senha definida), dados da empresa,
+  Pix (alterado/bloqueado/desbloqueado) e dinheiro (baixa, criar/excluir conta a pagar, marcar inscrição paga). É melhor esforço: se a gravação falhar,
+  a ação não é desfeita. Ao criar uma ação nova que mexe em dinheiro, em permissão ou em dados da empresa, registre-a. Remover usuário avisa que é irreversível
+  e que o histórico dele permanece.
 - Nada de rotinas que gravam ou apagam dados ao abrir uma página (seed, limpeza,
   migração). Dados de demonstração só com `npm run seed:demo`, em banco de teste.
 - Nunca enviar ao GitHub `.env*` nem a pasta `dados/`.
@@ -83,7 +93,11 @@ Valores em centavos (integer). Datas em texto ISO (`AAAA-MM-DD`, `AAAA-MM-DDTHH:
   na tela (não é guardada em texto; só o hash) e a pessoa é obrigada a trocá-la no primeiro acesso (`membros.senha_provisoria`;
   `(app)/layout.tsx` mostra só a tela de troca enquanto a flag estiver ligada, e a ação de troca confere a senha provisória).
   Também há "Nova senha" (gera outra provisória e derruba as sessões) e "Remover" (apaga a conta; não remove a si mesmo nem o último admin).
-  Não envia e-mail: o admin repassa a senha por conta própria. O cadastro público continua só para o primeiro usuário (`ALLOW_SIGNUP=true` reabre).
+  O cadastro público continua só para o primeiro usuário (`ALLOW_SIGNUP=true` reabre).
+  E-mail (`src/lib/email.ts`, nodemailer 10.3.1 fixado): SMTP só por variáveis de ambiente `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`
+  (`SMTP_SECURE` opcional). Sem `SMTP_HOST` e `SMTP_FROM` o sistema funciona e as telas escondem as opções de e-mail. Usos: desbloqueio do Pix, envio opcional do
+  acesso ao criar usuário / gerar nova senha, e "Esqueci minha senha" (`/esqueci-senha` e `/redefinir-senha`, link de 1 hora, derruba sessões e dispensa a troca da provisória).
+  Nunca colocar credenciais SMTP no código nem em arquivo versionado.
   A troca obrigatória é barreira de tela (layout), não de cada ação; o login tem limite de tentativas do Better Auth.
 - Início: toque em um serviço de hoje ou em uma conta vencida/que vence hoje abre um modal com os detalhes.
 - Visual: fundo #E9EEF5, cartões brancos, texto #0F1720, primária #2F5FE0, a receber verde

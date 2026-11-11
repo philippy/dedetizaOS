@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { canPublicRegister } from "@/actions";
+import { emailDisponivelAction } from "@/actions/configuracoes";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -15,8 +17,10 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [temEmail, setTemEmail] = useState(false);
 
   useEffect(() => {
+    emailDisponivelAction().then(setTemEmail).catch(() => {});
     canPublicRegister().then((can) => {
       setAllowRegister(can);
       if (can) setIsSignUp(true);
@@ -61,6 +65,9 @@ export default function LoginPage() {
           {error && <div className="bg-[#FDE4E1] text-[#8E1B10] rounded-xl p-3 text-xs font-bold">{error}</div>}
           <button type="submit" disabled={loading} className="min-h-[48px] rounded-full bg-[#2F5FE0] text-white font-bold text-sm">{loading ? "Aguarde..." : isSignUp && allowRegister ? "Criar primeiro usuário e entrar" : "Entrar no Detetiza OS"}</button>
         </form>
+        {temEmail && !(isSignUp && allowRegister) && (
+          <Link href="/esqueci-senha" className="text-xs font-bold text-[#1B47B5] text-center hover:underline -mt-2">Esqueci minha senha</Link>
+        )}
         {allowRegister && (
           <button type="button" onClick={() => setIsSignUp(!isSignUp)} className="text-xs font-bold text-[#1B47B5] text-center hover:underline">
             {isSignUp ? "Já tem conta? Entrar" : "Primeiro acesso? Criar conta"}

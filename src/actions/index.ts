@@ -3,12 +3,13 @@
 import { db } from "@/db";
 import { requireSession } from "@/lib/session";
 import { autorizar } from "@/lib/contexto";
+import { atorDe, registrarAuditoria } from "@/lib/auditoria";
 import { tecnicos, clientes, tiposServico, servicos, lancamentos, campanhas, inscricoes, user } from "@/db/schema";
 import { eq, and, ne, like, inArray } from "drizzle-orm";
 import { DURACAO_PADRAO, DURACOES, formatDuracao, horaDe, minutosDe, sobrepoe } from "@/lib/agenda";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { addDaysISO, parseBRLToCents, todaySP } from "@/lib/utils";
+import { addDaysISO, formatBRL, parseBRLToCents, todaySP } from "@/lib/utils";
 import { soDigitos } from "@/lib/importar-clientes";
 
 export async function canPublicRegister(): Promise<boolean> {
@@ -288,6 +289,7 @@ export async function criarLancamentoPagarAction(input: { fornecedor: string; de
   if (valor <= 0) return { error: "Informe um valor maior que zero." };
 
   await db.insert(lancamentos).values({ tipo: "pagar", fornecedor: input.fornecedor.trim(), descricao: input.descricao.trim(), vencimento: input.vencimento, valor, status: "aberto" });
+  await registrarAuditoria({ empresaId: aut.ctx.empresa.id, ator: atorDe(aut.ctx), acao: "financeiro.conta_criada", detalhe: `${input.fornecedor.trim()} · ${input.descricao.trim()} · ${formatBRL(valor)} · vence ${input.vencimento}` });
   revalidatePath("/");
   revalidatePath("/financeiro");
   return { success: true };
@@ -303,6 +305,7 @@ export async function darBaixaLancamentoAction(input: { lancamentoId: number; pa
   if (valorPago <= 0) return { error: "Informe um valor válido." };
 
   await db.update(lancamentos).set({ status: "pago", pagoEm: input.pagoEm, valor: valorPago }).where(eq(lancamentos.id, input.lancamentoId));
+  await registrarAuditoria({ empresaId: aut.ctx.empresa.id, ator: atorDe(aut.ctx), acao: "financeiro.baixa", detalhe: `${lanc.tipo === "pagar" ? "A pagar" : "A receber"} · ${lanc.descricao} · ${formatBRL(valorPago)} (valor anterior ${formatBRL(lanc.valor)}) · pago em ${input.pagoEm}` });
   if (lanc.inscricaoId) {
     await db.update(inscricoes).set({ pago: true, valor: valorPago }).where(eq(inscricoes.id, lanc.inscricaoId));
   }
@@ -320,6 +323,7 @@ export async function excluirLancamentoAction(id: number) {
   const [lanc] = await db.select().from(lancamentos).where(eq(lancamentos.id, id));
   if (!lanc || lanc.status === "pago") return { error: "Lançamento pago não pode ser excluído." };
   await db.delete(lancamentos).where(eq(lancamentos.id, id));
+  await registrarAuditoria({ empresaId: aut.ctx.empresa.id, ator: atorDe(aut.ctx), acao: "financeiro.conta_excluida", detalhe: `${lanc.tipo === "pagar" ? "A pagar" : "A receber"} · ${lanc.descricao} · ${formatBRL(lanc.valor)}` });
   revalidatePath("/");
   revalidatePath("/financeiro");
   return { success: true };
@@ -387,6 +391,7 @@ export async function marcarInscricaoPagaAction(inscricaoId: number) {
   const hoje = todaySP();
   await db.update(inscricoes).set({ pago: true }).where(eq(inscricoes.id, inscricaoId));
   await db.update(lancamentos).set({ status: "pago", pagoEm: hoje }).where(eq(lancamentos.inscricaoId, inscricaoId));
+  await registrarAuditoria({ empresaId: aut.ctx.empresa.id, ator: atorDe(aut.ctx), acao: "financeiro.inscricao_paga", detalhe: `${insc.morador} · unidade ${insc.unidade} · ${formatBRL(insc.valor)}` });
   revalidatePath(`/campanhas/${insc.campanhaId}`);
   revalidatePath("/campanhas");
   revalidatePath("/financeiro");

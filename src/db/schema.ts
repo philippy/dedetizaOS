@@ -78,8 +78,28 @@ export const membros = pgTable("membros", {
   telefone: text("telefone").notNull().default(""),
   // true enquanto a pessoa usa a senha provisória dada pelo administrador: ela precisa trocar antes de usar o sistema.
   senhaProvisoria: boolean("senha_provisoria").notNull().default(false),
+  // Limite de tentativas de senha ao trocar a chave Pix: 3 erros bloqueiam por 1 hora (ou desbloqueio por e-mail).
+  pixFalhas: integer("pix_falhas").notNull().default(0),
+  pixUltimaFalha: timestamp("pix_ultima_falha"),
+  pixBloqueadoAte: timestamp("pix_bloqueado_ate"),
   criadoEm: timestamp("criado_em").notNull().defaultNow(),
 }, (t) => [index("membros_empresa_idx").on(t.empresaId)]);
+
+// Registro de atividades. Sem chave estrangeira para o usuário: guarda nome e e-mail de quem fez (e de quem sofreu a ação)
+// no momento do fato, então o histórico continua inteiro mesmo depois de a conta ser removida.
+export const auditoria = pgTable("auditoria", {
+  id: serial("id").primaryKey(),
+  empresaId: integer("empresa_id").notNull().references(() => empresas.id, { onDelete: "restrict" }),
+  quando: timestamp("quando").notNull().defaultNow(),
+  atorId: text("ator_id").notNull(),
+  atorNome: text("ator_nome").notNull(),
+  atorEmail: text("ator_email").notNull(),
+  acao: text("acao").notNull(),
+  alvoId: text("alvo_id"),
+  alvoNome: text("alvo_nome"),
+  alvoEmail: text("alvo_email"),
+  detalhe: text("detalhe").notNull().default(""),
+}, (t) => [index("auditoria_empresa_quando_idx").on(t.empresaId, t.quando)]);
 
 export const tecnicos = pgTable("tecnicos", {
   id: serial("id").primaryKey(),
