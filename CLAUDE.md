@@ -34,6 +34,11 @@ Dados dos protótipos são de exemplo e não vão para o banco.
 - campanhas: nome, local, data_inicio, data_fim, desconto_pct, unidades, tipos_servico_ids (vazio = todo o catálogo),
   status (agendada, finalizada, cancelada)
 - inscricoes: campanha_id, tipo_servico_id, unidade, morador, telefone, valor, pago
+- empresas: nome, cnpj, endereco, telefone, email, responsavel, pix_tipo, pix_chave, pix_favorecido,
+  pix_atualizado_em/por (quem mexeu na chave), atualizado_em/por. Hoje existe uma só.
+- membros: user_id (um por usuário), empresa_id, papel (admin, financeiro, normal), telefone.
+  `empresa_id` já existe aqui, mas as tabelas de negócio (clientes, servicos, lancamentos...) AINDA NÃO têm
+  `empresa_id`: antes de atender uma segunda empresa é preciso incluí-lo nelas e filtrar todas as consultas.
 Valores em centavos (integer). Datas em texto ISO (`AAAA-MM-DD`, `AAAA-MM-DDTHH:MM`).
 
 ## Segurança (não remover)
@@ -41,6 +46,11 @@ Valores em centavos (integer). Datas em texto ISO (`AAAA-MM-DD`, `AAAA-MM-DDTHH:
   Action é um endpoint público: sem isso, qualquer pessoa chama sem login.
 - O cadastro só aceita o primeiro usuário (hook em `src/lib/auth.ts`). `ALLOW_SIGNUP=true`
   libera de novo.
+- Permissões: papel vem da tabela `membros`, lido no servidor por `obterContexto()` (`src/lib/contexto.ts`). Regras em
+  `src/lib/permissoes.ts` (`pode(papel, acao)`). Toda Server Action de dados da empresa ou da equipe usa `autorizar(acao)`;
+  a empresa vem da sessão, nunca do navegador. Hoje só `empresa.editar` e `equipe.gerenciar` (só admin) dependem do papel;
+  Financeiro e Normal veem as mesmas telas. Sempre deve restar um administrador (checado numa única instrução SQL).
+- Trocar a chave Pix (tipo, chave ou favorecido) pede a senha do usuário e grava quem/quando. Não tirar.
 - Nada de rotinas que gravam ou apagam dados ao abrir uma página (seed, limpeza,
   migração). Dados de demonstração só com `npm run seed:demo`, em banco de teste.
 - Nunca enviar ao GitHub `.env*` nem a pasta `dados/`.
@@ -58,8 +68,14 @@ Valores em centavos (integer). Datas em texto ISO (`AAAA-MM-DD`, `AAAA-MM-DDTHH:
 - Cobrança por WhatsApp (botão "Cobrar" nas contas a receber em aberto, no Início e no Financeiro): modal com a mensagem
   pronta e editável, que abre `wa.me` com o texto. Regras em `src/lib/cobranca.ts`, modal em `src/components/cobranca-modal.tsx`.
   O envio final é feito pela pessoa dentro do WhatsApp; o sistema não grava que cobrou (a hora "WhatsApp aberto" só vale na tela aberta).
-  A chave Pix da mensagem vem das variáveis da Vercel `PIX_CHAVE`, `PIX_TIPO` (ex.: e-mail, CNPJ, celular, aleatória) e
-  `PIX_FAVORECIDO`. Sem `PIX_CHAVE` o modal avisa e bloqueia o envio até a chave ser digitada no texto.
+  A chave Pix da mensagem vem dos Dados da empresa (`pixDaEmpresa()` em `src/lib/contexto.ts`). As variáveis da Vercel
+  `PIX_CHAVE`, `PIX_TIPO`, `PIX_FAVORECIDO` só valem como plano B enquanto a chave nunca foi salva na tela (remover depois).
+  Sem chave o modal avisa e bloqueia o envio até a chave ser digitada no texto.
+- Configurações (menu do avatar, canto superior direito: Minha conta, Dados da empresa, Sair; não é um sétimo item do menu lateral):
+  `/configuracoes/conta` (nome, telefone, troca de senha) e `/configuracoes/empresa` (dados da empresa, chave Pix e,
+  só para admin, Equipe e permissões). Validação de CNPJ (numérico e alfanumérico), CPF, telefone e chave Pix em `src/lib/validacao.ts`.
+  O nome da empresa no topo, no título da aba e na cobrança vem desses dados. Ainda não existe cadastro de novos usuários pela tela
+  (o cadastro público só aceita o primeiro usuário; `ALLOW_SIGNUP=true` reabre).
 - Início: toque em um serviço de hoje ou em uma conta vencida/que vence hoje abre um modal com os detalhes.
 - Visual: fundo #E9EEF5, cartões brancos, texto #0F1720, primária #2F5FE0, a receber verde
   #14653A sobre #DDF3E4, a pagar vermelho #8E1B10 sobre #FDE4E1, fonte Plus Jakarta Sans,

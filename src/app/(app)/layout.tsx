@@ -1,6 +1,7 @@
-import { headers } from "next/headers";
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+import { obterContexto } from "@/lib/contexto";
+import { ROTULO_PAPEL } from "@/lib/permissoes";
 import { db } from "@/db";
 import { clientes, tiposServico, tecnicos, tipoServicoColunas } from "@/db/schema";
 import { eq } from "drizzle-orm";
@@ -9,9 +10,14 @@ import { formatDateBR, todaySP } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
+export async function generateMetadata(): Promise<Metadata> {
+  const ctx = await obterContexto();
+  return { title: ctx?.empresa ? `Detetiza OS — ${ctx.empresa.nome}` : "Detetiza OS" };
+}
+
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) redirect("/login");
+  const ctx = await obterContexto();
+  if (!ctx) redirect("/login");
 
   const [clientesList, tiposList, tecnicosList] = await Promise.all([
     db.select({ id: clientes.id, nome: clientes.nome, tipo: clientes.tipo }).from(clientes),
@@ -20,7 +26,14 @@ export default async function ProtectedLayout({ children }: { children: React.Re
   ]);
 
   return (
-    <AppShell clientesList={clientesList} tiposList={tiposList} tecnicosList={tecnicosList} todayLabel={formatDateBR(todaySP())}>
+    <AppShell
+      clientesList={clientesList}
+      tiposList={tiposList}
+      tecnicosList={tecnicosList}
+      todayLabel={formatDateBR(todaySP())}
+      empresaNome={ctx.empresa?.nome ?? "Detetiza OS"}
+      usuario={{ nome: ctx.nome, email: ctx.email, rotuloPapel: ROTULO_PAPEL[ctx.papel] }}
+    >
       {children}
     </AppShell>
   );

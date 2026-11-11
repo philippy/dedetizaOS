@@ -1,13 +1,14 @@
 import { db } from "@/db";
 import { clientes, inscricoes, lancamentos } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { lerPixConfig } from "@/lib/pix-config";
+import { obterContexto, pixDaEmpresa } from "@/lib/contexto";
 import { todaySP } from "@/lib/utils";
 import { FinanceiroView, type LancamentoRow } from "./financeiro-view";
 
 export const dynamic = "force-dynamic";
 
 export default async function FinanceiroPage() {
+  const ctx = await obterContexto();
   const rows = await db
     .select({
       lancamento: lancamentos,
@@ -29,5 +30,5 @@ export default async function FinanceiroPage() {
     inscMorador: r.inscMorador,
     inscTelefone: r.inscTelefone,
   }));
-  return <FinanceiroView today={todaySP()} lancamentosList={list} pix={lerPixConfig()} />;
+  return <FinanceiroView today={todaySP()} lancamentosList={list} pix={pixDaEmpresa(ctx?.empresa ?? null)} />;
 }

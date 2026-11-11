@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { LayoutGrid, Calendar, Users, Wrench, Megaphone, CreditCard, LogOut, ShieldCheck } from "lucide-react";
-import { authClient } from "@/lib/auth-client";
+import { usePathname } from "next/navigation";
+import { LayoutGrid, Calendar, Users, Wrench, Megaphone, CreditCard, ShieldCheck } from "lucide-react";
 import { NovoServicoModal } from "./novo-servico-modal";
+import { UserMenu } from "./user-menu";
 
 const NAV_ITEMS = [
   { href: "/", label: "Início", icon: LayoutGrid },
@@ -15,16 +15,9 @@ const NAV_ITEMS = [
   { href: "/campanhas", label: "Campanhas", icon: Megaphone },
 ];
 
-export function AppShell({ children, clientesList, tiposList, tecnicosList, todayLabel }: any) {
+export function AppShell({ children, clientesList, tiposList, tecnicosList, todayLabel, empresaNome, usuario }: any) {
   const pathname = usePathname();
-  const router = useRouter();
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
-
-  async function handleLogout() {
-    await authClient.signOut();
-    router.push("/login");
-    router.refresh();
-  }
 
   return (
     <div className="min-h-screen bg-[#E9EEF5] p-3 md:p-6 pb-24 md:pb-6 text-[#0F1720]">
@@ -35,15 +28,14 @@ export function AppShell({ children, clientesList, tiposList, tecnicosList, toda
               <ShieldCheck className="w-6 h-6 text-[#9DBBFF]" />
             </div>
             <div>
-              <div className="text-xl font-extrabold leading-tight">Dedetizadora Impacto</div>
+              <div className="text-xl font-extrabold leading-tight">{empresaNome}</div>
               <div className="text-xs font-semibold text-[#3A4658]">Detetiza OS</div>
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <div className="hidden sm:flex items-center bg-white rounded-full px-4 h-12 text-sm font-semibold shadow-sm">{todayLabel}</div>
             <NovoServicoModal clientes={clientesList} tipos={tiposList} tecnicos={tecnicosList} />
-            <button onClick={handleLogout} title="Sair" aria-label="Sair" className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm"><LogOut className="w-5 h-5" /></button>
-            <div className="w-12 h-12 rounded-full bg-[#2F5FE0] text-white flex items-center justify-center text-sm font-extrabold">DI</div>
+            <UserMenu usuario={usuario} rotuloPapel={usuario.rotuloPapel} />
           </div>
         </header>
         <div className="flex gap-5 items-start">

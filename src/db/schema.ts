@@ -1,4 +1,4 @@
-import { pgTable, serial, text, integer, boolean, timestamp, date } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, integer, boolean, timestamp, date, index } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
 export const user = pgTable("user", {
@@ -46,6 +46,38 @@ export const verification = pgTable("verification", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+// Empresa (hoje só existe uma, mas tudo que é "da empresa" já nasce com empresa_id para o sistema
+// poder atender várias). As tabelas de negócio (clientes, servicos...) ainda NÃO têm empresa_id.
+export const empresas = pgTable("empresas", {
+  id: serial("id").primaryKey(),
+  nome: text("nome").notNull(),
+  cnpj: text("cnpj").notNull().default(""),
+  endereco: text("endereco").notNull().default(""),
+  telefone: text("telefone").notNull().default(""),
+  email: text("email").notNull().default(""),
+  responsavel: text("responsavel").notNull().default(""),
+  // Chave Pix usada na cobrança por WhatsApp. pix_tipo: CNPJ, CPF, E-mail, Celular ou Aleatória.
+  pixTipo: text("pix_tipo").notNull().default("CNPJ"),
+  pixChave: text("pix_chave").notNull().default(""),
+  pixFavorecido: text("pix_favorecido").notNull().default(""),
+  // Quem mexeu na chave e quando. Trocar a chave desvia pagamentos, então fica visível na tela.
+  pixAtualizadoEm: timestamp("pix_atualizado_em"),
+  pixAtualizadoPor: text("pix_atualizado_por").references(() => user.id, { onDelete: "set null" }),
+  atualizadoEm: timestamp("atualizado_em").notNull().defaultNow(),
+  atualizadoPor: text("atualizado_por").references(() => user.id, { onDelete: "set null" }),
+  criadoEm: timestamp("criado_em").notNull().defaultNow(),
+});
+
+// Quem pertence a qual empresa e com qual papel (admin, financeiro, normal). Fica numa tabela própria
+// para não mexer nas tabelas do Better Auth. telefone = contato do usuário (tela Minha conta).
+export const membros = pgTable("membros", {
+  userId: text("user_id").primaryKey().references(() => user.id, { onDelete: "cascade" }),
+  empresaId: integer("empresa_id").notNull().references(() => empresas.id, { onDelete: "restrict" }),
+  papel: text("papel", { enum: ["admin", "financeiro", "normal"] }).notNull().default("normal"),
+  telefone: text("telefone").notNull().default(""),
+  criadoEm: timestamp("criado_em").notNull().defaultNow(),
+}, (t) => [index("membros_empresa_idx").on(t.empresaId)]);
 
 export const tecnicos = pgTable("tecnicos", {
   id: serial("id").primaryKey(),

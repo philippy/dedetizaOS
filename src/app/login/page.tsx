@@ -10,7 +10,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [allowRegister, setAllowRegister] = useState(true);
   const [isSignUp, setIsSignUp] = useState(false);
-  const [name, setName] = useState("Dedetizadora Impacto");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -48,13 +48,13 @@ export default function LoginPage() {
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-[15px] bg-[#0F1720] flex items-center justify-center"><ShieldCheck className="w-6 h-6 text-[#9DBBFF]" /></div>
           <div>
-            <h1 className="text-xl font-extrabold">Dedetizadora Impacto</h1>
-            <p className="text-xs font-semibold text-[#3A4658]">Detetiza OS · Acesso ao sistema</p>
+            <h1 className="text-xl font-extrabold">Detetiza OS</h1>
+            <p className="text-xs font-semibold text-[#3A4658]">Acesso ao sistema</p>
           </div>
         </div>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {isSignUp && allowRegister && (
-            <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">Nome<input type="text" required value={name} onChange={(e) => setName(e.target.value)} className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3.5 text-sm" /></label>
+            <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">Nome<input type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder="Seu nome ou o da empresa" className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3.5 text-sm" /></label>
           )}
           <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">E-mail<input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@impacto.com.br" className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3.5 text-sm" /></label>
           <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">Senha<input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3.5 text-sm" /></label>

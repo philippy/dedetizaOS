@@ -46,6 +46,19 @@ export const auth = betterAuth({
           }
           return { data: novoUsuario };
         },
+        // Banco novo: o primeiro usuário cria a empresa e vira administrador dela. Só roda se ainda não
+        // existir nenhuma empresa; os demais usuários são vinculados por um administrador.
+        after: async (criado) => {
+          try {
+            const existentes = await db.select({ id: schema.empresas.id }).from(schema.empresas).limit(1);
+            if (existentes.length > 0) return;
+            const [empresa] = await db.insert(schema.empresas).values({ nome: criado.name }).returning({ id: schema.empresas.id });
+            await db.insert(schema.membros).values({ userId: criado.id, empresaId: empresa.id, papel: "admin" });
+          } catch (e) {
+            // Não derruba o cadastro (ex.: SQL de db/migracoes ainda não rodou). O vínculo pode ser criado depois.
+            console.error("Não foi possível criar a empresa do primeiro usuário", e);
+          }
+        },
       },
     },
   },

@@ -3,12 +3,13 @@ import { servicos, clientes, tiposServico, tecnicos, lancamentos, inscricoes } f
 import { eq } from "drizzle-orm";
 import { formatBRL, formatDateBR, todaySP } from "@/lib/utils";
 import { contaDeLancamento, quemEOque } from "@/lib/cobranca";
-import { lerPixConfig } from "@/lib/pix-config";
+import { obterContexto, pixDaEmpresa } from "@/lib/contexto";
 import { InicioView, type ContaInicio, type ServicoHoje } from "./inicio-view";
 
 export const dynamic = "force-dynamic";
 
 export default async function InicioPage() {
+  const ctx = await obterContexto();
   const hoje = todaySP();
   const mesPrefix = hoje.slice(0, 7);
 
@@ -121,7 +122,7 @@ export default async function InicioPage() {
         </div>
       </section>
 
-      <InicioView hoje={hoje} pix={lerPixConfig()} servicos={servicosView} contas={contasView} />
+      <InicioView hoje={hoje} pix={pixDaEmpresa(ctx?.empresa ?? null)} servicos={servicosView} contas={contasView} />
     </div>
   );
 }
