@@ -106,3 +106,13 @@ export function normalizarChavePix(tipo: TipoPix, valor: string): { ok: true; ch
     }
   }
 }
+
+// ---- Senha provisória ----
+// Sem 0/O, 1/l/I, para não confundir ao repassar a senha por mensagem.
+const ALFABETO_SENHA = "abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+// Ex.: "Xk7m-Qp4w-Tn9c". Usa o gerador criptográfico do Node (só no servidor).
+export function gerarSenhaProvisoria(sorteio: (max: number) => number): string {
+  const grupo = () => Array.from({ length: 4 }, () => ALFABETO_SENHA[sorteio(ALFABETO_SENHA.length)]).join("");
+  return `${grupo()}-${grupo()}-${grupo()}`;
+}

@@ -76,6 +76,8 @@ export const membros = pgTable("membros", {
   empresaId: integer("empresa_id").notNull().references(() => empresas.id, { onDelete: "restrict" }),
   papel: text("papel", { enum: ["admin", "financeiro", "normal"] }).notNull().default("normal"),
   telefone: text("telefone").notNull().default(""),
+  // true enquanto a pessoa usa a senha provisória dada pelo administrador: ela precisa trocar antes de usar o sistema.
+  senhaProvisoria: boolean("senha_provisoria").notNull().default(false),
   criadoEm: timestamp("criado_em").notNull().defaultNow(),
 }, (t) => [index("membros_empresa_idx").on(t.empresaId)]);
 

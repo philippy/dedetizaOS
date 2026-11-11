@@ -36,7 +36,7 @@ Dados dos protótipos são de exemplo e não vão para o banco.
 - inscricoes: campanha_id, tipo_servico_id, unidade, morador, telefone, valor, pago
 - empresas: nome, cnpj, endereco, telefone, email, responsavel, pix_tipo, pix_chave, pix_favorecido,
   pix_atualizado_em/por (quem mexeu na chave), atualizado_em/por. Hoje existe uma só.
-- membros: user_id (um por usuário), empresa_id, papel (admin, financeiro, normal), telefone.
+- membros: user_id (um por usuário), empresa_id, papel (admin, financeiro, normal), telefone, senha_provisoria.
   `empresa_id` já existe aqui, mas as tabelas de negócio (clientes, servicos, lancamentos...) AINDA NÃO têm
   `empresa_id`: antes de atender uma segunda empresa é preciso incluí-lo nelas e filtrar todas as consultas.
 Valores em centavos (integer). Datas em texto ISO (`AAAA-MM-DD`, `AAAA-MM-DDTHH:MM`).
@@ -78,8 +78,13 @@ Valores em centavos (integer). Datas em texto ISO (`AAAA-MM-DD`, `AAAA-MM-DDTHH:
 - Configurações (menu do avatar, canto superior direito: Minha conta, Dados da empresa, Sair; não é um sétimo item do menu lateral):
   `/configuracoes/conta` (nome, telefone, troca de senha) e `/configuracoes/empresa` (dados da empresa, chave Pix e,
   só para admin, Equipe e permissões). Validação de CNPJ (numérico e alfanumérico), CPF, telefone e chave Pix em `src/lib/validacao.ts`.
-  O nome da empresa no topo, no título da aba e na cobrança vem desses dados. Ainda não existe cadastro de novos usuários pela tela
-  (o cadastro público só aceita o primeiro usuário; `ALLOW_SIGNUP=true` reabre).
+  O nome da empresa no topo, no título da aba e na cobrança vem desses dados.
+  O administrador cria usuários em Equipe e permissões (nome, e-mail, papel): o sistema gera uma senha provisória, mostrada UMA vez
+  na tela (não é guardada em texto; só o hash) e a pessoa é obrigada a trocá-la no primeiro acesso (`membros.senha_provisoria`;
+  `(app)/layout.tsx` mostra só a tela de troca enquanto a flag estiver ligada, e a ação de troca confere a senha provisória).
+  Também há "Nova senha" (gera outra provisória e derruba as sessões) e "Remover" (apaga a conta; não remove a si mesmo nem o último admin).
+  Não envia e-mail: o admin repassa a senha por conta própria. O cadastro público continua só para o primeiro usuário (`ALLOW_SIGNUP=true` reabre).
+  A troca obrigatória é barreira de tela (layout), não de cada ação; o login tem limite de tentativas do Better Auth.
 - Início: toque em um serviço de hoje ou em uma conta vencida/que vence hoje abre um modal com os detalhes.
 - Visual: fundo #E9EEF5, cartões brancos, texto #0F1720, primária #2F5FE0, a receber verde
   #14653A sobre #DDF3E4, a pagar vermelho #8E1B10 sobre #FDE4E1, fonte Plus Jakarta Sans,

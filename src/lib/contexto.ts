@@ -16,6 +16,7 @@ export type Contexto = {
   email: string;
   papel: Papel;
   telefone: string;
+  senhaProvisoria: boolean;
   empresa: Empresa | null;
   // false quando a pessoa ainda não tem vínculo na tabela membros (usa a primeira empresa, só leitura).
   temVinculo: boolean;
@@ -35,19 +36,19 @@ export const obterContexto = cache(async (): Promise<Contexto | null> => {
 
   try {
     const [vinculo] = await db
-      .select({ papel: membros.papel, telefone: membros.telefone, empresa: empresas })
+      .select({ papel: membros.papel, telefone: membros.telefone, senhaProvisoria: membros.senhaProvisoria, empresa: empresas })
       .from(membros)
       .innerJoin(empresas, eq(membros.empresaId, empresas.id))
       .where(eq(membros.userId, session.user.id))
       .limit(1);
-    if (vinculo) return { ...base, papel: vinculo.papel, telefone: vinculo.telefone, empresa: vinculo.empresa, temVinculo: true };
+    if (vinculo) return { ...base, papel: vinculo.papel, telefone: vinculo.telefone, senhaProvisoria: vinculo.senhaProvisoria, empresa: vinculo.empresa, temVinculo: true };
 
     // Sem vínculo: papel normal e a primeira empresa, só para leitura. Nada é gravado ao abrir a página.
     const [primeira] = await db.select().from(empresas).orderBy(asc(empresas.id)).limit(1);
-    return { ...base, papel: "normal", telefone: "", empresa: primeira ?? null, temVinculo: false };
+    return { ...base, papel: "normal", telefone: "", senhaProvisoria: false, empresa: primeira ?? null, temVinculo: false };
   } catch (e) {
     if (!tabelaAusente(e)) throw e;
-    return { ...base, papel: "normal", telefone: "", empresa: null, temVinculo: false };
+    return { ...base, papel: "normal", telefone: "", senhaProvisoria: false, empresa: null, temVinculo: false };
   }
 });
 

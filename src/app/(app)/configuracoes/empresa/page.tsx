@@ -38,7 +38,7 @@ export default async function DadosDaEmpresaPage() {
 
   const equipe: Membro[] = podeGerenciar
     ? await db
-        .select({ userId: membros.userId, nome: user.name, email: user.email, papel: membros.papel })
+        .select({ userId: membros.userId, nome: user.name, email: user.email, papel: membros.papel, senhaProvisoria: membros.senhaProvisoria })
         .from(membros)
         .innerJoin(user, eq(membros.userId, user.id))
         .where(eq(membros.empresaId, empresa.id))

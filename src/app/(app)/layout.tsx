@@ -6,6 +6,7 @@ import { db } from "@/db";
 import { clientes, tiposServico, tecnicos, tipoServicoColunas } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { AppShell } from "@/components/app-shell";
+import { TrocaSenhaObrigatoria } from "@/components/troca-senha-obrigatoria";
 import { formatDateBR, todaySP } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -18,6 +19,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
   const ctx = await obterContexto();
   if (!ctx) redirect("/login");
+  // Conta criada pelo administrador: nada do sistema aparece antes de trocar a senha provisória.
+  if (ctx.senhaProvisoria) return <TrocaSenhaObrigatoria nome={ctx.nome} empresaNome={ctx.empresa?.nome ?? "Detetiza OS"} />;
 
   const [clientesList, tiposList, tecnicosList] = await Promise.all([
     db.select({ id: clientes.id, nome: clientes.nome, tipo: clientes.tipo }).from(clientes),
