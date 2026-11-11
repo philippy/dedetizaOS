@@ -6,7 +6,11 @@ import nodemailer from "nodemailer";
 // Sem SMTP_HOST e SMTP_FROM o sistema segue funcionando e as telas escondem as opções de e-mail.
 
 export function emailConfigurado(): boolean {
-  return Boolean(process.env.SMTP_HOST?.trim() && process.env.SMTP_FROM?.trim());
+  if (!process.env.SMTP_HOST?.trim() || !process.env.SMTP_FROM?.trim()) return false;
+  // Com usuário definido, a senha é obrigatória: configuração pela metade não liga o e-mail
+  // (evita mostrar opções de envio que fatalmente falhariam).
+  if (process.env.SMTP_USER?.trim() && !process.env.SMTP_PASS) return false;
+  return true;
 }
 
 function transporte() {

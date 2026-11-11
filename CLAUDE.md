@@ -100,7 +100,7 @@ Valores em centavos (integer). Datas em texto ISO (`AAAA-MM-DD`, `AAAA-MM-DDTHH:
   Também há "Nova senha" (gera outra provisória e derruba as sessões) e "Remover" (apaga a conta; não remove a si mesmo nem o último admin).
   O cadastro público continua só para o primeiro usuário (`ALLOW_SIGNUP=true` reabre).
   E-mail (`src/lib/email.ts`, nodemailer 10.3.1 fixado): SMTP só por variáveis de ambiente `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`
-  (`SMTP_SECURE` opcional). Sem `SMTP_HOST` e `SMTP_FROM` o sistema funciona e as telas escondem as opções de e-mail. Usos: desbloqueio do Pix, envio opcional do
+  (`SMTP_SECURE` opcional). Sem `SMTP_HOST` e `SMTP_FROM` (ou com `SMTP_USER` sem `SMTP_PASS`) o sistema funciona e as telas escondem as opções de e-mail. Usos: desbloqueio do Pix, envio opcional do
   acesso ao criar usuário / gerar nova senha, e "Esqueci minha senha" (`/esqueci-senha` e `/redefinir-senha`, link de 1 hora, derruba sessões e dispensa a troca da provisória).
   Nunca colocar credenciais SMTP no código nem em arquivo versionado.
   A troca obrigatória é barreira de tela (layout), não de cada ação; o login tem limite de tentativas do Better Auth.
