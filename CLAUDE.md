@@ -7,7 +7,8 @@ Produção: https://dedetiza-os.vercel.app (deploy automático a cada push na `m
 ## Escopo (MVP)
 Início, Agenda, Clientes, Serviços, Financeiro (contas a pagar e a receber) e Campanhas.
 Fora do escopo: IA, leitura de comprovante Pix, app offline do técnico, perfis de acesso,
-WhatsApp, Gerente Digital, certificados.
+Gerente Digital, certificados, atendente automático e qualquer integração/API do WhatsApp.
+Entra só a cobrança por LINK do WhatsApp (wa.me), sem API, sem número comercial e sem envio automático.
 
 ## Protótipo
 As telas de referência estão em `prototipo/`. Leia `prototipo/README.md` antes de criar ou
@@ -54,6 +55,12 @@ Valores em centavos (integer). Datas em texto ISO (`AAAA-MM-DD`, `AAAA-MM-DDTHH:
 - Excluir serviço = mudar status para cancelado. Lançamento pago não pode ser excluído.
 - Ao concluir um serviço, criar o lançamento a receber: vence hoje para PF e em 30 dias para PJ.
 - Cada inscrição de campanha cria um lançamento a receber.
+- Cobrança por WhatsApp (botão "Cobrar" nas contas a receber em aberto, no Início e no Financeiro): modal com a mensagem
+  pronta e editável, que abre `wa.me` com o texto. Regras em `src/lib/cobranca.ts`, modal em `src/components/cobranca-modal.tsx`.
+  O envio final é feito pela pessoa dentro do WhatsApp; o sistema não grava que cobrou (a hora "WhatsApp aberto" só vale na tela aberta).
+  A chave Pix da mensagem vem das variáveis da Vercel `PIX_CHAVE`, `PIX_TIPO` (ex.: e-mail, CNPJ, celular, aleatória) e
+  `PIX_FAVORECIDO`. Sem `PIX_CHAVE` o modal avisa e bloqueia o envio até a chave ser digitada no texto.
+- Início: toque em um serviço de hoje ou em uma conta vencida/que vence hoje abre um modal com os detalhes.
 - Visual: fundo #E9EEF5, cartões brancos, texto #0F1720, primária #2F5FE0, a receber verde
   #14653A sobre #DDF3E4, a pagar vermelho #8E1B10 sobre #FDE4E1, fonte Plus Jakarta Sans,
   botões em pílula, áreas de toque de no mínimo 44 px.

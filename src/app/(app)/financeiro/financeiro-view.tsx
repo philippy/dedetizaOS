@@ -3,10 +3,19 @@
 import { useMemo, useState } from "react";
 import { ArrowDownLeft, ArrowUpRight, ChevronDown, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { criarLancamentoPagarAction, darBaixaLancamentoAction, excluirLancamentoAction } from "@/actions";
+import { CobrancaModal } from "@/components/cobranca-modal";
 import type { lancamentos } from "@/db/schema";
+import { contaDeLancamento, quemEOque as quemEOqueBase, type ContaCobranca, type PixConfig } from "@/lib/cobranca";
 import { addDaysISO, centsToInput, formatBRL, formatDateBR, formatDiaExtenso, monthRangeISO } from "@/lib/utils";
 
-export type LancamentoRow = typeof lancamentos.$inferSelect & { clienteNome: string | null };
+export type LancamentoRow = typeof lancamentos.$inferSelect & {
+  clienteNome: string | null;
+  // Contato para a cobrança por WhatsApp: do cliente ou, nas contas de campanha, do morador inscrito.
+  clienteTipo: "PF" | "PJ" | null;
+  clienteWhatsapp: string | null;
+  inscMorador: string | null;
+  inscTelefone: string | null;
+};
 
 type Situacao = "Recebido" | "Pago" | "Vencido" | "Vence hoje" | "Em aberto";
 type Filtro = "Todas" | "Em aberto" | "Vencidas" | "Pagas";
@@ -30,17 +39,19 @@ function situacao(l: LancamentoRow, today: string): Situacao {
   return "Em aberto";
 }
 
-// Quem e o quê, como no protótipo. A descrição de serviço é "Tipo · Cliente";
-// tira o nome do cliente do fim para não repetir.
+// Quem e o quê, como no protótipo (regra compartilhada com o Início em lib/cobranca).
 function quemEOque(l: LancamentoRow) {
-  if (l.tipo === "pagar") return { who: l.fornecedor || "Fornecedor", what: l.descricao };
-  if (l.clienteNome) {
-    const sufixo = ` · ${l.clienteNome}`;
-    const what = l.descricao.endsWith(sufixo) ? l.descricao.slice(0, -sufixo.length) : l.descricao;
-    return { who: l.clienteNome, what };
-  }
-  const [a, ...resto] = l.descricao.split(" · ");
-  return resto.length ? { who: a, what: resto.join(" · ") } : { who: l.descricao, what: "" };
+  return quemEOqueBase(l, { clienteNome: l.clienteNome });
+}
+
+function contaCobranca(l: LancamentoRow): ContaCobranca {
+  return contaDeLancamento(l, {
+    clienteNome: l.clienteNome,
+    clienteTipo: l.clienteTipo,
+    clienteWhatsapp: l.clienteWhatsapp,
+    inscMorador: l.inscMorador,
+    inscTelefone: l.inscTelefone,
+  });
 }
 
 const soma = (arr: LancamentoRow[]) => arr.reduce((t, x) => t + x.valor, 0);
@@ -50,7 +61,7 @@ function totais(arr: LancamentoRow[]) {
   return { total: soma(arr), feito: soma(pagos), aberto: soma(arr) - soma(pagos) };
 }
 
-export function FinanceiroView({ today, lancamentosList }: { today: string; lancamentosList: LancamentoRow[] }) {
+export function FinanceiroView({ today, lancamentosList, pix }: { today: string; lancamentosList: LancamentoRow[]; pix: PixConfig | null }) {
   const [mesIni, mesFim] = monthRangeISO(today);
   const [from, setFrom] = useState(mesIni);
   const [to, setTo] = useState(mesFim);
@@ -73,6 +84,10 @@ export function FinanceiroView({ today, lancamentosList }: { today: string; lanc
 
   const [excluirId, setExcluirId] = useState<number | null>(null);
   const [salvando, setSalvando] = useState(false);
+
+  // Cobrança por WhatsApp. A hora do último link aberto só vale enquanto a tela está aberta.
+  const [cobrar, setCobrar] = useState<ContaCobranca | null>(null);
+  const [cobradas, setCobradas] = useState<Record<number, string>>({});
 
   const atalhos: { label: Periodo; de: string; ate: string }[] = [
     { label: "Hoje", de: today, ate: today },
@@ -178,12 +193,18 @@ export function FinanceiroView({ today, lancamentosList }: { today: string; lanc
           <div className="text-xs font-medium text-[#3A4658] mt-0.5">
             {what ? `${what} · ` : ""}vence {formatDateBR(l.vencimento).slice(0, 5)}
           </div>
+          {cobradas[l.id] && <div className="text-[11px] font-bold text-[#14653A] mt-0.5">WhatsApp aberto hoje às {cobradas[l.id]}</div>}
         </div>
         <div className="flex items-center gap-2 ml-auto">
           <div className="text-right">
             <div className={`text-[15px] font-extrabold ${cor}`}>{formatBRL(l.valor)}</div>
             <span className={`inline-block mt-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold whitespace-nowrap ${CHIP[st]}`}>{st}</span>
           </div>
+          {aberto && l.tipo === "receber" && excluirId !== l.id && (
+            <button onClick={() => setCobrar(contaCobranca(l))} aria-label={`Cobrar ${who} por WhatsApp`} className="min-h-[44px] rounded-full border-[1.5px] border-[#0F1720] px-3.5 text-xs font-bold">
+              Cobrar
+            </button>
+          )}
           {aberto && excluirId !== l.id && (
             <button onClick={() => abrirBaixa(l)} className="min-h-[44px] rounded-full border-[1.5px] border-[#0F1720] px-3.5 text-xs font-bold">
               Dar baixa
@@ -214,10 +235,18 @@ export function FinanceiroView({ today, lancamentosList }: { today: string; lanc
         <div className="min-w-0">
           <div className="text-sm font-extrabold">{who}</div>
           {what && <div className="text-xs font-medium text-[#3A4658]">{what}</div>}
+          {cobradas[l.id] && <div className="text-[11px] font-bold text-[#14653A] mt-0.5">WhatsApp aberto hoje às {cobradas[l.id]}</div>}
         </div>
-        <div className="shrink-0 text-right">
-          <div className={`text-sm font-extrabold ${cor}`}>{formatBRL(l.valor)}</div>
-          <span className={`inline-block mt-0.5 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${CHIP[st]}`}>{st}</span>
+        <div className="shrink-0 flex items-center gap-2">
+          {l.status === "aberto" && l.tipo === "receber" && (
+            <button onClick={() => setCobrar(contaCobranca(l))} aria-label={`Cobrar ${who} por WhatsApp`} className="min-h-[44px] rounded-full border-[1.5px] border-[#0F1720] px-3.5 text-xs font-bold">
+              Cobrar
+            </button>
+          )}
+          <div className="text-right">
+            <div className={`text-sm font-extrabold ${cor}`}>{formatBRL(l.valor)}</div>
+            <span className={`inline-block mt-0.5 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${CHIP[st]}`}>{st}</span>
+          </div>
         </div>
       </div>
     );
@@ -385,6 +414,17 @@ export function FinanceiroView({ today, lancamentosList }: { today: string; lanc
             </div>
           </div>
         </div>
+      )}
+
+      {cobrar && (
+        <CobrancaModal
+          key={cobrar.id}
+          conta={cobrar}
+          hoje={today}
+          pix={pix}
+          onClose={() => setCobrar(null)}
+          onAberto={(id, hora) => setCobradas((p) => ({ ...p, [id]: hora }))}
+        />
       )}
 
       {baixaItem && (
