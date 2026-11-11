@@ -81,3 +81,7 @@ function pixDasVariaveis(): PixConfig | null {
     favorecido: process.env.PIX_FAVORECIDO?.trim() || "Dedetizadora Impacto",
   };
 }
+
+// Id da empresa da sessão para filtrar consultas de leitura. Sem empresa devolve 0, que nenhuma linha tem
+// (as telas ficam vazias em vez de mostrar dados de outra empresa).
+export const empresaIdDe = (ctx: Contexto | null): number => ctx?.empresa?.id ?? 0;

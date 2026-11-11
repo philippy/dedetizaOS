@@ -1,7 +1,8 @@
+import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { clientes, servicos, lancamentos } from "@/db/schema";
 import { ClientesView } from "./clientes-view";
-import { obterContexto } from "@/lib/contexto";
+import { empresaIdDe, obterContexto } from "@/lib/contexto";
 import { pode } from "@/lib/permissoes";
 
 export const dynamic = "force-dynamic";
@@ -9,10 +10,11 @@ export const dynamic = "force-dynamic";
 export default async function ClientesPage() {
   const ctx = await obterContexto();
   const verFinanceiro = !!ctx && pode(ctx.papel, "financeiro.acessar");
+  const eid = empresaIdDe(ctx);
   const [allClientes, allServicos, allLancamentos] = await Promise.all([
-    db.select().from(clientes),
-    db.select().from(servicos),
-    verFinanceiro ? db.select().from(lancamentos) : Promise.resolve([] as (typeof lancamentos.$inferSelect)[]),
+    db.select().from(clientes).where(eq(clientes.empresaId, eid)),
+    db.select().from(servicos).where(eq(servicos.empresaId, eid)),
+    verFinanceiro ? db.select().from(lancamentos).where(eq(lancamentos.empresaId, eid)) : Promise.resolve([] as (typeof lancamentos.$inferSelect)[]),
   ]);
 
   const rows = allClientes.map((c) => {

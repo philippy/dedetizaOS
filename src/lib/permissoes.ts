@@ -11,13 +11,15 @@ export const ROTULO_PAPEL: Record<Papel, string> = {
   normal: "Normal",
 };
 
-export type Acao = "empresa.editar" | "equipe.gerenciar" | "financeiro.acessar";
+export type Acao = "empresa.editar" | "equipe.gerenciar" | "financeiro.acessar" | "dados.escrever";
 
 const QUEM_PODE: Record<Acao, readonly Papel[]> = {
   "empresa.editar": ["admin"],
   "equipe.gerenciar": ["admin"],
   // Tela Financeiro, contas a pagar e a receber, cobrança, baixa e os totais de dinheiro das outras telas.
   "financeiro.acessar": ["admin", "financeiro"],
+  // Gravar clientes, serviços, técnicos e campanhas da própria empresa. Exige vínculo com uma empresa (ver autorizar()).
+  "dados.escrever": ["admin", "financeiro", "normal"],
 };
 
 export function ehPapel(valor: unknown): valor is Papel {

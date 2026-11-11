@@ -2,11 +2,11 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/db";
 import { clientes, servicos, tiposServico, tecnicos, lancamentos } from "@/db/schema";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { diffDaysISO, formatBRL, formatDateBR, formatDateTimeBR, todaySP } from "@/lib/utils";
 import { calcularPainel, statusDaLinha, textoPrazo, MESES_RETORNO, type StatusLinha } from "@/lib/cliente-painel";
 import { ClienteFichaForm } from "./cliente-ficha-form";
-import { obterContexto } from "@/lib/contexto";
+import { empresaIdDe, obterContexto } from "@/lib/contexto";
 import { pode } from "@/lib/permissoes";
 
 export const dynamic = "force-dynamic";
@@ -37,8 +37,9 @@ export default async function ClienteDetalhePage({ params }: { params: Promise<{
   const ctx = await obterContexto();
   const verFinanceiro = !!ctx && pode(ctx.papel, "financeiro.acessar");
   const clienteId = Number(id);
+  const eid = empresaIdDe(ctx);
   if (!Number.isInteger(clienteId)) notFound();
-  const [cliente] = await db.select().from(clientes).where(eq(clientes.id, clienteId));
+  const [cliente] = await db.select().from(clientes).where(and(eq(clientes.id, clienteId), eq(clientes.empresaId, eid)));
   if (!cliente) notFound();
 
   const historico = await db
@@ -46,11 +47,11 @@ export default async function ClienteDetalhePage({ params }: { params: Promise<{
     .from(servicos)
     .innerJoin(tiposServico, eq(servicos.tipoServicoId, tiposServico.id))
     .leftJoin(tecnicos, eq(servicos.tecnicoId, tecnicos.id))
-    .where(eq(servicos.clienteId, clienteId))
+    .where(and(eq(servicos.clienteId, clienteId), eq(servicos.empresaId, eid)))
     .orderBy(desc(servicos.dataHora));
 
   // Sem acesso ao Financeiro, as contas do cliente nem são lidas.
-  const lancCliente = verFinanceiro ? await db.select().from(lancamentos).where(eq(lancamentos.clienteId, clienteId)) : [];
+  const lancCliente = verFinanceiro ? await db.select().from(lancamentos).where(and(eq(lancamentos.clienteId, clienteId), eq(lancamentos.empresaId, eid))) : [];
 
   const hoje = todaySP();
   const p = calcularPainel(historico, lancCliente, hoje);

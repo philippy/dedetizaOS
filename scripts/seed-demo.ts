@@ -4,7 +4,7 @@
 import "./load-env";
 import { sql } from "drizzle-orm";
 import { db } from "../src/db";
-import { tecnicos } from "../src/db/schema";
+import { empresas, tecnicos } from "../src/db/schema";
 import { sqlRecriarDemo } from "../src/lib/demo-data";
 import { todaySP } from "../src/lib/utils";
 
@@ -14,6 +14,11 @@ async function main() {
   const local = /@(localhost|127\.0\.0\.1)(:\d+)?\//.test(url);
   if (!local && !process.argv.includes("--permitir-remoto")) {
     console.error("DATABASE_URL não aponta para um Postgres local. Os dados de demonstração só devem ir para banco de teste. Se tem certeza, use --permitir-remoto.");
+    process.exit(1);
+  }
+  const temEmpresa = await db.select({ id: empresas.id }).from(empresas).limit(1);
+  if (temEmpresa.length === 0) {
+    console.error("Não há empresa cadastrada. Crie o primeiro usuário (login) antes: ele cria a empresa. Os dados de demonstração pertencem a ela.");
     process.exit(1);
   }
   const reset = process.argv.includes("--reset");

@@ -47,8 +47,9 @@ export const verification = pgTable("verification", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Empresa (hoje só existe uma, mas tudo que é "da empresa" já nasce com empresa_id para o sistema
-// poder atender várias). As tabelas de negócio (clientes, servicos...) ainda NÃO têm empresa_id.
+// Empresa (hoje só existe uma, mas tudo que é "da empresa" tem empresa_id para o sistema poder atender várias).
+// Toda tabela de negócio (tecnicos, clientes, tipos_servico, servicos, campanhas, inscricoes, lancamentos) tem empresa_id:
+// TODA consulta filtra por ele e TODO insert o grava, sempre a partir da sessão (ver obterContexto/autorizar).
 export const empresas = pgTable("empresas", {
   id: serial("id").primaryKey(),
   nome: text("nome").notNull(),
@@ -103,14 +104,16 @@ export const auditoria = pgTable("auditoria", {
 
 export const tecnicos = pgTable("tecnicos", {
   id: serial("id").primaryKey(),
+  empresaId: integer("empresa_id").notNull().references(() => empresas.id, { onDelete: "restrict" }),
   nome: text("nome").notNull(),
   telefone: text("telefone").notNull(),
   cor: text("cor").notNull().default("#2F5FE0"),
   ativo: boolean("ativo").notNull().default(true),
-});
+}, (t) => [index("tecnicos_empresa_idx").on(t.empresaId)]);
 
 export const clientes = pgTable("clientes", {
   id: serial("id").primaryKey(),
+  empresaId: integer("empresa_id").notNull().references(() => empresas.id, { onDelete: "restrict" }),
   tipo: text("tipo", { enum: ["PF", "PJ"] }).notNull().default("PJ"),
   nome: text("nome").notNull(),
   documento: text("documento").default(""),
@@ -119,10 +122,11 @@ export const clientes = pgTable("clientes", {
   endereco: text("endereco").default(""),
   observacoes: text("observacoes").default(""),
   criadoEm: timestamp("criado_em").notNull().defaultNow(),
-});
+}, (t) => [index("clientes_empresa_idx").on(t.empresaId)]);
 
 export const tiposServico = pgTable("tipos_servico", {
   id: serial("id").primaryKey(),
+  empresaId: integer("empresa_id").notNull().references(() => empresas.id, { onDelete: "restrict" }),
   nome: text("nome").notNull(),
   preco: integer("preco").notNull(),
   // Tempo que o serviço costuma levar, em minutos. Serve de padrão ao agendar.
@@ -130,7 +134,7 @@ export const tiposServico = pgTable("tipos_servico", {
   // Foto do serviço, já reduzida no navegador, como data URL (jpeg/png/webp). Pesada: só a
   // tela Serviços lê; as demais telas usam tipoServicoColunas.
   imagem: text("imagem"),
-});
+}, (t) => [index("tipos_servico_empresa_idx").on(t.empresaId)]);
 
 // Colunas leves do tipo de serviço (sem a imagem), para telas que só precisam de nome, preço e duração.
 export const tipoServicoColunas = {
@@ -142,6 +146,7 @@ export const tipoServicoColunas = {
 
 export const servicos = pgTable("servicos", {
   id: serial("id").primaryKey(),
+  empresaId: integer("empresa_id").notNull().references(() => empresas.id, { onDelete: "restrict" }),
   clienteId: integer("cliente_id").notNull().references(() => clientes.id, { onDelete: "cascade" }),
   tipoServicoId: integer("tipo_servico_id").notNull().references(() => tiposServico.id),
   tecnicoId: integer("tecnico_id").references(() => tecnicos.id),
@@ -151,10 +156,11 @@ export const servicos = pgTable("servicos", {
   duracaoMin: integer("duracao_min").notNull().default(60),
   status: text("status", { enum: ["agendado", "concluido", "cancelado"] }).notNull().default("agendado"),
   observacoes: text("observacoes").default(""),
-});
+}, (t) => [index("servicos_empresa_idx").on(t.empresaId)]);
 
 export const campanhas = pgTable("campanhas", {
   id: serial("id").primaryKey(),
+  empresaId: integer("empresa_id").notNull().references(() => empresas.id, { onDelete: "restrict" }),
   nome: text("nome").notNull(),
   local: text("local").notNull(),
   dataInicio: date("data_inicio", { mode: "string" }).notNull(),
@@ -164,10 +170,11 @@ export const campanhas = pgTable("campanhas", {
   // Tipos de serviço oferecidos na campanha. Vazio = todo o catálogo.
   tiposServicoIds: integer("tipos_servico_ids").array().notNull().default(sql`'{}'::integer[]`),
   status: text("status", { enum: ["agendada", "finalizada", "cancelada"] }).notNull().default("agendada"),
-});
+}, (t) => [index("campanhas_empresa_idx").on(t.empresaId)]);
 
 export const inscricoes = pgTable("inscricoes", {
   id: serial("id").primaryKey(),
+  empresaId: integer("empresa_id").notNull().references(() => empresas.id, { onDelete: "restrict" }),
   campanhaId: integer("campanha_id").notNull().references(() => campanhas.id, { onDelete: "cascade" }),
   unidade: text("unidade").notNull(),
   tipoServicoId: integer("tipo_servico_id").references(() => tiposServico.id, { onDelete: "set null" }),
@@ -175,10 +182,11 @@ export const inscricoes = pgTable("inscricoes", {
   telefone: text("telefone").notNull(),
   valor: integer("valor").notNull(),
   pago: boolean("pago").notNull().default(false),
-});
+}, (t) => [index("inscricoes_empresa_idx").on(t.empresaId)]);
 
 export const lancamentos = pgTable("lancamentos", {
   id: serial("id").primaryKey(),
+  empresaId: integer("empresa_id").notNull().references(() => empresas.id, { onDelete: "restrict" }),
   tipo: text("tipo", { enum: ["receber", "pagar"] }).notNull(),
   descricao: text("descricao").notNull(),
   clienteId: integer("cliente_id").references(() => clientes.id, { onDelete: "set null" }),
@@ -189,4 +197,4 @@ export const lancamentos = pgTable("lancamentos", {
   valor: integer("valor").notNull(),
   status: text("status", { enum: ["aberto", "pago"] }).notNull().default("aberto"),
   pagoEm: date("pago_em", { mode: "string" }),
-});
+}, (t) => [index("lancamentos_empresa_idx").on(t.empresaId)]);

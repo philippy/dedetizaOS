@@ -3,7 +3,7 @@ import { servicos, clientes, tiposServico, tecnicos, lancamentos, inscricoes } f
 import { eq } from "drizzle-orm";
 import { formatBRL, formatDateBR, todaySP } from "@/lib/utils";
 import { contaDeLancamento, quemEOque } from "@/lib/cobranca";
-import { obterContexto, pixDaEmpresa } from "@/lib/contexto";
+import { empresaIdDe, obterContexto, pixDaEmpresa } from "@/lib/contexto";
 import { pode } from "@/lib/permissoes";
 import { InicioView, type ContaInicio, type ServicoHoje } from "./inicio-view";
 
@@ -13,6 +13,7 @@ export default async function InicioPage() {
   const ctx = await obterContexto();
   // Sem acesso ao Financeiro, nenhum dado de dinheiro é nem lido: o painel de contas e os totais não existem para a pessoa.
   const verFinanceiro = !!ctx && pode(ctx.papel, "financeiro.acessar");
+  const eid = empresaIdDe(ctx);
   const hoje = todaySP();
   const mesPrefix = hoje.slice(0, 7);
 
@@ -32,7 +33,8 @@ export default async function InicioPage() {
     .from(servicos)
     .innerJoin(clientes, eq(servicos.clienteId, clientes.id))
     .innerJoin(tiposServico, eq(servicos.tipoServicoId, tiposServico.id))
-    .leftJoin(tecnicos, eq(servicos.tecnicoId, tecnicos.id));
+    .leftJoin(tecnicos, eq(servicos.tecnicoId, tecnicos.id))
+    .where(eq(servicos.empresaId, eid));
 
   const servicosHoje = allServicos.filter((s) => s.dataHora.startsWith(hoje) && s.status !== "cancelado").sort((a, b) => a.dataHora.localeCompare(b.dataHora));
 
@@ -47,7 +49,8 @@ export default async function InicioPage() {
     })
     .from(lancamentos)
     .leftJoin(clientes, eq(lancamentos.clienteId, clientes.id))
-    .leftJoin(inscricoes, eq(lancamentos.inscricaoId, inscricoes.id));
+    .leftJoin(inscricoes, eq(lancamentos.inscricaoId, inscricoes.id))
+    .where(eq(lancamentos.empresaId, eid));
 
   const allLancamentos = lancRows.map((r) => r.lancamento);
   const lancMes = allLancamentos.filter((l) => l.vencimento.startsWith(mesPrefix));

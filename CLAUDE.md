@@ -40,8 +40,13 @@ Dados dos protótipos são de exemplo e não vão para o banco.
   pix_falhas/pix_ultima_falha/pix_bloqueado_ate (limite de senha na troca da chave Pix).
 - auditoria: registro de atividades (empresa_id, quando, ator_id/nome/email, acao, alvo_id/nome/email, detalhe). SEM chave estrangeira para o
   usuário: guarda nome e e-mail no momento do fato, então o histórico sobrevive à remoção da conta. Só o admin lê (Dados da empresa). Nunca apagar linhas.
-  `empresa_id` já existe aqui, mas as tabelas de negócio (clientes, servicos, lancamentos...) AINDA NÃO têm
-  `empresa_id`: antes de atender uma segunda empresa é preciso incluí-lo nelas e filtrar todas as consultas.
+- Multiempresa: TODAS as tabelas de negócio (tecnicos, clientes, tipos_servico, servicos, campanhas, inscricoes, lancamentos) têm `empresa_id`
+  (not null, índice `*_empresa_idx`). Regra: a empresa vem da sessão (`aut.ctx.empresa.id` nas ações, `empresaIdDe(ctx)` nas páginas), nunca do navegador.
+  Toda leitura filtra por `empresaId` e toda gravação/atualização/exclusão usa `and(eq(tabela.id, x), eq(tabela.empresaId, eid))`. Ao receber ids de
+  outras tabelas (cliente, tipo, técnico, campanha) numa ação, conferir que pertencem à mesma empresa antes de gravar (hoje só validação na aplicação,
+  sem chave estrangeira composta). Ação de dados do dia a dia usa `autorizar("dados.escrever")` (todos os papéis, exige vínculo com a empresa).
+  Tabela nova de negócio já nasce com `empresa_id`. O teste de isolamento (empresa B tentando ler/alterar dados da A, repetindo as Server Actions
+  com ids da A) precisa continuar passando.
 Valores em centavos (integer). Datas em texto ISO (`AAAA-MM-DD`, `AAAA-MM-DDTHH:MM`).
 
 ## Segurança (não remover)
@@ -52,7 +57,7 @@ Valores em centavos (integer). Datas em texto ISO (`AAAA-MM-DD`, `AAAA-MM-DDTHH:
 - Permissões: papel vem da tabela `membros`, lido no servidor por `obterContexto()` (`src/lib/contexto.ts`). Regras em
   `src/lib/permissoes.ts` (`pode(papel, acao)`). Toda Server Action de dados da empresa ou da equipe usa `autorizar(acao)`;
   a empresa vem da sessão, nunca do navegador. Ações: `empresa.editar` e `equipe.gerenciar` (só admin) e `financeiro.acessar`
-  (admin e financeiro). O papel Normal não vê o item Financeiro no menu, `/financeiro` redireciona para o Início, e os dados de dinheiro
+  (admin e financeiro) e `dados.escrever` (todos os papéis com vínculo; cadastros, agenda, campanhas). O papel Normal não vê o item Financeiro no menu, `/financeiro` redireciona para o Início, e os dados de dinheiro
   nem são lidos no servidor para ele: KPIs e painel de contas do Início, Cobrar, "Pagamento" no modal do serviço, LTV/pendente/atraso e
   chips de pagamento do cliente, "Total pago" em Clientes, receita em Campanhas e "Marcar como pago". As ações que gravam dinheiro
   (baixa, criar/excluir conta, marcar inscrição paga) conferem `financeiro.acessar` no servidor. O preço do serviço continua visível.

@@ -187,12 +187,15 @@ export function gerarDadosDemo(hoje: string) {
 const q = (v: string | number | boolean | null) =>
   v === null ? "NULL" : typeof v === "number" ? String(v) : typeof v === "boolean" ? (v ? "true" : "false") : `'${v.replace(/'/g, "''")}'`;
 
+// Os dados de demonstração pertencem à primeira empresa cadastrada (crie o primeiro usuário antes).
+const EMPRESA_DEMO = "(SELECT id FROM empresas ORDER BY id LIMIT 1)";
+
 // Um único bloco: apaga os dados de negócio (usuários e sessões ficam) e insere o
 // conjunto de demonstração. Ou faz tudo, ou nada.
 export function sqlRecriarDemo(hoje: string): string {
   const g = gerarDadosDemo(hoje);
   const rows = (t: string, cols: string[], vals: (string | number | boolean | null)[][]) =>
-    `INSERT INTO ${t} (${cols.join(", ")}) VALUES\n${vals.map((r) => `(${r.map(q).join(", ")})`).join(",\n")};`;
+    `INSERT INTO ${t} (${cols.join(", ")}, empresa_id) VALUES\n${vals.map((r) => `(${r.map(q).join(", ")}, ${EMPRESA_DEMO})`).join(",\n")};`;
   return `DO $demo$
 BEGIN
 TRUNCATE lancamentos, inscricoes, campanhas, servicos, clientes, tipos_servico, tecnicos RESTART IDENTITY CASCADE;

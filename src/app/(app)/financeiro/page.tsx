@@ -24,7 +24,8 @@ export default async function FinanceiroPage() {
     })
     .from(lancamentos)
     .leftJoin(clientes, eq(lancamentos.clienteId, clientes.id))
-    .leftJoin(inscricoes, eq(lancamentos.inscricaoId, inscricoes.id));
+    .leftJoin(inscricoes, eq(lancamentos.inscricaoId, inscricoes.id))
+    .where(eq(lancamentos.empresaId, ctx.empresa?.id ?? 0));
 
   const list: LancamentoRow[] = rows.map((r) => ({
     ...r.lancamento,
