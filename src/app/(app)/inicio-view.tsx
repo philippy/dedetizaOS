@@ -106,7 +106,7 @@ export function InicioView({ hoje, pix, servicos, contas, verFinanceiro }: {
         {verFinanceiro && <section className="bg-white rounded-[24px] p-5 shadow-sm flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <h2 className="text-[17px] font-extrabold">Contas de hoje e vencidas</h2>
-            <Link href="/financeiro" className="text-xs font-bold text-[#1B47B5]">Financeiro →</Link>
+            <Link href="/financeiro" className="text-xs font-bold text-[#1B47B5] whitespace-nowrap">Financeiro →</Link>
           </div>
           <div className="rounded-[16px] overflow-hidden"><ImpactoAnimation type="payment" /></div>
           {contas.length === 0 ? (
@@ -117,35 +117,38 @@ export function InicioView({ hoje, pix, servicos, contas, verFinanceiro }: {
                 const sit = situacaoVencimento(c.vencimento, hoje);
                 const receber = c.tipo === "receber";
                 return (
-                  <div key={c.id} className="flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-slate-200">
+                  <div key={c.id} className="flex flex-wrap sm:flex-nowrap items-center gap-x-2 gap-y-1 border-t border-slate-200">
                     <button
                       type="button"
                       onClick={() => setDetalhe({ t: "conta", id: c.id })}
                       aria-label={`Ver detalhes da conta ${c.quem}, ${sit.longo.toLowerCase()}`}
-                      className="flex-1 basis-60 min-w-0 min-h-[56px] flex items-center justify-between gap-3 py-2.5 text-left hover:bg-[#F4F7FB] rounded-lg"
+                      className="basis-full sm:basis-0 sm:flex-1 min-w-0 min-h-[56px] flex items-center justify-between gap-3 py-2.5 text-left hover:bg-[#F4F7FB] rounded-lg"
                     >
-                      <span className="min-w-0">
+                      <span className="min-w-0 flex-1">
                         <span className="block text-sm font-bold">{c.quem}</span>
                         <span className="block text-xs text-[#3A4658] mt-0.5">
                           {c.oQue ? `${c.oQue} · ` : ""}vence {formatDateBR(c.vencimento).slice(0, 5)}
                         </span>
                         {cobradas[c.id] && <span className="block text-[11px] font-bold text-[#14653A] mt-0.5">WhatsApp aberto hoje às {cobradas[c.id]}</span>}
                       </span>
-                      <span className="shrink-0 text-right">
+                      <span className="shrink-0 w-[116px] text-right">
                         <span className={`block text-sm font-extrabold ${receber ? "text-[#14653A]" : "text-[#8E1B10]"}`}>{formatBRL(c.valor)}</span>
                         <span className={`inline-block mt-0.5 rounded-full px-2.5 py-0.5 text-[11px] font-bold whitespace-nowrap ${sit.chip}`}>{sit.curto}</span>
                       </span>
                       <ChevronRight className="w-[18px] h-[18px] shrink-0 text-[#3A4658]" aria-hidden="true" />
                     </button>
-                    {receber && c.cobranca && (
+                    {receber && c.cobranca ? (
                       <button
                         type="button"
                         onClick={() => setCobrar(c.cobranca)}
                         aria-label={`Cobrar ${c.quem} por WhatsApp`}
-                        className="min-h-[44px] rounded-full border-[1.5px] border-[#0F1720] bg-white px-4 text-xs font-bold"
+                        className="ml-auto sm:ml-0 mb-2 sm:mb-0 min-h-[44px] w-[96px] shrink-0 rounded-full border-[1.5px] border-[#0F1720] bg-white px-4 text-xs font-bold"
                       >
                         Cobrar
                       </button>
+                    ) : (
+                      // Reserva o espaço do botão para os valores ficarem na mesma coluna em todas as linhas.
+                      <span aria-hidden="true" className="hidden sm:block w-[96px] shrink-0" />
                     )}
                   </div>
                 );
