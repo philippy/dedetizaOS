@@ -10,7 +10,7 @@ import { emailDisponivelAction } from "@/actions/configuracoes";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [allowRegister, setAllowRegister] = useState(true);
+  const [allowRegister, setAllowRegister] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -61,7 +61,7 @@ export default function LoginPage() {
             <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">Nome<input type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder="Seu nome ou o da empresa" className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3.5 text-sm" /></label>
           )}
           <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">E-mail<input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@impacto.com.br" className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3.5 text-sm" /></label>
-          <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">Senha<input type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3.5 text-sm" /></label>
+          <label className="flex flex-col gap-1 text-xs font-bold text-[#3A4658]">Senha<input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="h-12 border-[1.5px] border-[#C9D3E0] rounded-[14px] px-3.5 text-sm" /></label>
           {error && <div className="bg-[#FDE4E1] text-[#8E1B10] rounded-xl p-3 text-xs font-bold">{error}</div>}
           <button type="submit" disabled={loading} className="min-h-[48px] rounded-full bg-[#2F5FE0] text-white font-bold text-sm">{loading ? "Aguarde..." : isSignUp && allowRegister ? "Criar primeiro usuário e entrar" : "Entrar no Detetiza OS"}</button>
         </form>

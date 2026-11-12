@@ -19,11 +19,9 @@ function resolveSecret() {
 export const auth = betterAuth({
   secret: resolveSecret(),
   baseURL: process.env.BETTER_AUTH_URL || (process.env.VERCEL_URL ? "https://" + process.env.VERCEL_URL : "https://dedetiza-os.vercel.app"),
-  trustedOrigins: [
-    "https://dedetiza-os.vercel.app",
-    "https://*.vercel.app",
-    "http://localhost:3000",
-  ],
+  // Só o endereço de produção (e o local, fora de produção). Sem curinga "*.vercel.app": qualquer pessoa
+  // publica um site nesse domínio, e ele passaria a ser aceito como origem confiável do login.
+  trustedOrigins: ["https://dedetiza-os.vercel.app", ...(process.env.NODE_ENV === "production" ? [] : ["http://localhost:3000", "http://localhost:3100"])],
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {
