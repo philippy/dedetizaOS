@@ -77,6 +77,23 @@ export function formatarTelefone(entrada: string): string {
   return d.length === 11 ? d.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3") : d.replace(/^(\d{2})(\d{4})(\d{4})$/, "($1) $2-$3");
 }
 
+// Data no formato AAAA-MM-DD que existe no calendário (rejeita 2026-02-31, "abc", etc.).
+export function dataISOValida(s: unknown): s is string {
+  if (typeof s !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
+  const d = new Date(`${s}T00:00:00Z`);
+  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === s;
+}
+
+// Horário HH:MM de 00:00 a 23:59.
+export function horaValida(s: unknown): s is string {
+  return typeof s === "string" && /^([01]\d|2[0-3]):[0-5]\d/.test(s);
+}
+
+// Cor em hexadecimal (#RGB ou #RRGGBB).
+export function corHexValida(s: unknown): s is string {
+  return typeof s === "string" && /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(s);
+}
+
 export function emailValido(entrada: string): boolean {
   const e = entrada.trim();
   return e.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);

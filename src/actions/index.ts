@@ -5,12 +5,13 @@ import { requireSession } from "@/lib/session";
 import { autorizar } from "@/lib/contexto";
 import { atorDe, registrarAuditoria } from "@/lib/auditoria";
 import { tecnicos, clientes, tiposServico, servicos, lancamentos, campanhas, inscricoes, user } from "@/db/schema";
-import { eq, and, ne, like, inArray } from "drizzle-orm";
+import { eq, and, ne, like, inArray, sql } from "drizzle-orm";
 import { DURACAO_PADRAO, DURACOES, formatDuracao, horaDe, minutosDe, sobrepoe } from "@/lib/agenda";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { addDaysISO, formatBRL, parseBRLToCents, todaySP } from "@/lib/utils";
 import { soDigitos } from "@/lib/importar-clientes";
+import { cnpjValido, corHexValida, cpfValido, dataISOValida, emailValido, horaValida } from "@/lib/validacao";
 
 export async function canPublicRegister(): Promise<boolean> {
   try {
@@ -24,12 +25,12 @@ export async function canPublicRegister(): Promise<boolean> {
 const clienteSchema = z.object({
   id: z.number().optional(),
   tipo: z.enum(["PF", "PJ"]),
-  nome: z.string().min(2, "Informe o nome ou razão social."),
-  documento: z.string().optional().default(""),
-  whatsapp: z.string().min(8, "Informe o WhatsApp para contato."),
-  email: z.string().optional().default(""),
-  endereco: z.string().optional().default(""),
-  observacoes: z.string().optional().default(""),
+  nome: z.string().trim().min(2, "Informe o nome ou razão social.").max(200, "O nome pode ter no máximo 200 letras."),
+  documento: z.string().max(30, "Documento muito longo.").optional().default(""),
+  whatsapp: z.string().trim().min(8, "Informe o WhatsApp para contato.").max(40, "WhatsApp muito longo."),
+  email: z.string().max(200, "E-mail muito longo.").optional().default(""),
+  endereco: z.string().max(400, "O endereço pode ter no máximo 400 letras.").optional().default(""),
+  observacoes: z.string().max(1000, "As observações podem ter no máximo 1000 letras.").optional().default(""),
 });
 
 export async function salvarClienteAction(data: z.infer<typeof clienteSchema>) {
@@ -41,13 +42,36 @@ export async function salvarClienteAction(data: z.infer<typeof clienteSchema>) {
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const v = parsed.data;
 
+  const email = v.email?.trim() || "";
+  if (email && !emailValido(email)) return { error: "E-mail inválido." };
+
+  // CPF/CNPJ: confere os dígitos e impede duplicar o mesmo documento na empresa.
+  // Em cliente já existente só confere se o documento mudou (cadastros antigos podem ter documento fora do padrão).
+  const documento = v.documento?.trim() || "";
+  const digitos = soDigitos(documento);
+  if (documento) {
+    let mudou = true;
+    if (v.id) {
+      const [antes] = await db.select({ documento: clientes.documento }).from(clientes).where(and(eq(clientes.id, v.id), eq(clientes.empresaId, eid)));
+      if (antes && soDigitos(antes.documento ?? "") === digitos) mudou = false;
+    }
+    if (mudou && !(v.tipo === "PJ" ? cnpjValido(documento) : cpfValido(documento))) {
+      return { error: v.tipo === "PJ" ? "CNPJ inválido. Confira os números." : "CPF inválido. Confira os números." };
+    }
+  }
+  if (digitos.length >= 11) {
+    const outros = await db.select({ id: clientes.id, nome: clientes.nome, documento: clientes.documento }).from(clientes).where(eq(clientes.empresaId, eid));
+    const igual = outros.find((o) => o.id !== v.id && soDigitos(o.documento ?? "") === digitos);
+    if (igual) return { error: `Já existe um cliente com este documento: ${igual.nome}.` };
+  }
+
   if (v.id) {
     const feito = await db.update(clientes).set({
       tipo: v.tipo,
       nome: v.nome.trim(),
       documento: v.documento?.trim() || "",
       whatsapp: v.whatsapp.trim(),
-      email: v.email?.trim() || "",
+      email,
       endereco: v.endereco?.trim() || "",
       observacoes: v.observacoes?.trim() || "",
     }).where(and(eq(clientes.id, v.id), eq(clientes.empresaId, eid))).returning({ id: clientes.id });
@@ -59,7 +83,7 @@ export async function salvarClienteAction(data: z.infer<typeof clienteSchema>) {
       nome: v.nome.trim(),
       documento: v.documento?.trim() || "",
       whatsapp: v.whatsapp.trim(),
-      email: v.email?.trim() || "",
+      email,
       endereco: v.endereco?.trim() || "",
       observacoes: v.observacoes?.trim() || "",
     }).returning();
@@ -117,13 +141,27 @@ export async function importarClientesAction(linhas: z.input<typeof importacaoSc
   return { success: true, importados: novos.length, jaExistiam };
 }
 
-export async function excluirClienteAction(id: number) {
+// Excluir cliente apaga também os serviços dele (as contas a receber continuam no Financeiro, sem vínculo).
+// Por isso, com histórico a exclusão só acontece depois de uma confirmação explícita (confirmar = true).
+export async function excluirClienteAction(id: number, confirmar = false) {
   await requireSession();
   const aut = await autorizar("dados.escrever");
   if ("erro" in aut) return { error: aut.erro };
   const eid = aut.ctx.empresa.id;
+  const [cli] = await db.select().from(clientes).where(and(eq(clientes.id, id), eq(clientes.empresaId, eid)));
+  if (!cli) return { error: "Cliente não encontrado." };
+
+  const [{ servicosN }] = await db.select({ servicosN: sql<number>`count(*)::int` }).from(servicos).where(and(eq(servicos.clienteId, id), eq(servicos.empresaId, eid)));
+  const [{ contasN }] = await db.select({ contasN: sql<number>`count(*)::int` }).from(lancamentos).where(and(eq(lancamentos.clienteId, id), eq(lancamentos.empresaId, eid)));
+  if (!confirmar) return { precisaConfirmar: true as const, nome: cli.nome, servicos: servicosN, contas: contasN };
+
   await db.delete(clientes).where(and(eq(clientes.id, id), eq(clientes.empresaId, eid)));
+  await registrarAuditoria({ empresaId: eid, ator: atorDe(aut.ctx), acao: "cliente.excluido", detalhe: `${cli.nome} · ${servicosN} serviço(s) apagado(s) · ${contasN} conta(s) mantida(s) no Financeiro` });
   revalidatePath("/clientes");
+  revalidatePath("/servicos");
+  revalidatePath("/agenda");
+  revalidatePath("/financeiro");
+  revalidatePath("/");
   return { success: true };
 }
 
@@ -183,6 +221,7 @@ export async function salvarServicoAction(input: {
   if (!input.tipoServicoId) return { error: "Selecione o tipo de serviço." };
   if (!input.tecnicoId) return { error: "Selecione o técnico." };
   if (!input.data || !input.hora) return { error: "Informe a data e o horário." };
+  if (!dataISOValida(input.data) || !horaValida(input.hora)) return { error: "Data ou horário inválido." };
 
   const dataHora = `${input.data}T${input.hora.slice(0, 5)}`;
   const valor = parseBRLToCents(input.valorReais);
@@ -243,7 +282,18 @@ export async function salvarServicoAction(input: {
       contaAtualizada = valor !== lancamentoDoServico.valor || input.clienteId !== lancamentoDoServico.clienteId;
     }
   } else {
-    await db.insert(servicos).values({ empresaId: eid, clienteId: input.clienteId, tipoServicoId: input.tipoServicoId, tecnicoId: input.tecnicoId, dataHora, duracaoMin, valor, status: "agendado", observacoes: input.observacoes || "" });
+    const [criado] = await db.insert(servicos).values({ empresaId: eid, clienteId: input.clienteId, tipoServicoId: input.tipoServicoId, tecnicoId: input.tecnicoId, dataHora, duracaoMin, valor, status: "agendado", observacoes: input.observacoes || "" }).returning({ id: servicos.id });
+    // Sem transação no banco, dois pedidos simultâneos podem passar pela checagem acima. Confere de novo depois de
+    // gravar: se existe um serviço mais antigo (id menor) sobreposto, este é desfeito.
+    const mesmosDia = await db
+      .select({ id: servicos.id, dataHora: servicos.dataHora, duracaoMin: servicos.duracaoMin })
+      .from(servicos)
+      .where(and(eq(servicos.empresaId, eid), eq(servicos.tecnicoId, input.tecnicoId), like(servicos.dataHora, `${input.data}%`), ne(servicos.status, "cancelado"), ne(servicos.id, criado.id)));
+    const inicioNovo = minutosDe(dataHora);
+    if (mesmosDia.some((s2) => s2.id < criado.id && sobrepoe(inicioNovo, duracaoMin, minutosDe(s2.dataHora), s2.duracaoMin))) {
+      await db.delete(servicos).where(and(eq(servicos.id, criado.id), eq(servicos.empresaId, eid)));
+      return { error: "Conflito: o técnico acabou de receber outro serviço nesse horário. Escolha outro horário." };
+    }
   }
   revalidatePath("/");
   revalidatePath("/agenda");
@@ -269,23 +319,32 @@ export async function concluirServicoAction(servicoId: number) {
   if (rows.length === 0) return { error: "Serviço não encontrado." };
   const { servico, cliente, tipoServico } = rows[0];
 
-  await db.update(servicos).set({ status: "concluido" }).where(and(eq(servicos.id, servicoId), eq(servicos.empresaId, eid)));
+  if (servico.status === "cancelado") return { error: "Serviço cancelado não pode ser concluído." };
 
-  const existente = await db.select().from(lancamentos).where(and(eq(lancamentos.servicoId, servicoId), eq(lancamentos.empresaId, eid)));
+  // Troca de estado atômica: só quem realmente muda "agendado" → "concluido" cria a conta a receber.
+  // Dois cliques/abas ao mesmo tempo não geram conta duplicada (o banco não tem transação aqui).
   const hoje = todaySP();
   const vencimento = cliente.tipo === "PF" ? hoje : addDaysISO(hoje, 30);
+  const virou = await db.update(servicos).set({ status: "concluido" }).where(and(eq(servicos.id, servicoId), eq(servicos.empresaId, eid), eq(servicos.status, "agendado"))).returning({ id: servicos.id });
 
-  if (existente.length === 0) {
-    await db.insert(lancamentos).values({
-      empresaId: eid,
-      tipo: "receber",
-      descricao: `${tipoServico.nome} · ${cliente.nome}`,
-      clienteId: cliente.id,
-      servicoId: servico.id,
-      vencimento,
-      valor: servico.valor,
-      status: "aberto",
-    });
+  if (virou.length > 0) {
+    try {
+      await db.insert(lancamentos).values({
+        empresaId: eid,
+        tipo: "receber",
+        descricao: `${tipoServico.nome} · ${cliente.nome}`,
+        clienteId: cliente.id,
+        servicoId: servico.id,
+        vencimento,
+        valor: servico.valor,
+        status: "aberto",
+      });
+    } catch (e) {
+      // Sem a conta a receber o serviço não pode ficar como concluído: desfaz e avisa.
+      await db.update(servicos).set({ status: "agendado" }).where(and(eq(servicos.id, servicoId), eq(servicos.empresaId, eid)));
+      console.error("Falha ao criar conta a receber", (e as Error)?.message);
+      return { error: "Não foi possível concluir o serviço agora. Tente de novo." };
+    }
   }
   revalidatePath("/");
   revalidatePath("/agenda");
@@ -318,6 +377,8 @@ export async function criarLancamentoPagarAction(input: { fornecedor: string; de
   if (!input.fornecedor.trim()) return { error: "Informe o fornecedor." };
   if (!input.descricao.trim()) return { error: "Informe a descrição." };
   if (!input.vencimento) return { error: "Informe o vencimento." };
+  if (!dataISOValida(input.vencimento)) return { error: "Vencimento inválido." };
+  if (input.fornecedor.length > 200 || input.descricao.length > 400) return { error: "Fornecedor ou descrição muito longos." };
   const valor = parseBRLToCents(input.valorReais);
   if (valor <= 0) return { error: "Informe um valor maior que zero." };
 
@@ -336,8 +397,12 @@ export async function darBaixaLancamentoAction(input: { lancamentoId: number; pa
   if (!lanc) return { error: "Lançamento não encontrado." };
   const valorPago = parseBRLToCents(input.valorPagoReais);
   if (valorPago <= 0) return { error: "Informe um valor válido." };
+  if (!dataISOValida(input.pagoEm)) return { error: "Data do pagamento inválida." };
+  if (lanc.status === "pago") return { error: "Esta conta já foi paga. Atualize a página." };
 
-  await db.update(lancamentos).set({ status: "pago", pagoEm: input.pagoEm, valor: valorPago }).where(and(eq(lancamentos.id, input.lancamentoId), eq(lancamentos.empresaId, aut.ctx.empresa.id)));
+  // Só quem muda "aberto" → "pago" registra a baixa (evita sobrescrever valor/data em clique duplo).
+  const baixou = await db.update(lancamentos).set({ status: "pago", pagoEm: input.pagoEm, valor: valorPago }).where(and(eq(lancamentos.id, input.lancamentoId), eq(lancamentos.empresaId, aut.ctx.empresa.id), eq(lancamentos.status, "aberto"))).returning({ id: lancamentos.id });
+  if (baixou.length === 0) return { error: "Esta conta já foi paga. Atualize a página." };
   await registrarAuditoria({ empresaId: aut.ctx.empresa.id, ator: atorDe(aut.ctx), acao: "financeiro.baixa", detalhe: `${lanc.tipo === "pagar" ? "A pagar" : "A receber"} · ${lanc.descricao} · ${formatBRL(valorPago)} (valor anterior ${formatBRL(lanc.valor)}) · pago em ${input.pagoEm}` });
   if (lanc.inscricaoId) {
     await db.update(inscricoes).set({ pago: true, valor: valorPago }).where(and(eq(inscricoes.id, lanc.inscricaoId), eq(inscricoes.empresaId, aut.ctx.empresa.id)));
@@ -371,12 +436,19 @@ export async function salvarCampanhaAction(input: { id?: number; nome: string; l
   if (!(input.unidades >= 1)) return { error: "Informe pelo menos 1 unidade." };
   if (!(input.descontoPct >= 0 && input.descontoPct <= 100)) return { error: "O desconto deve ficar entre 0 e 100%." };
   if (!input.dataInicio || !input.dataFim) return { error: "Informe as datas de início e fim." };
+  if (!dataISOValida(input.dataInicio) || !dataISOValida(input.dataFim)) return { error: "Data de início ou fim inválida." };
+  if (input.nome.length > 200 || input.local.length > 200) return { error: "Nome ou local muito longos." };
   if (input.dataFim < input.dataInicio) return { error: "A data de fim não pode ser antes da data de início." };
 
   // Só guarda tipos que existem no catálogo.
   const pedidos = Array.from(new Set(input.tiposServicoIds ?? []));
   const existentes = pedidos.length ? await db.select({ id: tiposServico.id }).from(tiposServico).where(and(inArray(tiposServico.id, pedidos), eq(tiposServico.empresaId, eid))) : [];
   const tiposServicoIds = existentes.map((t) => t.id).sort((a, b) => a - b);
+
+  if (input.id) {
+    const [{ n }] = await db.select({ n: sql<number>`count(*)::int` }).from(inscricoes).where(and(eq(inscricoes.campanhaId, input.id), eq(inscricoes.empresaId, eid)));
+    if (Math.round(input.unidades) < n) return { error: `Esta campanha já tem ${n} unidade(s) inscrita(s); o limite não pode ficar abaixo disso.` };
+  }
 
   const base = { nome: input.nome.trim(), local: input.local.trim(), dataInicio: input.dataInicio, dataFim: input.dataFim, descontoPct: Math.round(input.descontoPct), unidades: Math.round(input.unidades), tiposServicoIds };
   if (input.id) {
@@ -401,6 +473,7 @@ export async function inscreverUnidadeCampanhaAction(input: { campanhaId: number
   const inscritosAtuais = await db.select().from(inscricoes).where(and(eq(inscricoes.campanhaId, input.campanhaId), eq(inscricoes.empresaId, eid)));
   if (inscritosAtuais.length >= camp.unidades) return { error: `Limite máximo de ${camp.unidades} unidades atingido.` };
   if (!input.unidade.trim() || !input.morador.trim()) return { error: "Preencha unidade e morador." };
+  if (inscritosAtuais.some((i) => i.unidade.trim().toLowerCase() === input.unidade.trim().toLowerCase())) return { error: `A unidade ${input.unidade.trim()} já está inscrita nesta campanha.` };
   const valor = parseBRLToCents(input.valorReais);
   if (valor <= 0) return { error: "Informe um valor válido." };
 
@@ -413,6 +486,14 @@ export async function inscreverUnidadeCampanhaAction(input: { campanhaId: number
   }
 
   const [nova] = await db.insert(inscricoes).values({ empresaId: eid, campanhaId: camp.id, tipoServicoId, unidade: input.unidade.trim(), morador: input.morador.trim(), telefone: input.telefone.trim(), valor, pago: false }).returning();
+
+  // O banco aqui não tem transação, então a checagem de limite acima pode perder uma corrida (várias inscrições
+  // no mesmo instante). Conferência de novo depois de gravar: quem ficou além do limite (pela ordem de gravação) desfaz a sua.
+  const [{ posicao }] = await db.select({ posicao: sql<number>`count(*)::int` }).from(inscricoes).where(and(eq(inscricoes.campanhaId, camp.id), eq(inscricoes.empresaId, eid), sql`${inscricoes.id} <= ${nova.id}`));
+  if (posicao > camp.unidades) {
+    await db.delete(inscricoes).where(and(eq(inscricoes.id, nova.id), eq(inscricoes.empresaId, eid)));
+    return { error: `Limite máximo de ${camp.unidades} unidades atingido.` };
+  }
   await db.insert(lancamentos).values({ empresaId: eid, tipo: "receber", descricao: `Campanha ${camp.nome} · Unid. ${nova.unidade} (${nova.morador})`, inscricaoId: nova.id, vencimento: camp.dataInicio || todaySP(), valor, status: "aberto" });
 
   revalidatePath(`/campanhas/${camp.id}`);
@@ -461,7 +542,7 @@ export async function salvarTecnicoAction(input: {
     empresaId: eid,
     nome: nm,
     telefone: (input.telefone || "").trim() || "sem telefone",
-    cor: input.cor || "#2F5FE0",
+    cor: corHexValida(input.cor) ? input.cor : "#2F5FE0",
     ativo: true,
   });
 

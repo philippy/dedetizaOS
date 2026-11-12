@@ -6,6 +6,7 @@ import { db } from "@/db";
 import { clientes, tiposServico, tecnicos, tipoServicoColunas } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 import { AppShell } from "@/components/app-shell";
+import { ModalAcessivel } from "@/components/modal-acessivel";
 import { TrocaSenhaObrigatoria } from "@/components/troca-senha-obrigatoria";
 import { formatDateBR, todaySP } from "@/lib/utils";
 
@@ -39,6 +40,7 @@ export default async function ProtectedLayout({ children }: { children: React.Re
       verFinanceiro={pode(ctx.papel, "financeiro.acessar")}
       usuario={{ nome: ctx.nome, email: ctx.email, rotuloPapel: ROTULO_PAPEL[ctx.papel] }}
     >
+      <ModalAcessivel />
       {children}
     </AppShell>
   );

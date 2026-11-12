@@ -5,6 +5,7 @@ import Link from "next/link";
 import { salvarClienteAction, excluirClienteAction } from "@/actions";
 import { formatBRL, formatDateBR } from "@/lib/utils";
 import { X } from "lucide-react";
+import { Modal } from "@/components/modal";
 
 export function ClientesView({ clientesList, verFinanceiro }: { clientesList: any[]; verFinanceiro: boolean }) {
   const [q, setQ] = useState("");
@@ -18,6 +19,24 @@ export function ClientesView({ clientesList, verFinanceiro }: { clientesList: an
   const [endereco, setEndereco] = useState("");
   const [observacoes, setObservacoes] = useState("");
   const [error, setError] = useState("");
+  const [aviso, setAviso] = useState("");
+
+  async function excluir(c: { id: number; nome: string }) {
+    setAviso("");
+    const prev = await excluirClienteAction(c.id);
+    if ("error" in prev && prev.error) {
+      setAviso(prev.error);
+      return;
+    }
+    if ("precisaConfirmar" in prev && prev.precisaConfirmar) {
+      const historico = prev.servicos > 0 || prev.contas > 0
+        ? `\n\nIsso apaga também ${prev.servicos} serviço(s) do histórico dele(a). ${prev.contas > 0 ? `As ${prev.contas} conta(s) financeira(s) continuam no Financeiro, sem vínculo com o cliente.` : ""}`
+        : "";
+      if (!window.confirm(`Excluir o cliente ${prev.nome}?\n\nEsta ação é IRREVERSÍVEL.${historico}`)) return;
+      const res = await excluirClienteAction(c.id, true);
+      if ("error" in res && res.error) setAviso(res.error);
+    }
+  }
 
   const filtered = clientesList.filter((c) => {
     const matchTipo = tipoFilter === "Todos" || c.tipo === tipoFilter;
@@ -123,6 +142,13 @@ export function ClientesView({ clientesList, verFinanceiro }: { clientesList: an
               </tr>
             </thead>
             <tbody>
+              {filtered.length === 0 && (
+                <tr>
+                  <td colSpan={verFinanceiro ? 6 : 5} className="p-6 text-center text-sm font-semibold text-[#3A4658]">
+                    Nenhum cliente encontrado{q.trim() ? ` para "${q.trim()}"` : ""}.
+                  </td>
+                </tr>
+              )}
               {filtered.map((c) => (
                 <tr key={c.id} className="border-t border-[#E3E8EF]">
                   <td className="p-3">
@@ -150,7 +176,7 @@ export function ClientesView({ clientesList, verFinanceiro }: { clientesList: an
                         Gerenciar
                       </Link>
                       <button
-                        onClick={() => excluirClienteAction(c.id)}
+                        onClick={() => excluir(c)}
                         className="min-h-[40px] px-3 rounded-full text-xs font-bold text-[#8E1B10]"
                       >
                         Excluir
@@ -164,15 +190,13 @@ export function ClientesView({ clientesList, verFinanceiro }: { clientesList: an
         </div>
       </section>
 
+      {aviso && <div role="alert" className="bg-[#FDE4E1] text-[#8E1B10] rounded-xl p-3 text-xs font-bold">{aviso}</div>}
+
       {modalOpen && (
-        <div className="fixed inset-0 z-50 bg-[#0F1720]/55 flex items-start justify-center p-4 pt-12 overflow-y-auto">
-          <div
-            role="dialog"
-            aria-modal="true"
-            className="w-full max-w-[560px] bg-white rounded-[28px] p-[26px] flex flex-col gap-3.5 text-[#0F1720]"
-          >
+        <Modal titleId="cli-titulo" onClose={() => setModalOpen(false)}>
+          <>
             <div className="flex items-center justify-between">
-              <h2 className="text-[22px] font-extrabold">Cadastrar cliente</h2>
+              <h2 id="cli-titulo" className="text-[22px] font-extrabold">Cadastrar cliente</h2>
               <button
                 onClick={() => setModalOpen(false)}
                 className="w-11 h-11 rounded-full bg-[#E8ECF2] flex items-center justify-center"
@@ -285,8 +309,8 @@ export function ClientesView({ clientesList, verFinanceiro }: { clientesList: an
                 Salvar cliente
               </button>
             </div>
-          </div>
-        </div>
+          </>
+        </Modal>
       )}
     </div>
   );

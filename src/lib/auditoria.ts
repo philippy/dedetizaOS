@@ -12,6 +12,7 @@ export const ROTULO_ACAO = {
   "pix.alterado": "Alterou a chave Pix",
   "pix.bloqueado": "Troca da chave Pix bloqueada (3 senhas erradas)",
   "pix.desbloqueado": "Desbloqueou a troca da chave Pix por e-mail",
+  "cliente.excluido": "Excluiu um cliente",
   "financeiro.baixa": "Deu baixa em uma conta",
   "financeiro.conta_criada": "Criou uma conta a pagar",
   "financeiro.conta_excluida": "Excluiu uma conta a pagar",

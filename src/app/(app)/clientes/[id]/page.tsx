@@ -115,7 +115,7 @@ export default async function ClienteDetalhePage({ params }: { params: Promise<{
           {historico.length === 0 ? (
             <div className="text-sm font-semibold text-[#3A4658] py-6 text-center">Este cliente ainda não tem serviços.</div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Histórico de serviços do cliente">
               <table className="w-full min-w-[560px] text-sm">
                 <thead><tr className="text-left text-xs font-bold text-[#3A4658]"><th className="p-2">Data</th><th className="p-2">Serviço</th><th className="p-2">Técnico</th><th className="p-2">Valor</th><th className="p-2">Status</th></tr></thead>
                 <tbody>

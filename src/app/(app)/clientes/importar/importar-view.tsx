@@ -112,7 +112,7 @@ export function ImportarView({ existentes }: { existentes: ClienteExistente[] })
   return (
     <div className="flex flex-col gap-4">
       <div>
-        <Link href="/clientes" className="text-xs font-bold text-[#1B47B5]">← Clientes</Link>
+        <Link href="/clientes" className="text-xs font-bold text-[#1B47B5] min-h-[44px] inline-flex items-center">← Clientes</Link>
         <h1 className="text-[28px] font-extrabold mt-1">Importar clientes</h1>
         <div className="text-sm font-semibold text-[#3A4658] mt-1">
           Cole as linhas da sua planilha. O sistema arruma telefone, CPF/CNPJ e endereço e mostra o que ficou duvidoso antes de importar.

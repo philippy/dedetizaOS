@@ -68,11 +68,12 @@ export function InicioView({ hoje, pix, servicos, contas, verFinanceiro }: {
 
   return (
     <>
+      <h1 className="sr-only">Início</h1>
       <div className={`grid grid-cols-1 ${verFinanceiro ? "lg:grid-cols-2" : ""} gap-5 items-start`}>
         <section className="bg-white rounded-[24px] p-5 shadow-sm flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <h2 className="text-[17px] font-extrabold">Trabalhos de hoje ({formatDateBR(hoje)})</h2>
-            <Link href="/agenda" className="text-xs font-bold text-[#1B47B5]">Abrir agenda →</Link>
+            <Link href="/agenda" className="text-xs font-bold text-[#1B47B5] min-h-[44px] inline-flex items-center">Abrir agenda →</Link>
           </div>
           <div className="rounded-[16px] overflow-hidden"><ImpactoAnimation type="street" /></div>
           {servicos.length === 0 ? (
@@ -106,7 +107,7 @@ export function InicioView({ hoje, pix, servicos, contas, verFinanceiro }: {
         {verFinanceiro && <section className="bg-white rounded-[24px] p-5 shadow-sm flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <h2 className="text-[17px] font-extrabold">Contas de hoje e vencidas</h2>
-            <Link href="/financeiro" className="text-xs font-bold text-[#1B47B5] whitespace-nowrap">Financeiro →</Link>
+            <Link href="/financeiro" className="text-xs font-bold text-[#1B47B5] whitespace-nowrap min-h-[44px] inline-flex items-center">Financeiro →</Link>
           </div>
           <div className="rounded-[16px] overflow-hidden"><ImpactoAnimation type="payment" /></div>
           {contas.length === 0 ? (
