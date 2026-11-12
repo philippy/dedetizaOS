@@ -7,6 +7,7 @@ export const ROTULO_ACAO = {
   "usuario.removido": "Removeu o acesso de um usuário",
   "usuario.papel": "Mudou o papel de um usuário",
   "usuario.senha_redefinida": "Gerou nova senha provisória",
+  "usuario.email": "Trocou o próprio e-mail de acesso",
   "usuario.senha_definida": "Definiu a própria senha (primeiro acesso)",
   "empresa.dados": "Alterou os dados da empresa",
   "pix.alterado": "Alterou a chave Pix",

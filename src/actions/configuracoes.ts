@@ -196,6 +196,46 @@ export async function salvarMinhaContaAction(data: z.input<typeof contaSchema>):
   return { ok: true };
 }
 
+// A própria pessoa troca o e-mail de acesso. Exige a senha atual. O e-mail antigo recebe um aviso (se houver SMTP).
+// As sessões continuam; quem troca por engano pode pedir a um admin para corrigir.
+export async function trocarMeuEmailAction(data: { senha: string; novoEmail: string }): Promise<Resultado> {
+  const session = await requireSession();
+  const novo = String(data?.novoEmail ?? "").trim().toLowerCase();
+  const senha = String(data?.senha ?? "");
+  if (!senha) return { error: "Digite sua senha atual para confirmar.", campo: "senha" };
+  if (!novo || novo.length > 200 || !emailValido(novo)) return { error: "E-mail inválido.", campo: "novoEmail" };
+
+  const [atual] = await db.select({ email: user.email, name: user.name }).from(user).where(eq(user.id, session.user.id));
+  if (!atual) return { error: "Usuário não encontrado." };
+  if (atual.email.toLowerCase() === novo) return { error: "Este já é o seu e-mail de acesso.", campo: "novoEmail" };
+
+  if (!(await senhaConfere(session.user.id, senha))) return { error: "Senha incorreta.", campo: "senha" };
+
+  const [existe] = await db.select({ id: user.id }).from(user).where(and(sql`lower(${user.email}) = ${novo}`, ne(user.id, session.user.id))).limit(1);
+  if (existe) return { error: "Já existe uma conta com este e-mail.", campo: "novoEmail" };
+
+  try {
+    await db.update(user).set({ email: novo, emailVerified: false, updatedAt: new Date() }).where(eq(user.id, session.user.id));
+  } catch {
+    return { error: "Não foi possível trocar o e-mail. Tente de novo.", campo: "novoEmail" };
+  }
+
+  const ctx = await obterContexto();
+  if (ctx?.temVinculo && ctx.empresa) {
+    await registrarAuditoria({ empresaId: ctx.empresa.id, ator: { id: session.user.id, nome: atual.name, email: novo }, acao: "usuario.email", detalhe: `De ${atual.email} para ${novo}` });
+  }
+  if (emailConfigurado()) {
+    const { texto, html } = montarEmail({
+      titulo: "O e-mail de acesso da sua conta foi trocado",
+      linhas: [`Olá, ${atual.name}.`, `O e-mail de acesso ao Detetiza OS mudou de ${atual.email} para ${novo}.`, "Se não foi você, avise o administrador da empresa imediatamente."],
+    });
+    await enviarEmail({ para: atual.email, assunto: "E-mail de acesso alterado · Detetiza OS", texto, html });
+  }
+
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
 // Só o administrador muda o papel de alguém, e só dentro da própria empresa. Sempre sobra um administrador.
 export async function alterarPapelAction(data: { userId: string; papel: string }): Promise<Resultado> {
   await requireSession();

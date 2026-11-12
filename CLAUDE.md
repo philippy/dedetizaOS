@@ -91,7 +91,7 @@ Valores em centavos (integer). Datas em texto ISO (`AAAA-MM-DD`, `AAAA-MM-DDTHH:
   `PIX_CHAVE`, `PIX_TIPO`, `PIX_FAVORECIDO` só valem como plano B enquanto a chave nunca foi salva na tela (remover depois).
   Sem chave o modal avisa e bloqueia o envio até a chave ser digitada no texto.
 - Configurações (menu do avatar, canto superior direito: Minha conta, Dados da empresa, Sair; não é um sétimo item do menu lateral):
-  `/configuracoes/conta` (nome, telefone, troca de senha) e `/configuracoes/empresa` (dados da empresa, chave Pix e,
+  `/configuracoes/conta` (nome, telefone, troca de e-mail de acesso com senha atual e troca de senha) e `/configuracoes/empresa` (dados da empresa, chave Pix e,
   só para admin, Equipe e permissões). Validação de CNPJ (numérico e alfanumérico), CPF, telefone e chave Pix em `src/lib/validacao.ts`.
   O nome da empresa no topo, no título da aba e na cobrança vem desses dados.
   O administrador cria usuários em Equipe e permissões (nome, e-mail, papel): o sistema gera uma senha provisória, mostrada UMA vez
